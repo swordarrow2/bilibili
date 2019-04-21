@@ -4,7 +4,7 @@ import android.content.*;
 import android.graphics.*;
 import android.widget.*;
 
-import com.meng.bilibili.javaBean.bilibili.user.BilibiliPersonInfo;
+import com.meng.bilibili.javaBean.BilibiliPersonInfo;
 
 import java.io.*;
 import java.net.*;
@@ -35,7 +35,7 @@ public class DownloadImageThread extends Thread {
 
     private String getBilibiliHeadUrl(long uid) {
         try {
-            URL url = new URL("https://api.bilibili.com/x/space/acc/info?mid=" + uid + "&jsonp=jsonp");
+            URL url = new URL("https://api.myBilibili.com/x/space/acc/info?mid=" + uid + "&jsonp=jsonp");
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line;

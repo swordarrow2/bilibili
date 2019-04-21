@@ -1,16 +1,17 @@
 package com.meng.bilibili.fragments;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.view.KeyEvent;
 
 import com.meng.bilibili.MainActivity;
-import com.meng.bilibili.*;
-import android.view.*;
+import com.meng.bilibili.R;
 
-public class SettingsFragment extends PreferenceFragment{
+public class SettingsFragment extends PreferenceFragment {
 
 	public void onKeyDown(int keyCode,KeyEvent event){
 		// TODO: Implement this method

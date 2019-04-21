@@ -7,8 +7,14 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.meng.bilibili.MainActivity;
+import com.meng.bilibili.*;
+import android.view.*;
 
 public class SettingsFragment extends PreferenceFragment{
+
+	public void onKeyDown(int keyCode,KeyEvent event){
+		// TODO: Implement this method
+	  }
 
     @Override
     public void onCreate(Bundle savedInstanceState){

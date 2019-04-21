@@ -18,7 +18,6 @@
                 android:layout_width="36dip"
                 android:layout_height="36dip"
                 android:paddingLeft="10dip"
-                android:src="@drawable/ic_launcher"
                 android:visibility="gone" />
 
         </RelativeLayout>

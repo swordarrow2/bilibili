@@ -13,10 +13,7 @@ import com.meng.bilibili.lib.ExceptionCatcher;
 import com.meng.bilibili.lib.SharedPreferenceHelper;
 import com.meng.bilibili.lib.materialDesign.ActionBarDrawerToggle;
 import com.meng.bilibili.lib.materialDesign.DrawerArrowDrawable;
-import com.meng.qrtools.*;
-import com.meng.qrtools.creator.*;
-import com.meng.qrtools.lib.materialDesign.*;
-import com.meng.qrtools.reader.*;
+
 
 public class MainActivity2 extends Activity{
     public static MainActivity2 instence;
@@ -43,8 +40,6 @@ public class MainActivity2 extends Activity{
         findViews();
         initFragment();
         setListener();
-        changeTheme();
-
 	  }
     public void doVibrate(long time) {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -57,31 +52,9 @@ public class MainActivity2 extends Activity{
         f.startActivityForResult(intent,SELECT_FILE_REQUEST_CODE);
 	  }
 
-    private void changeTheme(){
-        if(SharedPreferenceHelper.getBoolean("useLightTheme",true)){
-            mDrawerList.setBackgroundColor(getResources().getColor(android.R.color.background_light));
-            rt.setBackgroundColor(getResources().getColor(android.R.color.background_light));
-		  }else{
-            mDrawerList.setBackgroundColor(getResources().getColor(android.R.color.background_dark));
-            rt.setBackgroundColor(getResources().getColor(android.R.color.background_dark));
-		  }
-        if(getIntent().getBooleanExtra("setTheme",false)){
-            initSettingsFragment(true);
-		  }else{
-            initWelcome(true);
-            if(SharedPreferenceHelper.getBoolean("opendraw",true)){
-                mDrawerLayout.openDrawer(mDrawerList);
-			  }
-		  }
-	  }
-
     @Override
     public void setTheme(int resid){
-        if(MainActivity.lightTheme){
-            super.setTheme(R.style.AppThemeLight);
-		  }else{
-            super.setTheme(R.style.AppThemeDark);
-		  }
+      super.setTheme(R.style.AppThemeLight);
 	  }
 
     private void setActionBar(){
@@ -124,7 +97,7 @@ public class MainActivity2 extends Activity{
 			  public void onItemClick(AdapterView<?> parent,View view,int position,long id){
 				  switch(((TextView) view).getText().toString()){
 					  case "首页(大概)":
-                        initWelcome(true);
+                        initSettingsFragment(true);
                         break;
 					  case "退出":
                         if(SharedPreferenceHelper.getBoolean("exitsettings")){
@@ -151,9 +124,9 @@ public class MainActivity2 extends Activity{
     private void initFragment(){
         manager=getFragmentManager();
 
-        initAwesomeFragment(false);
-        if(MainActivity.instence.sharedPreference.getBoolean("ldgif")){
-            initGifAwesomeFragment(false);
+        initSettingsFragment(false);
+        if(SharedPreferenceHelper.getBoolean("ldgif")){
+            initSettingsFragment(false);
 		  }
 
 	  }
@@ -161,13 +134,13 @@ public class MainActivity2 extends Activity{
 
     private void initSettingsFragment(boolean showNow){
         FragmentTransaction transactionGifAwesomeCreatorFragment = manager.beginTransaction();
-        if(gifAwesomeFragment==null){
-            gifAwesomeFragment=new SettingsFragment();
-            transactionGifAwesomeCreatorFragment.add(R.id.main_activityLinearLayout,gifAwesomeFragment);
+        if(settingsFragment==null){
+            settingsFragment=new SettingsFragment();
+            transactionGifAwesomeCreatorFragment.add(R.id.main_activityLinearLayout,settingsFragment);
 		  }
         hideFragment(transactionGifAwesomeCreatorFragment);
         if(showNow){
-            transactionGifAwesomeCreatorFragment.show(gifAwesomeFragment);
+            transactionGifAwesomeCreatorFragment.show(settingsFragment);
 		  }
         transactionGifAwesomeCreatorFragment.commit();
 	  }
@@ -217,12 +190,8 @@ public class MainActivity2 extends Activity{
 			  }
             return true;
 		  }
-        if(arbAwesomeFragment!=null&&arbAwesomeFragment.isVisible()){
-            arbAwesomeFragment.onKeyDown(keyCode,event);
-            return true;
-		  }
-        if(gifArbAwesomeFragment!=null&&gifArbAwesomeFragment.isVisible()){
-            gifArbAwesomeFragment.onKeyDown(keyCode,event);
+        if(settingsFragment!=null&&settingsFragment.isVisible()){
+            settingsFragment.onKeyDown(keyCode,event);
             return true;
 		  }
         return super.onKeyDown(keyCode,event);

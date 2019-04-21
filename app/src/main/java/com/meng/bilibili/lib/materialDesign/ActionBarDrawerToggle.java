@@ -5,16 +5,17 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.meng.qrtools.R;
+
 
 import java.lang.reflect.Method;
+import android.support.v4.widget.*;
+import com.meng.bilibili.*;
+import android.support.v4.view.*;
 
 
 public class ActionBarDrawerToggle extends android.support.v4.app.ActionBarDrawerToggle{

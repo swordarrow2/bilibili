@@ -7,13 +7,13 @@ public class SharedPreferenceHelper {
 
     private static SharedPreferences sp;
     private static SharedPreferences.Editor editor;
-    private Context context;
+    private static Context context;
 
-    public SharedPreferenceHelper(Context c, String name) {
-        context = c;
-        sp = context.getSharedPreferences("mainPreference", 0);
-        editor = sp.edit();
-    }
+    
+	public static void init(Context c){
+		context = c;
+        sp = context.getSharedPreferences("mainPreference", 0);	
+	}
 
     public static boolean getBoolean(String key) {
         return sp.getBoolean(key, false);

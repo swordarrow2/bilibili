@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import java.lang.reflect.Method;
 import android.support.v4.widget.*;
+import com.meng.bilibili.*;
 
-import com.meng.bilibili.R;
 
 public class ActionBarDrawerToggle extends android.support.v4.app.ActionBarDrawerToggle{
 

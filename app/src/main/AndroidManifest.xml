@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.meng.bilibili.MainActivity2" />
+		<activity android:name="com.meng.bilibili.Login" />
     </application>
 
 </manifest>

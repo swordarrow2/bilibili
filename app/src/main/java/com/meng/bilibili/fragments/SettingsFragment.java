@@ -1,15 +1,9 @@
 package com.meng.bilibili.fragments;
-
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.view.KeyEvent;
-
-import com.meng.bilibili.MainActivity;
-import com.meng.bilibili.R;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import com.meng.bilibili.*;
 
 public class SettingsFragment extends PreferenceFragment {
 

@@ -16,6 +16,7 @@ import com.meng.bilibili.lib.ExceptionCatcher;
 import com.meng.bilibili.lib.SharedPreferenceHelper;
 import com.meng.bilibili.lib.materialDesign.ActionBarDrawerToggle;
 import com.meng.bilibili.lib.materialDesign.DrawerArrowDrawable;
+import com.meng.bilibili.*;
 
 
 public class MainActivity2 extends Activity {
@@ -83,13 +84,13 @@ public class MainActivity2 extends Activity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-                "首页(大概)", "退出"
+                "视频", "退出"
         }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (((TextView) view).getText().toString()) {
-                    case "首页(大概)":
+                    case "视频":
                         initSettingsFragment(true);
                         break;
                     case "退出":

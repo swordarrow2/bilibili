@@ -4,25 +4,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" >
+
+		<Button
+			android:id="@+id/btn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="添加账号" />
+
+		<Button
+			android:id="@+id/btn2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="全部" />
+		
+	</LinearLayout>
+
     <EditText
         android:id="@+id/et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="add" />
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="add" />
+        android:hint="直播间号" />
 
     <ListView
         android:id="@+id/lv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:drawSelectorOnTop="false" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
 

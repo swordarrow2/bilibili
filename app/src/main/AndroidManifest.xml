@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.meng.bilibili.MainActivity2" />
+        <activity android:name="com.meng.bilibili.LiveActivity" />
 		<activity android:name="com.meng.bilibili.Login" />
     </application>
 

@@ -5,6 +5,7 @@ import android.os.*;
 import android.webkit.*;
 import android.app.*;
 
+import com.google.gson.Gson;
 import com.meng.bilibili.javaBean.BilibiliPersonInfo;
 import com.meng.bilibili.javaBean.LoginInfoPeople;
 
@@ -12,18 +13,20 @@ public class Login extends Activity {
 
     private WebView webView;
     private String loginUrl = "https://www.bilibili.com";
-    private long id = 0;
 
+    public void clearWebViewCache() {
+        CookieSyncManager.createInstance(this);
+        CookieManager.getInstance().removeAllCookie();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        id = intent.getLongExtra("id", 0);
         webView = new WebView(this);
         setContentView(webView);
-        webView.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0");
+        webView.getSettings().setUserAgentString(MainActivity.UA);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setBuiltInZoomControls(true);
+        clearWebViewCache();
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -32,7 +35,7 @@ public class Login extends Activity {
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
+            public void onPageFinished(WebView view, final String url) {
                 super.onPageFinished(view, url);
                 CookieManager cookieManager = CookieManager.getInstance();
                 final String cookieStr = cookieManager.getCookie(url) == null ? "null" : cookieManager.getCookie(url);
@@ -40,11 +43,14 @@ public class Login extends Activity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        BilibiliPersonInfo bilibiliPersonInfo = MainActivity.instence.gson.fromJson(
-                                MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid= " + id + "&jsonp=jsonp"),
+                        BilibiliPersonInfo bilibiliPersonInfo = new Gson().fromJson(
+                                MainActivity.getSourceCode(
+                                        "https://api.bilibili.com/x/space/acc/info?mid=" +
+                                                url.substring(url.indexOf("/")+1) +
+                                                "&jsonp=jsonp"),
                                 BilibiliPersonInfo.class
                         );
-                        LoginInfoPeople log = new LoginInfoPeople();                    
+                        LoginInfoPeople log = new LoginInfoPeople();
                         log.name = bilibiliPersonInfo.data.name;
                         log.cookie = cookieStr;
                         MainActivity.loginInfo.loginInfoPeople.add(log);

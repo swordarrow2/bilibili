@@ -44,14 +44,13 @@ public class Login extends Activity {
                                 MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid= " + id + "&jsonp=jsonp"),
                                 BilibiliPersonInfo.class
                         );
-                        LoginInfoPeople log = new LoginInfoPeople();
-                        log.id = id;
+                        LoginInfoPeople log = new LoginInfoPeople();                    
                         log.name = bilibiliPersonInfo.data.name;
                         log.cookie = cookieStr;
-                        MainActivity.instence.loginInfo.loginInfoPeople.add(log);
-                        MainActivity.instence.saveConfig();
+                        MainActivity.loginInfo.loginInfoPeople.add(log);
+                        MainActivity.saveConfig();
                     }
-                });
+                }).start();
             }
         });
         webView.loadUrl(loginUrl);

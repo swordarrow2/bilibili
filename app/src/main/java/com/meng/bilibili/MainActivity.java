@@ -32,11 +32,11 @@ import com.meng.bilibili.javaBean.LoginInfoPeople;
 
 public class MainActivity extends Activity {
     public static MainActivity instence;
-    public Gson gson = new Gson();
-    private final String exDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-    public final String mainDic = exDir + "/meng/myBilibili/";
+    public static Gson gson = new Gson();
+    private static final String exDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final String mainDic = exDir + "/meng/myBilibili/";
     public HashMap<String, LoginInfoPeople> hashMap = new HashMap<>();
-    public LoginInfo loginInfo;
+    public static LoginInfo loginInfo;
     private Button btn;
     private ListView listView;
     private EditText et;
@@ -63,9 +63,9 @@ public class MainActivity extends Activity {
                 arrayList.add(loginInfoPeople.name);
             }
         }
-        btn = findViewById(R.id.btn);
-        listView = findViewById(R.id.lv);
-        et=findViewById(R.id.et);
+        btn = (Button) findViewById(R.id.btn);
+        listView = (ListView) findViewById(R.id.lv);
+        et=(EditText) findViewById(R.id.et);
 
         ArrayAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(adapter);
@@ -76,7 +76,6 @@ public class MainActivity extends Activity {
                 String s= (String) parent.getItemAtPosition(position);
                 LoginInfoPeople loginInfoPeople=hashMap.get(s);
                 intent.putExtra("cookie",loginInfoPeople.cookie);
-                intent.putExtra("id",loginInfoPeople.id);
                 intent.putExtra("url",et.getText().toString());
                 startActivity(intent);
             }
@@ -98,11 +97,11 @@ public class MainActivity extends Activity {
         vibrator.vibrate(time);
     }
 
-    public String getSourceCode(String url) {
+    public static String getSourceCode(String url) {
         return getSourceCode(url, null);
     }
 
-    public String getSourceCode(String url, String cookie) {
+    public static String getSourceCode(String url, String cookie) {
         Connection.Response response = null;
         Connection connection = null;
         try {
@@ -120,7 +119,7 @@ public class MainActivity extends Activity {
         return response.body();
     }
 
-    public Map<String, String> cookieToMap(String value) {
+    public static Map<String, String> cookieToMap(String value) {
         Map<String, String> map = new HashMap<String, String>();
         String values[] = value.split("; ");
         for (String val : values) {
@@ -134,7 +133,7 @@ public class MainActivity extends Activity {
         return map;
     }
 
-    public String readFileToString() throws IOException, UnsupportedEncodingException {
+    public static String readFileToString() throws IOException, UnsupportedEncodingException {
         File file = new File(mainDic + "info.json");
         if (!file.exists()) {
             file.createNewFile();
@@ -147,7 +146,7 @@ public class MainActivity extends Activity {
         return new String(filecontent, "UTF-8");
     }
 
-    public void saveConfig() {
+    public static void saveConfig() {
         try {
             FileOutputStream fos = null;
             OutputStreamWriter writer = null;

@@ -26,6 +26,13 @@ public class MainActivity extends Activity{
 	private Button btn2;
     public ListView listView;
     private EditText et;
+	private String[] strs=new String[]{
+		"发发发",
+		"你稳了",
+		"不会糟的",
+		"稳的很",
+		"今天,也是发气满满的一天",
+		"你这把全关稳了"};
 
 	public ArrayAdapter<String> adapter;
 
@@ -69,7 +76,7 @@ public class MainActivity extends Activity{
 						public void run(){
 							try{
 								String key=(String) parent.getItemAtPosition(position);
-								sendDanmakuData("发发发",hashMap.get(key).cookie,Long.parseLong(et.getText().toString()));
+								sendDanmakuData(strs[new Random().nextInt(strs.length)],hashMap.get(key).cookie,Long.parseLong(et.getText().toString()));
 							  }catch(IOException e){
 								e.printStackTrace();
 							  }
@@ -94,7 +101,7 @@ public class MainActivity extends Activity{
 						public void run(){
 							for(LoginInfoPeople l:hashMap.values()){
 								try{						
-									sendDanmakuData("发发发",l.cookie,Long.parseLong(et.getText().toString()));
+									sendDanmakuData(strs[new Random().nextInt(strs.length)],l.cookie,Long.parseLong(et.getText().toString()));
 								  }catch(IOException e){
 									e.printStackTrace();
 								  }
@@ -217,11 +224,11 @@ public class MainActivity extends Activity{
         out.close();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
-        System.out.println(" Contents of post request ");
+		String s="";
         while((line=reader.readLine())!=null){
-            System.out.println(line);
+            s+=line;
 		  }
-        System.out.println(" Contents of post request ends ");
+		final String ss=s;
         reader.close();
         connection.disconnect();
 
@@ -229,7 +236,9 @@ public class MainActivity extends Activity{
 
 			  @Override
 			  public void run(){
-				  Toast.makeText(MainActivity.this,roomId+"已奶",Toast.LENGTH_SHORT).show();
+				  Toast.makeText(MainActivity.this,
+								 //  roomId+"已奶,返回"+
+								 ss,Toast.LENGTH_LONG).show();
 				}
 			});
 	  }

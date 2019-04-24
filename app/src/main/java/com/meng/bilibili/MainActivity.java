@@ -100,14 +100,14 @@ public class MainActivity extends Activity{
 						@Override
 						public void run(){
 							for(LoginInfoPeople l:hashMap.values()){
-								try{						
+								try{
 									sendDanmakuData(strs[new Random().nextInt(strs.length)],l.cookie,Long.parseLong(et.getText().toString()));
 								  }catch(IOException e){
 									e.printStackTrace();
 								  }
-							  }					  						
+							  }
 						  }
-					  }).start();	
+					  }).start();
 				}
 			});
 	  }
@@ -231,16 +231,48 @@ public class MainActivity extends Activity{
 		final String ss=s;
         reader.close();
         connection.disconnect();
+        final ReturnData returnData=gson.fromJson(ss,ReturnData.class);
+        switch (returnData.code){
+            case 0:
+                if( !returnData.message.equals("")){
+                    runOnUiThread(new Runnable() {
 
-        runOnUiThread(new Runnable() {
+                        @Override
+                        public void run(){
+                            Toast.makeText(MainActivity.this,
+                                    //  roomId+"已奶,返回"+
+                                    returnData.message,Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else {
+                    runOnUiThread(new Runnable() {
 
-			  @Override
-			  public void run(){
-				  Toast.makeText(MainActivity.this,
-								 //  roomId+"已奶,返回"+
-								 ss,Toast.LENGTH_LONG).show();
-				}
-			});
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,roomId+"已奶", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                break;
+            case 1990000:
+                if( returnData.message.equals("risk")){
+                    Intent intent = new Intent(MainActivity.this,RiskActivity.class);
+                    intent.putExtra("url",returnData.data.verify_url);
+                    startActivity(intent);
+                }
+                break;
+            default:
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run(){
+                        Toast.makeText(MainActivity.this,
+                                //  roomId+"已奶,返回"+
+                                ss,Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
+        }
 	  }
 
     public String encode(String url){

@@ -9,9 +9,7 @@ import com.meng.bilibili.javaBean.*;
 
 public class Login extends Activity{
 
-    private WebView webView;
-    private String loginUrl = "https://passport.bilibili.com/login";
-	private EditText et;
+	private EditText editText;
 
     public void clearWebViewCache(){
         CookieSyncManager.createInstance(this);
@@ -21,9 +19,9 @@ public class Login extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        webView=new WebView(this);
-		et=new EditText(this);
-		et.setHint("对此账号的称呼");
+		WebView webView = new WebView(this);
+		editText =new EditText(this);
+		editText.setHint("对此账号的称呼");
         setContentView(webView);
         webView.getSettings().setUserAgentString(MainActivity.UA);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -49,7 +47,7 @@ public class Login extends Activity{
 						@Override
 						public void run(){		  			                   
 							LoginInfoPeople log = new LoginInfoPeople();						
-							log.name=et.getText().toString();
+							log.name= editText.getText().toString();
 							log.cookie=cookieStr;
 							MainActivity.loginInfo.loginInfoPeople.add(log);
 							MainActivity.saveConfig();
@@ -73,7 +71,8 @@ public class Login extends Activity{
 					  }).start();
 				}
 			});
-        webView.loadUrl(loginUrl);
+		String loginUrl = "https://passport.bilibili.com/login";
+		webView.loadUrl(loginUrl);
 	  }
 
 	@Override
@@ -81,7 +80,7 @@ public class Login extends Activity{
         super.onCreateOptionsMenu(menu);     
         MenuItem add = menu.add(1,1,1,"添加");
         add.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        add.setActionView(et);      
+        add.setActionView(editText);
         return true;
 	  }
 

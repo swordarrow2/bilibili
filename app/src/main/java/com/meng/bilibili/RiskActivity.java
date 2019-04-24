@@ -10,15 +10,12 @@ import android.content.*;
 
 public class RiskActivity extends Activity{
 
-	private WebView webView;
-	private String loginUrl = "";
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		webView=new WebView(this);
+		WebView webView = new WebView(this);
 		Intent intent=getIntent();
-		loginUrl=intent.getStringExtra("url");
+		String verify_url = intent.getStringExtra("url");
 		setContentView(webView);
 		webView.getSettings().setUserAgentString(MainActivity.UA);
 		webView.getSettings().setJavaScriptEnabled(true);
@@ -74,6 +71,6 @@ public class RiskActivity extends Activity{
 					  }).start();*/
 				}
 			});
-		webView.loadUrl(loginUrl);
+		webView.loadUrl(verify_url);
 	  }
   }

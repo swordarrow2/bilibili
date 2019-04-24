@@ -20,17 +20,14 @@ import android.widget.AdapterView.*;
 
 public class MainActivity extends Activity {
     public static MainActivity instence;
-    public static final String UA = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
+    public static final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public static Gson gson = new Gson();
-    private static final String exDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-    public static final String mainDic = exDir + "/meng/myBilibili/";
-    public HashMap<String, LoginInfoPeople> hashMap = new HashMap<>();
+    public static final String mainDic = Environment.getExternalStorageDirectory().getAbsolutePath() + "/meng/myBilibili/";
+    public HashMap<String, LoginInfoPeople> loginInfoPeopleHashMap = new HashMap<>();
     public static LoginInfo loginInfo;
-    private Button btn;
-    private Button btn2;
     public ListView listView;
-    private EditText et;
-    private String[] strs = new String[]{
+    private EditText editText;
+    private String[] strings = new String[]{
             "发发发",
             "你稳了",
             "不会糟的",
@@ -48,7 +45,6 @@ public class MainActivity extends Activity {
     };
 
     public ArrayAdapter<String> adapter;
-
     public ArrayList<String> arrayList;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,21 +65,21 @@ public class MainActivity extends Activity {
         }
         if (loginInfo != null) {
             for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
-                hashMap.put(loginInfoPeople.name, loginInfoPeople);
+                loginInfoPeopleHashMap.put(loginInfoPeople.name, loginInfoPeople);
                 arrayList.add(loginInfoPeople.name);
             }
         }
-        btn = (Button) findViewById(R.id.btn);
-        btn2 = (Button) findViewById(R.id.btn2);
+        Button btn = (Button) findViewById(R.id.btn);
+        Button btn2 = (Button) findViewById(R.id.btn2);
         listView = (ListView) findViewById(R.id.lv);
-        et = (EditText) findViewById(R.id.et);
-
-        listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList));
+        editText = (EditText) findViewById(R.id.et);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
+        listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
                 ListView l = new ListView(MainActivity.this);
-                l.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, strs));
+                l.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, strings));
                 l.setOnItemClickListener(new OnItemClickListener() {
 
                     @Override
@@ -94,7 +90,7 @@ public class MainActivity extends Activity {
                             public void run() {
                                 try {
                                     String key = (String) parent.getItemAtPosition(position);
-                                    sendDanmakuData((String) p1.getItemAtPosition(p3), hashMap.get(key).cookie, et.getText().toString());
+                                    sendDanmakuData((String) p1.getItemAtPosition(p3), loginInfoPeopleHashMap.get(key).cookie, editText.getText().toString());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -112,7 +108,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
-                    sendSignData(hashMap.get(parent.getItemAtPosition(position)).cookie, et.getText().toString());
+                    sendSignData(loginInfoPeopleHashMap.get(parent.getItemAtPosition(position)).cookie, editText.getText().toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,10 +130,10 @@ public class MainActivity extends Activity {
 
                     @Override
                     public void run() {
-                        for (LoginInfoPeople l : hashMap.values()) {
+                        for (LoginInfoPeople l : loginInfoPeopleHashMap.values()) {
                             try {
                                 Thread.sleep(1000);
-                                sendDanmakuData(strs[new Random().nextInt(strs.length)], l.cookie, et.getText().toString());
+                                sendDanmakuData(strings[new Random().nextInt(strings.length)], l.cookie, editText.getText().toString());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -235,7 +231,7 @@ public class MainActivity extends Activity {
         connection.setRequestProperty("Connection", "keep-alive");
         connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
         connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", UA);
+        connection.setRequestProperty("User-Agent", userAgent);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
@@ -342,7 +338,7 @@ public class MainActivity extends Activity {
         connection.setRequestProperty("Connection", "keep-alive");
         connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
         connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", UA);
+        connection.setRequestProperty("User-Agent", userAgent);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");

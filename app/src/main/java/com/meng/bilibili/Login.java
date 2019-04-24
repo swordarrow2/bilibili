@@ -23,7 +23,7 @@ public class Login extends Activity{
 		editText =new EditText(this);
 		editText.setHint("对此账号的称呼");
         setContentView(webView);
-        webView.getSettings().setUserAgentString(MainActivity.UA);
+        webView.getSettings().setUserAgentString(MainActivity.userAgent);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setBuiltInZoomControls(true);
         clearWebViewCache();
@@ -56,10 +56,10 @@ public class Login extends Activity{
 								  @Override
 								  public void run(){			
 									  if(MainActivity.loginInfo!=null){
-										  MainActivity.instence.hashMap.clear();
+										  MainActivity.instence.loginInfoPeopleHashMap.clear();
 										  MainActivity.instence.arrayList.clear();									
 										  for(LoginInfoPeople loginInfoPeople : MainActivity.loginInfo.loginInfoPeople){											  
-											  MainActivity.instence.hashMap.put(loginInfoPeople.name,loginInfoPeople);
+											  MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.name,loginInfoPeople);
 											  MainActivity.instence.arrayList.add(loginInfoPeople.name);
 											}
 										}

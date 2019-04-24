@@ -215,8 +215,8 @@ public class MainActivity extends Activity{
 		  "&csrf_token="+cookieToMap(cookie).get("bili_jct")+
 		  "&csrf="+cookieToMap(cookie).get("bili_jct");
         connection.setRequestProperty("Content-Length",String.valueOf(content.length()));
-        // 连接，从postUrl.openConnection()至此的配置必须要在 connect之前完成，
-        // 要注意的是connection.getOutputStream会隐含的进行 connect。
+        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
+        // 要注意的是connection.getOutputStream会隐含的进行 connect
         connection.connect();
         DataOutputStream out = new DataOutputStream(connection.getOutputStream());
         out.writeBytes(content);
@@ -224,11 +224,11 @@ public class MainActivity extends Activity{
         out.close();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
-		String s="";
+		StringBuilder s= new StringBuilder();
         while((line=reader.readLine())!=null){
-            s+=line;
+            s.append(line);
 		  }
-		final String ss=s;
+		final String ss= s.toString();
         reader.close();
         connection.disconnect();
         final ReturnData returnData=gson.fromJson(ss,ReturnData.class);
@@ -256,9 +256,13 @@ public class MainActivity extends Activity{
                 break;
             case 1990000:
                 if( returnData.message.equals("risk")){
-                    Intent intent = new Intent(MainActivity.this,RiskActivity.class);
-                    intent.putExtra("url",returnData.data.verify_url);
-                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run(){
+                            Toast.makeText(MainActivity.this,"需要在官方客户端进行账号风险验证",Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
                 break;
             default:
@@ -266,9 +270,7 @@ public class MainActivity extends Activity{
 
                     @Override
                     public void run(){
-                        Toast.makeText(MainActivity.this,
-                                //  roomId+"已奶,返回"+
-                                ss,Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
                     }
                 });
                 break;

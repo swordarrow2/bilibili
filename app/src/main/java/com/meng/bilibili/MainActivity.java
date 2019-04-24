@@ -18,204 +18,231 @@ import org.jsoup.*;
 import android.view.View.*;
 import android.widget.AdapterView.*;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity{
     public static MainActivity instence;
     public static final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public static Gson gson = new Gson();
-    public static final String mainDic = Environment.getExternalStorageDirectory().getAbsolutePath() + "/meng/myBilibili/";
+    public static final String mainDic = Environment.getExternalStorageDirectory().getAbsolutePath()+"/meng/myBilibili/";
     public HashMap<String, LoginInfoPeople> loginInfoPeopleHashMap = new HashMap<>();
     public static LoginInfo loginInfo;
     public ListView listView;
     private EditText editText;
     private String[] strings = new String[]{
-            "发发发",
-            "你稳了",
-            "不会糟的",
-            "稳的很",
-            "今天,也是发气满满的一天",
-            "你这把全关稳了",
-            "点歌 信仰は儚き人間の為に",
-            "点歌 星条旗のピエロ",
-            "点歌 春の湊に-上海アリス幻樂団",
-            "点歌 the last crusade",
-            "点歌 ピュアヒューリーズ~心の在処",
-            "点歌 忘れがたき、よすがの緑",
-            "点歌 遥か38万キロのボヤージュ",
-            "点歌 プレイヤーズスコア"
-    };
+		"发发发",
+		"你稳了",
+		"不会糟的",
+		"稳的很",
+		"今天,也是发气满满的一天",
+		"你这把全关稳了",
+		"点歌 信仰は儚き人間の為に",
+		"点歌 星条旗のピエロ",
+		"点歌 春の湊に-上海アリス幻樂団",
+		"点歌 the last crusade",
+		"点歌 ピュアヒューリーズ~心の在処",
+		"点歌 忘れがたき、よすがの緑",
+		"点歌 遥か38万キロのボヤージュ",
+		"点歌 プレイヤーズスコア"
+	  };
 
     public ArrayAdapter<String> adapter;
     public ArrayList<String> arrayList;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        instence = this;
+        instence=this;
         File f = new File(mainDic);
-        if (!f.exists()) {
+        if(!f.exists()){
             f.mkdirs();
-            loginInfo = new LoginInfo();
+            loginInfo=new LoginInfo();
             saveConfig();
-        }
-        arrayList = new ArrayList<>();
-        try {
-            loginInfo = gson.fromJson(readFileToString(), LoginInfo.class);
-        } catch (IOException e) {
+		  }
+        arrayList=new ArrayList<>();
+        try{
+            loginInfo=gson.fromJson(readFileToString(),LoginInfo.class);
+		  }catch(IOException e){
             e.printStackTrace();
-        }
-        if (loginInfo != null) {
-            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
-                loginInfoPeopleHashMap.put(loginInfoPeople.name, loginInfoPeople);
+		  }
+        if(loginInfo!=null){
+            for(LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople){
+                loginInfoPeopleHashMap.put(loginInfoPeople.name,loginInfoPeople);
                 arrayList.add(loginInfoPeople.name);
-            }
-        }
+			  }
+		  }
         Button btn = (Button) findViewById(R.id.btn);
         Button btn2 = (Button) findViewById(R.id.btn2);
-        listView = (ListView) findViewById(R.id.lv);
-        editText = (EditText) findViewById(R.id.et);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
+		Button btn3 = (Button) findViewById(R.id.btn3);
+        listView=(ListView) findViewById(R.id.lv);
+        editText=(EditText) findViewById(R.id.et);
+        adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-                ListView l = new ListView(MainActivity.this);
-                l.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, strings));
-                l.setOnItemClickListener(new OnItemClickListener() {
+			  @Override
+			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
+				  ListView l = new ListView(MainActivity.this);
+				  l.setAdapter(new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,strings));
+				  l.setOnItemClickListener(new OnItemClickListener() {
 
-                    @Override
-                    public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
-                        new Thread(new Runnable() {
+						@Override
+						public void onItemClick(final AdapterView<?> p1,View p2,final int p3,long p4){
+							new Thread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                try {
-                                    String key = (String) parent.getItemAtPosition(position);
-                                    sendDanmakuData((String) p1.getItemAtPosition(p3), loginInfoPeopleHashMap.get(key).cookie, editText.getText().toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    }
-                });
-                new AlertDialog.Builder(MainActivity.this)
-                        .setView(l)
-                        .setTitle("奶")
-                        .setNegativeButton("我好了", null).show();
-            }
-        });
+								  @Override
+								  public void run(){
+									  try{
+										  String key = (String) parent.getItemAtPosition(position);
+										  sendDanmakuData((String) p1.getItemAtPosition(p3),loginInfoPeopleHashMap.get(key).cookie,editText.getText().toString());
+										}catch(IOException e){
+										  e.printStackTrace();
+										}
+									}
+								}).start();
+						  }
+					  });
+				  new AlertDialog.Builder(MainActivity.this)
+					.setView(l)
+					.setTitle("奶")
+					.setNegativeButton("我好了",null).show();
+				}
+			});
         listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    sendSignData(loginInfoPeopleHashMap.get(parent.getItemAtPosition(position)).cookie, editText.getText().toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-        });
+			  @Override
+			  public boolean onItemLongClick(final AdapterView<?> parent,View view,final int position,long id){
+				  new Thread(new Runnable() {
+
+						@Override
+						public void run(){
+							try{
+								sendSignData(loginInfoPeopleHashMap.get(parent.getItemAtPosition(position)).cookie,editText.getText().toString());
+							  }catch(Exception e){
+								e.printStackTrace();
+							  }
+						  }
+					  }).start();             
+				  return true;
+				}
+			});
         btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-            }
-        });
+			  @Override
+			  public void onClick(View v){
+				  Intent intent = new Intent(MainActivity.this,Login.class);
+				  startActivity(intent);
+				}
+			});
         btn2.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View p1) {
-                new Thread(new Runnable() {
+			  @Override
+			  public void onClick(View p1){
+				  new Thread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        for (LoginInfoPeople l : loginInfoPeopleHashMap.values()) {
-                            try {
-                                Thread.sleep(1000);
-                                sendDanmakuData(strings[new Random().nextInt(strings.length)], l.cookie, editText.getText().toString());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }).start();
-            }
-        });
-    }
+						@Override
+						public void run(){
+							for(LoginInfoPeople l : loginInfoPeopleHashMap.values()){
+								try{
+									Thread.sleep(1000);
+									sendDanmakuData(strings[new Random().nextInt(strings.length)],l.cookie,editText.getText().toString());
+								  }catch(Exception e){
+									e.printStackTrace();
+								  }
+							  }
+						  }
+					  }).start();
+				}
+			});
+		btn3.setOnClickListener(new OnClickListener() {
 
-    public void doVibrate(long time) {
+			  @Override
+			  public void onClick(View p1){
+				  new Thread(new Runnable() {
+
+						@Override
+						public void run(){
+							for(LoginInfoPeople l : loginInfoPeopleHashMap.values()){
+								try{
+									Thread.sleep(1000);
+									sendSignData(l.cookie,editText.getText().toString());
+								  }catch(Exception e){
+									e.printStackTrace();
+								  }
+							  }
+						  }
+					  }).start();
+				}
+			});
+	  }
+
+    public void doVibrate(long time){
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(time);
-    }
+	  }
 
-    public static String getSourceCode(String url) {
-        return getSourceCode(url, null);
-    }
+    public static String getSourceCode(String url){
+        return getSourceCode(url,null);
+	  }
 
-    public static String getSourceCode(String url, String cookie) {
+    public static String getSourceCode(String url,String cookie){
         Connection.Response response = null;
         Connection connection = null;
-        try {
-            connection = Jsoup.connect(url);
-            if (cookie != null) {
+        try{
+            connection=Jsoup.connect(url);
+            if(cookie!=null){
                 connection.cookies(cookieToMap(cookie));
-            }
+			  }
             connection.ignoreContentType(true).method(Connection.Method.GET);
-            response = connection.execute();
-            if (response.statusCode() != 200) {
-            }
-        } catch (IOException e) {
+            response=connection.execute();
+            if(response.statusCode()!=200){
+			  }
+		  }catch(IOException e){
             e.printStackTrace();
-        }
+		  }
         return response.body();
-    }
+	  }
 
-    public static Map<String, String> cookieToMap(String value) {
+    public static Map<String, String> cookieToMap(String value){
         Map<String, String> map = new HashMap<String, String>();
         String values[] = value.split("; ");
-        for (String val : values) {
+        for(String val : values){
             String vals[] = val.split("=");
-            if (vals.length == 2) {
-                map.put(vals[0], vals[1]);
-            } else if (vals.length == 1) {
-                map.put(vals[0], "");
-            }
-        }
+            if(vals.length==2){
+                map.put(vals[0],vals[1]);
+			  }else if(vals.length==1){
+                map.put(vals[0],"");
+			  }
+		  }
         return map;
-    }
+	  }
 
-    public static String readFileToString() throws IOException, UnsupportedEncodingException {
-        File file = new File(mainDic + "info.json");
-        if (!file.exists()) {
+    public static String readFileToString() throws IOException, UnsupportedEncodingException{
+        File file = new File(mainDic+"info.json");
+        if(!file.exists()){
             file.createNewFile();
-        }
+		  }
         Long filelength = file.length();
         byte[] filecontent = new byte[filelength.intValue()];
         FileInputStream in = new FileInputStream(file);
         in.read(filecontent);
         in.close();
-        return new String(filecontent, "UTF-8");
-    }
+        return new String(filecontent,"UTF-8");
+	  }
 
-    public static void saveConfig() {
-        try {
+    public static void saveConfig(){
+        try{
             FileOutputStream fos = null;
             OutputStreamWriter writer = null;
-            File file = new File(mainDic + "info.json");
-            fos = new FileOutputStream(file);
-            writer = new OutputStreamWriter(fos, "utf-8");
+            File file = new File(mainDic+"info.json");
+            fos=new FileOutputStream(file);
+            writer=new OutputStreamWriter(fos,"utf-8");
             writer.write(gson.toJson(loginInfo));
             writer.flush();
-            if (fos != null) {
+            if(fos!=null){
                 fos.close();
-            }
-        } catch (IOException e) {
+			  }
+		  }catch(IOException e){
             e.printStackTrace();
-        }
-    }
+		  }
+	  }
 
-    public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
+    public void sendDanmakuData(String msg,String cookie,final String roomId) throws IOException{
         URL postUrl = new URL("http://api.live.bilibili.com/msg/send");
         String content = "";//要发出的数据
         // 打开连接
@@ -227,26 +254,26 @@ public class MainActivity extends Activity {
         //	 Post请求不能使用缓存
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        content = "color=16777215" +
-                "&fontsize=25" +
-                "&mode=1" +
-                "&msg=" + encode(msg) +
-                "&rnd=" + (System.currentTimeMillis() / 1000) +
-                "&roomid=" + roomId +
-                "&bubble=0" +
-                "&csrf_token=" + cookieToMap(cookie).get("bili_jct") +
-                "&csrf=" + cookieToMap(cookie).get("bili_jct");
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
+        connection.setRequestProperty("Host","api.live.bilibili.com");
+        connection.setRequestProperty("Connection","keep-alive");
+        connection.setRequestProperty("Accept","application/json, text/javascript, */*; q=0.01");
+        connection.setRequestProperty("Origin","https://live.bilibili.com");
+        connection.setRequestProperty("User-Agent",userAgent);
+        connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+        connection.setRequestProperty("Referer","https://live.bilibili.com/"+roomId);
+        connection.setRequestProperty("Accept-Encoding","gzip, deflate, br");
+        connection.setRequestProperty("Accept-Language","zh-CN,zh;q=0.8");
+        connection.setRequestProperty("cookie",cookie);
+        content="color=16777215"+
+		  "&fontsize=25"+
+		  "&mode=1"+
+		  "&msg="+encode(msg)+
+		  "&rnd="+(System.currentTimeMillis()/1000)+
+		  "&roomid="+roomId+
+		  "&bubble=0"+
+		  "&csrf_token="+cookieToMap(cookie).get("bili_jct")+
+		  "&csrf="+cookieToMap(cookie).get("bili_jct");
+        connection.setRequestProperty("Content-Length",String.valueOf(content.length()));
         // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
         // 要注意的是connection.getOutputStream会隐含的进行 connect
         connection.connect();
@@ -257,76 +284,76 @@ public class MainActivity extends Activity {
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
         StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
+        while((line=reader.readLine())!=null){
             s.append(line);
-        }
+		  }
         final String ss = s.toString();
         reader.close();
         connection.disconnect();
-        try {
-            final ReturnData returnData = gson.fromJson(ss, ReturnData.class);
-            switch (returnData.code) {
+        try{
+            final ReturnData returnData = gson.fromJson(ss,ReturnData.class);
+            switch(returnData.code){
                 case 0:
-                    if (!returnData.message.equals("")) {
-                        runOnUiThread(new Runnable() {
+				  if(!returnData.message.equals("")){
+					  runOnUiThread(new Runnable() {
 
                             @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, returnData.message, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
+                            public void run(){
+                                Toast.makeText(MainActivity.this,returnData.message,Toast.LENGTH_LONG).show();
+							  }
+						  });
+                    }else{
+					  runOnUiThread(new Runnable() {
 
                             @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, roomId + "已奶", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                            public void run(){
+                                Toast.makeText(MainActivity.this,roomId+"已奶",Toast.LENGTH_LONG).show();
+							  }
+						  });
                     }
-                    break;
+				  break;
                 case 1990000:
-                    if (returnData.message.equals("risk")) {
-                        runOnUiThread(new Runnable() {
+				  if(returnData.message.equals("risk")){
+					  runOnUiThread(new Runnable() {
 
                             @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, "需要在官方客户端进行账号风险验证", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                            public void run(){
+                                Toast.makeText(MainActivity.this,"需要在官方客户端进行账号风险验证",Toast.LENGTH_LONG).show();
+							  }
+						  });
                     }
-                    break;
+				  break;
                 default:
-                    runOnUiThread(new Runnable() {
+				  runOnUiThread(new Runnable() {
 
                         @Override
-                        public void run() {
-                            Toast.makeText(MainActivity.this, ss, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    break;
-            }
-        } catch (Exception e) {
+                        public void run(){
+                            Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
+						  }
+					  });
+				  break;
+			  }
+		  }catch(Exception e){
             runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
-                    Toast.makeText(MainActivity.this, ss, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    }
+				  @Override
+				  public void run(){
+					  Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
+					}
+				});
+		  }
+	  }
 
-    public String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "Issue while encoding" + e.getMessage();
-        }
-    }
+    public String encode(String url){
+        try{
+            return URLEncoder.encode(url,"UTF-8");
+		  }catch(UnsupportedEncodingException e){
+            return "Issue while encoding"+e.getMessage();
+		  }
+	  }
 
 
-    public void sendSignData(String cookie, String roomId) throws IOException {
+    public void sendSignData(String cookie,String roomId) throws IOException{
         URL postUrl = new URL("https://api.live.bilibili.com/sign/doSign");
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
         connection.setDoOutput(false);
@@ -334,32 +361,32 @@ public class MainActivity extends Activity {
         connection.setRequestMethod("GET");
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
+        connection.setRequestProperty("Host","api.live.bilibili.com");
+        connection.setRequestProperty("Connection","keep-alive");
+        connection.setRequestProperty("Accept","application/json, text/javascript, */*; q=0.01");
+        connection.setRequestProperty("Origin","https://live.bilibili.com");
+        connection.setRequestProperty("User-Agent",userAgent);
+        connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+        connection.setRequestProperty("Referer","https://live.bilibili.com/"+roomId);
+        connection.setRequestProperty("Accept-Encoding","gzip, deflate, br");
+        connection.setRequestProperty("Accept-Language","zh-CN,zh;q=0.8");
+        connection.setRequestProperty("cookie",cookie);
         connection.connect();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
         StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
+        while((line=reader.readLine())!=null){
             s.append(line);
-        }
+		  }
         final String ss = s.toString();
         reader.close();
         connection.disconnect();
 
         runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, ss, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-}
+			  @Override
+			  public void run(){
+				  Toast.makeText(MainActivity.this,"结果"+ss,Toast.LENGTH_LONG).show();
+				}
+			});
+	  }
+  }

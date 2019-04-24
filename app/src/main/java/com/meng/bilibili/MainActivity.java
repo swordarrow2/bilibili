@@ -12,6 +12,7 @@ import java.net.*;
 import java.util.*;
 import org.jsoup.*;
 import android.view.View.*;
+import android.widget.AdapterView.*;
 
 public class MainActivity extends Activity{
     public static MainActivity instence;
@@ -70,18 +71,37 @@ public class MainActivity extends Activity{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override
 			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
-				  new Thread(new Runnable(){
+				  ListView l=new ListView(MainActivity.this);
+				  ArrayAdapter a=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,strs);
+				  l.setAdapter(a);
+				  l.setOnItemClickListener(new OnItemClickListener(){
 
 						@Override
-						public void run(){
-							try{
-								String key=(String) parent.getItemAtPosition(position);
-								sendDanmakuData(strs[new Random().nextInt(strs.length)],hashMap.get(key).cookie,Long.parseLong(et.getText().toString()));
-							  }catch(IOException e){
-								e.printStackTrace();
-							  }
+						public void onItemClick(final AdapterView<?> p1,View p2,final int p3,long p4){
+							new Thread(new Runnable(){
+
+								  @Override
+								  public void run(){
+									  try{
+										  String key=(String) parent.getItemAtPosition(position);
+										  sendDanmakuData((String) p1.getItemAtPosition(p3),hashMap.get(key).cookie,Long.parseLong(et.getText().toString()));
+										}catch(IOException e){
+										  e.printStackTrace();
+										}
+									}
+								}).start();	
 						  }
-					  }).start();
+					  });
+
+				  new AlertDialog.Builder(MainActivity.this)
+					.setView(l)
+					.setTitle("编辑")
+					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface p11,int p2){
+
+						  }
+					  }).setNegativeButton("取消",null).show();															  
 				}
 			});
         btn.setOnClickListener(new View.OnClickListener() {
@@ -231,50 +251,60 @@ public class MainActivity extends Activity{
 		final String ss= s.toString();
         reader.close();
         connection.disconnect();
-        final ReturnData returnData=gson.fromJson(ss,ReturnData.class);
-        switch (returnData.code){
-            case 0:
-                if( !returnData.message.equals("")){
-                    runOnUiThread(new Runnable() {
+		try{
+			final ReturnData returnData=gson.fromJson(ss,ReturnData.class);
+			switch(returnData.code){
+				case 0:
+				  if(!returnData.message.equals("")){
+					  runOnUiThread(new Runnable() {
 
-                        @Override
-                        public void run(){
-                            Toast.makeText(MainActivity.this,
-                                    //  roomId+"已奶,返回"+
-                                    returnData.message,Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }else {
-                    runOnUiThread(new Runnable() {
+							@Override
+							public void run(){
+								Toast.makeText(MainActivity.this,
+											   //  roomId+"已奶,返回"+
+											   returnData.message,Toast.LENGTH_LONG).show();
+							  }
+						  });
+					}else{
+					  runOnUiThread(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            Toast.makeText(MainActivity.this,roomId+"已奶", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-                break;
-            case 1990000:
-                if( returnData.message.equals("risk")){
-                    runOnUiThread(new Runnable() {
+							@Override
+							public void run(){
+								Toast.makeText(MainActivity.this,roomId+"已奶",Toast.LENGTH_LONG).show();
+							  }
+						  });
+					}
+				  break;
+				case 1990000:
+				  if(returnData.message.equals("risk")){
+					  runOnUiThread(new Runnable() {
 
-                        @Override
-                        public void run(){
-                            Toast.makeText(MainActivity.this,"需要在官方客户端进行账号风险验证",Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-                break;
-            default:
-                runOnUiThread(new Runnable() {
+							@Override
+							public void run(){
+								Toast.makeText(MainActivity.this,"需要在官方客户端进行账号风险验证",Toast.LENGTH_LONG).show();
+							  }
+						  });
+					}
+				  break;
+				default:
+				  runOnUiThread(new Runnable() {
 
-                    @Override
-                    public void run(){
-                        Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
-                    }
-                });
-                break;
-        }
+						@Override
+						public void run(){
+							Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
+						  }
+					  });
+				  break;
+			  }
+		  }catch(Exception e){
+			runOnUiThread(new Runnable() {
+
+				  @Override
+				  public void run(){
+					  Toast.makeText(MainActivity.this,ss,Toast.LENGTH_LONG).show();
+					}
+				});
+		  }
 	  }
 
     public String encode(String url){

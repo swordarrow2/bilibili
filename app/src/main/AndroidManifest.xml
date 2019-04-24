@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity android:name="com.meng.bilibili.Login" />
-        <activity android:name="com.meng.bilibili.RiskActivity" />
     </application>
 
 </manifest>

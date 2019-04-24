@@ -24,6 +24,7 @@
 	</LinearLayout>
 
     <EditText
+		android:text="2409909"
         android:id="@+id/et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

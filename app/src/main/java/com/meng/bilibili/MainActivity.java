@@ -33,7 +33,16 @@ public class MainActivity extends Activity{
 		"不会糟的",
 		"稳的很",
 		"今天,也是发气满满的一天",
-		"你这把全关稳了"};
+		"你这把全关稳了",
+		"点歌 信仰は儚き人間の為に",
+		"点歌 星条旗のピエロ",
+		"点歌 春の湊に-上海アリス幻樂団",
+		"点歌 the last crusade",
+		"点歌 ピュアヒューリーズ~心の在処",
+		"点歌 忘れがたき、よすがの緑",
+		"点歌 遥か38万キロのボヤージュ",
+		"点歌 プレイヤーズスコア"
+		};
 
 	public ArrayAdapter<String> adapter;
 
@@ -95,13 +104,8 @@ public class MainActivity extends Activity{
 
 				  new AlertDialog.Builder(MainActivity.this)
 					.setView(l)
-					.setTitle("编辑")
-					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface p11,int p2){
-
-						  }
-					  }).setNegativeButton("取消",null).show();															  
+					.setTitle("奶")
+					.setNegativeButton("我好了",null).show();															  
 				}
 			});
         btn.setOnClickListener(new View.OnClickListener() {
@@ -121,8 +125,9 @@ public class MainActivity extends Activity{
 						public void run(){
 							for(LoginInfoPeople l:hashMap.values()){
 								try{
+								  Thread.sleep(1000);
 									sendDanmakuData(strs[new Random().nextInt(strs.length)],l.cookie,Long.parseLong(et.getText().toString()));
-								  }catch(IOException e){
+								  }catch(Exception e){
 									e.printStackTrace();
 								  }
 							  }

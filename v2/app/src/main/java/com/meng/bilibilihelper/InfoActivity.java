@@ -2,10 +2,12 @@ package com.meng.bilibilihelper;
 
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
+import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.relation.*;
 import com.meng.bilibilihelper.javaBean.spaceToLive.*;
 import com.meng.bilibilihelper.javaBean.upstat.*;
@@ -15,6 +17,7 @@ import java.net.*;
 
 public class InfoActivity extends Activity{
 	public ProgressBar progressBar;
+	public static String mainDic = "";
 
 	private LinearLayout l1;
 	private Context c;
@@ -26,10 +29,22 @@ public class InfoActivity extends Activity{
 		if(intent.getStringExtra("bid")==null){
 			finish();
 		  }	
+		mainDic=Environment.getExternalStorageDirectory()+"/Pictures/grzx/";
+
 		setContentView(R.layout.info_list);
 		c=this;
 		progressBar=(ProgressBar) findViewById(R.id.info_listProgressBar1);	
 		l1=(LinearLayout)findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
+		ImageView im=new ImageView(this);
+
+		File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");
+		if(imf.exists()){
+			im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
+		  }else{
+			new DownloadImageThread(this,im,intent.getStringExtra("bid")).start();
+		  }
+		l1.addView(im);
+		
 		getBilibiliUserInfo(intent.getStringExtra("bid"));
 	  }
 

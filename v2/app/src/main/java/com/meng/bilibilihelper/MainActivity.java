@@ -196,7 +196,7 @@ public class MainActivity extends Activity{
 		  }
         transactionBusR.commit();
 	  }
-	  
+
 	private void initManagerFragment(boolean showNow){
         FragmentTransaction transactionBusR = manager.beginTransaction();
         if(managerFragment==null){
@@ -320,7 +320,17 @@ public class MainActivity extends Activity{
 		  }
 	  }
 
-
+	@Override
+    public boolean onKeyDown(int keyCode,KeyEvent event){
+        if(keyCode==KeyEvent.KEYCODE_BACK||keyCode==KeyEvent.KEYCODE_MENU){
+            if(mDrawerLayout.isDrawerOpen(mDrawerList)){
+                mDrawerLayout.closeDrawer(mDrawerList);
+			  }else{
+                mDrawerLayout.openDrawer(mDrawerList);
+			  }
+            return true;
+		  }return super.onKeyDown(keyCode,event);
+	  }
 
 	public void showToast(final String msg){
 		runOnUiThread(new Runnable(){

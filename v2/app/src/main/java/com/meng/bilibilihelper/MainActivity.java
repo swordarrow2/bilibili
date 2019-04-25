@@ -6,18 +6,37 @@ import android.content.res.*;
 import android.os.*;
 import android.support.v4.widget.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 
-import com.google.gson.*;
-import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.materialDesign.*;
+import com.google.gson.Gson;
+import com.meng.bilibilihelper.javaBean.LoginInfo;
+import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
+import com.meng.bilibilihelper.javaBean.ReturnData;
+import com.meng.bilibilihelper.materialDesign.ActionBarDrawerToggle;
+import com.meng.bilibilihelper.materialDesign.DrawerArrowDrawable;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 
-import org.jsoup.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainActivity extends Activity {
     public static MainActivity instence;
@@ -26,11 +45,11 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerArrowDrawable drawerArrow;
 
-    public ArrayList<Fragment> fragments = new ArrayList<Fragment>();
-    public ArrayList<String> fragmentNames = new ArrayList<String>();
 
     public static String mainDic = "";
-    public MainFrgment frag;
+    public MainFrgment mainFrgment;
+    public NaiFragment naiFragment;
+    public SignFragment signFragment;
     public HashMap<String, LoginInfoPeople> loginInfoPeopleHashMap = new HashMap<>();
     public LoginInfo loginInfo;
 
@@ -57,6 +76,8 @@ public class MainActivity extends Activity {
     public ArrayList<String> arrayList;
 
     public FragmentManager manager;
+    public RelativeLayout rt;
+    public TextView rightText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +101,6 @@ public class MainActivity extends Activity {
         if (loginInfo != null) {
             for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
                 loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name, loginInfoPeople);
-                fragmentNames.add(loginInfoPeople.personInfo.data.name);
                 arrayList.add(loginInfoPeople.personInfo.data.name);
             }
             initFragment();
@@ -125,17 +145,30 @@ public class MainActivity extends Activity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-        mDrawerList.setAdapter(adapter);
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
+                "首页(大概)", "奶", "签到", "退出"
+        }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                FragmentTransaction transactionBusR = manager.beginTransaction();
-                Fragment f = fragments.get(position);
-                hideFragment(transactionBusR);
-                transactionBusR.show(f);
-                transactionBusR.commit();
-
+                switch (((TextView) view).getText().toString()) {
+                    case "首页(大概)":
+                        initMainFragment(true);
+                        break;
+                    case "奶":
+                        initNaiFragment(true);
+                        break;
+                    case "签到":
+                        initSignFragment(true);
+                        break;
+                    case "退出":
+                        if (true) {
+                            System.exit(0);
+                        } else {
+                            finish();
+                        }
+                        break;
+                }
                 mDrawerToggle.syncState();
                 mDrawerLayout.closeDrawer(mDrawerList);
             }
@@ -144,42 +177,65 @@ public class MainActivity extends Activity {
     }
 
     private void findViews() {
+        rt = (RelativeLayout) findViewById(R.id.right_drawer);
+        rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
-        TextView v = new TextView(this);
-        v.setText("add");
-        v.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-            }
-        });
-        mDrawerList.addHeaderView(v);
     }
 
     private void initFragment() {
         manager = getFragmentManager();
-        for (LoginInfoPeople loginInfoPeople : loginInfoPeopleHashMap.values()) {
-            FragmentTransaction transactionBusR = manager.beginTransaction();
-            Fragment f = new InfoFragment(loginInfoPeople.personInfo);
-            transactionBusR.add(R.id.main_activityLinearLayout, f);
-            fragments.add(f);
-            hideFragment(transactionBusR);
-            transactionBusR.commit();
-        }
-        FragmentTransaction transactionBusR = manager.beginTransaction();
-        frag = new MainFrgment();
-        fragments.add(frag);
-        transactionBusR.add(R.id.main_activityLinearLayout, frag);
-        hideFragment(transactionBusR);
-        transactionBusR.commit();
-
+        initNaiFragment(false);
+        initSignFragment(false);
     }
 
+    private void initMainFragment(boolean showNow) {
+        FragmentTransaction transactionWelcome = manager.beginTransaction();
+        if (mainFrgment == null) {
+            mainFrgment = new MainFrgment();
+            transactionWelcome.add(R.id.main_activityLinearLayout, mainFrgment);
+        }
+        hideFragment(transactionWelcome);
+        if (showNow) {
+            transactionWelcome.show(mainFrgment);
+        }
+        transactionWelcome.commit();
+    }
+
+    private void initNaiFragment(boolean showNow) {
+        FragmentTransaction transactionsettings = manager.beginTransaction();
+        if (naiFragment == null) {
+            naiFragment = new NaiFragment();
+            transactionsettings.add(R.id.main_activityLinearLayout, naiFragment);
+        }
+        hideFragment(transactionsettings);
+        if (showNow) {
+            transactionsettings.show(naiFragment);
+        }
+        transactionsettings.commit();
+    }
+
+    private void initSignFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = manager.beginTransaction();
+        if (signFragment == null) {
+            signFragment = new SignFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, signFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(signFragment);
+        }
+        transactionBusR.commit();
+    }
+
+
     public void hideFragment(FragmentTransaction transaction) {
-        for (Fragment f : fragments) {
+        Fragment fs[] = {
+                mainFrgment,
+                naiFragment,
+                signFragment
+        };
+        for (Fragment f : fs) {
             if (f != null) {
                 transaction.hide(f);
             }
@@ -208,19 +264,6 @@ public class MainActivity extends Activity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
-            } else {
-                mDrawerLayout.openDrawer(mDrawerList);
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     public void doVibrate(long time) {
@@ -295,85 +338,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
-        URL postUrl = new URL("http://api.live.bilibili.com/msg/send");
-        String content = "";//要发出的数据
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        content = "color=16777215" +
-                "&fontsize=25" +
-                "&mode=1" +
-                "&msg=" + encode(msg) +
-                "&rnd=" + (System.currentTimeMillis() / 1000) +
-                "&roomid=" + roomId +
-                "&bubble=0" +
-                "&csrf_token=" + cookieToMap(cookie).get("bili_jct") +
-                "&csrf=" + cookieToMap(cookie).get("bili_jct");
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
-        }
-        final String ss = s.toString();
-        reader.close();
-        connection.disconnect();
-        try {
-            final ReturnData returnData = new Gson().fromJson(ss, ReturnData.class);
-            switch (returnData.code) {
-                case 0:
-                    if (!returnData.message.equals("")) {
-                        showToast(returnData.message);
-                    } else {
-                        showToast(roomId + "已奶");
-                    }
-                    break;
-                case 1990000:
-                    if (returnData.message.equals("risk")) {
-                        showToast("需要在官方客户端进行账号风险验证");
-                    }
-                    break;
-                default:
-                    showToast(ss);
-                    break;
-            }
-        } catch (Exception e) {
-            showToast(ss);
-        }
-    }
-
-    public String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "Issue while encoding" + e.getMessage();
-        }
-    }
 
     public boolean copyFile() {
         File f1 = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/meng/myBilibili/" + "info.json");
@@ -425,37 +389,6 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    public void sendSignData(String cookie, String roomId) throws IOException {
-        URL postUrl = new URL("https://api.live.bilibili.com/sign/doSign");
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        connection.setDoOutput(false);
-        connection.setDoInput(true);
-        connection.setRequestMethod("GET");
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        connection.connect();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
-        }
-        final String ss = s.toString();
-        reader.close();
-        connection.disconnect();
-        showToast("结果" + ss);
-    }
-
     public void showToast(final String msg) {
         runOnUiThread(new Runnable() {
 
@@ -466,3 +399,4 @@ public class MainActivity extends Activity {
         });
     }
 }
+

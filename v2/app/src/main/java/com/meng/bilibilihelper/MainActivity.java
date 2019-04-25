@@ -25,6 +25,7 @@ public class MainActivity extends Activity{
     public MainFrgment mainFrgment;
     public NaiFragment naiFragment;
     public SignFragment signFragment;
+	public ManagerFragment managerFragment;
 
     public FragmentManager manager;
     public RelativeLayout rt;
@@ -106,7 +107,7 @@ public class MainActivity extends Activity{
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,new String[]{
-															"首页(大概)","添加账号", "奶", "签到", "退出"
+															"首页(大概)","添加账号","管理账号", "奶", "签到", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override
@@ -117,6 +118,9 @@ public class MainActivity extends Activity{
                         break;
 					  case "添加账号":
 						startActivity(new Intent(MainActivity.this,Login.class));
+						break;
+					  case "管理账号":
+						initManagerFragment(true);
 						break;
 					  case "奶":
                         initNaiFragment(true);
@@ -150,6 +154,7 @@ public class MainActivity extends Activity{
         manager=getFragmentManager();
         initNaiFragment(false);
         initSignFragment(false);
+		initManagerFragment(false);
 		initMainFragment(true);
 	  }
 
@@ -191,13 +196,26 @@ public class MainActivity extends Activity{
 		  }
         transactionBusR.commit();
 	  }
-
+	  
+	private void initManagerFragment(boolean showNow){
+        FragmentTransaction transactionBusR = manager.beginTransaction();
+        if(managerFragment==null){
+            managerFragment=new ManagerFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout,managerFragment);
+		  }
+        hideFragment(transactionBusR);
+        if(showNow){
+            transactionBusR.show(managerFragment);
+		  }
+        transactionBusR.commit();
+	  }
 
     public void hideFragment(FragmentTransaction transaction){
         Fragment fs[] = {
 			mainFrgment,
 			naiFragment,
-			signFragment
+			signFragment,
+			managerFragment
 		  };
         for(Fragment f : fs){
             if(f!=null){

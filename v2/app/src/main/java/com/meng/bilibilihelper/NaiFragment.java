@@ -1,6 +1,7 @@
 package com.meng.bilibilihelper;
 
 import android.app.*;
+import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -12,7 +13,7 @@ import java.net.*;
 
 public class NaiFragment extends Fragment{
 
-	private String[] strings = new String[]{
+	public String[] strings = new String[]{
 		"发发发",
 		"你稳了",
 		"不会糟的",
@@ -63,6 +64,7 @@ public class NaiFragment extends Fragment{
 										}
 									}
 								}).start();
+							ab.dismiss();
 						  }
 					  });
 				  ab=new AlertDialog.Builder(getActivity())

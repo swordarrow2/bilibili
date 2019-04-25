@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
 		<activity android:name=".Login"/>
+		<activity
+			android:theme="@android:style/Theme.Holo.Dialog"
+            android:name=".InfoActivity"
+            android:label="详细信息"></activity>
+		
     </application>
 
 </manifest>

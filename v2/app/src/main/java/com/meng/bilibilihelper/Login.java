@@ -2,23 +2,20 @@ package com.meng.bilibilihelper;
 
 import android.app.*;
 import android.os.*;
-import android.view.*;
 import android.webkit.*;
-import android.widget.*;
-
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.user.BilibiliPersonInfo;
+import com.meng.bilibilihelper.javaBean.user.*;
 
-public class Login extends Activity {
+public class Login extends Activity{
 
-    public void clearWebViewCache() {
+    public void clearWebViewCache(){
         CookieSyncManager.createInstance(this);
         CookieManager.getInstance().removeAllCookie();
-    }
+	  }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         WebView webView = new WebView(this);
         setContentView(webView);
@@ -27,57 +24,57 @@ public class Login extends Activity {
         webView.getSettings().setBuiltInZoomControls(true);
         clearWebViewCache();
         webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
+			  @Override
+			  public boolean shouldOverrideUrlLoading(WebView view,String url){
+				  view.loadUrl(url);
+				  return true;
+				}
 
-            @Override
-            public void onPageFinished(WebView view, final String url) {
-                super.onPageFinished(view, url);
-                if (!url.equals("https://www.bilibili.com/")) {
-                    return;
-                }
-                CookieManager cookieManager = CookieManager.getInstance();
-                final String cookieStr = cookieManager.getCookie(url) == null ? "null" : cookieManager.getCookie(url);
+			  @Override
+			  public void onPageFinished(WebView view,final String url){
+				  super.onPageFinished(view,url);
+				  if(!url.equals("https://www.bilibili.com/")){
+					  return;
+					}
+				  CookieManager cookieManager = CookieManager.getInstance();
+				  final String cookieStr = cookieManager.getCookie(url)==null? "null" :cookieManager.getCookie(url);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LoginInfoPeople log = new LoginInfoPeople();
-                        log.cookie = cookieStr;
+				  new Thread(new Runnable() {
+						@Override
+						public void run(){
+							LoginInfoPeople log = new LoginInfoPeople();
+							log.cookie=cookieStr;
 
-                        String myInfoJson = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr);
-                        BilibiliPersonInfo bilibiliPersonInfo = new Gson().fromJson(myInfoJson, BilibiliPersonInfo.class);
-                        String json2 = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + bilibiliPersonInfo.data.mid + "&jsonp=jsonp");
+							String myInfoJson = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp",cookieStr);
+							BilibiliPersonInfo bilibiliPersonInfo = new Gson().fromJson(myInfoJson,BilibiliPersonInfo.class);
+							String json2 = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid="+bilibiliPersonInfo.data.mid+"&jsonp=jsonp");
 
-                        log.personInfo = new Gson().fromJson(json2, BilibiliPersonInfo.class);
+							log.personInfo=new Gson().fromJson(json2,BilibiliPersonInfo.class);
 
-                        MainActivity.instence.loginInfo.loginInfoPeople.add(log);
-                        MainActivity.instence.saveConfig();
-                        runOnUiThread(new Runnable() {
+							MainActivity.instence.loginInfo.loginInfoPeople.add(log);
+							MainActivity.instence.saveConfig();
+							runOnUiThread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                if (MainActivity.instence.loginInfo != null) {
-                                    MainActivity.instence.loginInfoPeopleHashMap.clear();
-                                    MainActivity.instence.arrayList.clear();
-                                    for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
-                                        MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name, loginInfoPeople);
-                                        MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
-                                    }
-                                }
-                                MainActivity.instence.adapter.notifyDataSetChanged();
-                                finish();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+								  @Override
+								  public void run(){
+									  if(MainActivity.instence.loginInfo!=null){
+										  MainActivity.instence.loginInfoPeopleHashMap.clear();
+										  MainActivity.instence.arrayList.clear();
+										  for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople){
+											  MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name,loginInfoPeople);
+											  MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
+											}
+										}
+									  MainActivity.instence.adapter.notifyDataSetChanged();
+									  finish();
+									}
+								});
+						  }
+					  }).start();
+				}
+			});
         String loginUrl = "https://passport.bilibili.com/login";
         webView.loadUrl(loginUrl);
-    }
-}
+	  }
+  }
 

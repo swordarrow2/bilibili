@@ -1,88 +1,79 @@
 package com.meng.bilibilihelper;
 
 import android.app.*;
-import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-
 import com.google.gson.*;
-import com.meng.bilibilihelper.javaBean.ReturnData;
-import com.meng.bilibilihelper.javaBean.relation.*;
-import com.meng.bilibilihelper.javaBean.spaceToLive.*;
-import com.meng.bilibilihelper.javaBean.upstat.*;
-import com.meng.bilibilihelper.javaBean.user.*;
-
+import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.Map;
 
-import android.view.View.OnClickListener;
+public class NaiFragment extends Fragment{
 
-public class NaiFragment extends Fragment {
-    private String[] strings = new String[]{
-            "发发发",
-            "你稳了",
-            "不会糟的",
-            "稳的很",
-            "今天,也是发气满满的一天",
-            "你这把全关稳了",
-            "点歌 信仰は儚き人間の為に",
-            "点歌 星条旗のピエロ",
-            "点歌 春の湊に-上海アリス幻樂団",
-            "点歌 the last crusade",
-            "点歌 ピュアヒューリーズ~心の在処",
-            "点歌 忘れがたき、よすがの緑",
-            "点歌 遥か38万キロのボヤージュ",
-            "点歌 プレイヤーズスコア"
-    };
+	private String[] strings = new String[]{
+		"发发发",
+		"你稳了",
+		"不会糟的",
+		"稳的很",
+		"今天,也是发气满满的一天",
+		"你这把全关稳了",
+		"点歌 信仰は儚き人間の為に",
+		"点歌 星条旗のピエロ",
+		"点歌 春の湊に-上海アリス幻樂団",
+		"点歌 the last crusade",
+		"点歌 ピュアヒューリーズ~心の在処",
+		"点歌 忘れがたき、よすがの緑",
+		"点歌 遥か38万キロのボヤージュ",
+		"点歌 プレイヤーズスコア"
+	  };
+
     AlertDialog ab;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.list_fragment, container, false);
-    }
+    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState){
+        return inflater.inflate(R.layout.list_fragment,container,false);	
+	  }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onViewCreated(View view,Bundle savedInstanceState){
+        super.onViewCreated(view,savedInstanceState);
 
-        ListView acountList = (ListView) view.findViewById(R.id.list);
-        acountList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-                ListView contentList = new ListView(getActivity());
-                contentList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, strings));
-                contentList.setOnItemClickListener(new OnItemClickListener() {
+        ListView list=(ListView)view.findViewById(R.id.list);
+		list.setAdapter(MainActivity.instence.adapter);
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			  @Override
+			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
+				  ListView l = new ListView(getActivity());
+				  l.setAdapter(new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,strings));
+				  l.setOnItemClickListener(new OnItemClickListener() {
 
-                    @Override
-                    public void onItemClick(final AdapterView<?> adapterView, View p2, final int p3, long p4) {
-                        new Thread(new Runnable() {
+						@Override
+						public void onItemClick(final AdapterView<?> p1,View p2,final int p3,long p4){
+							new Thread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                try {
-                                    String key = (String) parent.getItemAtPosition(position);
-                                    sendDanmakuData((String) adapterView.getItemAtPosition(p3), MainActivity.instence.loginInfoPeopleHashMap.get(key).cookie, MainActivity.instence.mainFrgment.editText.getText().toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                        ab.dismiss();
-                    }
-                });
-                ab = new AlertDialog.Builder(getActivity())
-                        .setView(contentList)
-                        .setTitle("奶")
-                        .setNegativeButton("我好了", null).show();
-            }
-        });
-    }
+								  @Override
+								  public void run(){
+									  try{
+										  String key = (String) parent.getItemAtPosition(position);
+										  sendDanmakuData((String) p1.getItemAtPosition(p3),MainActivity.instence. loginInfoPeopleHashMap.get(key).cookie,MainActivity.instence.mainFrgment.editText.getText().toString());
+										}catch(IOException e){
+										  e.printStackTrace();
+										}
+									}
+								}).start();
+						  }
+					  });
+				  ab=new AlertDialog.Builder(getActivity())
+					.setView(l)
+					.setTitle("奶")
+					.setNegativeButton("我好了",null).show();
+				}
+			});
+	  }
 
-    public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
+	public void sendDanmakuData(String msg,String cookie,final String roomId) throws IOException{
         URL postUrl = new URL("http://api.live.bilibili.com/msg/send");
         String content = "";//要发出的数据
         // 打开连接
@@ -94,26 +85,26 @@ public class NaiFragment extends Fragment {
         //	 Post请求不能使用缓存
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        content = "color=16777215" +
-                "&fontsize=25" +
-                "&mode=1" +
-                "&msg=" + encode(msg) +
-                "&rnd=" + (System.currentTimeMillis() / 1000) +
-                "&roomid=" + roomId +
-                "&bubble=0" +
-                "&csrf_token=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct") +
-                "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
+        connection.setRequestProperty("Host","api.live.bilibili.com");
+        connection.setRequestProperty("Connection","keep-alive");
+        connection.setRequestProperty("Accept","application/json, text/javascript, */*; q=0.01");
+        connection.setRequestProperty("Origin","https://live.bilibili.com");
+        connection.setRequestProperty("User-Agent",MainActivity.instence. userAgent);
+        connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+        connection.setRequestProperty("Referer","https://live.bilibili.com/"+roomId);
+        connection.setRequestProperty("Accept-Encoding","gzip, deflate, br");
+        connection.setRequestProperty("Accept-Language","zh-CN,zh;q=0.8");
+        connection.setRequestProperty("cookie",cookie);
+        content="color=16777215"+
+		  "&fontsize=25"+
+		  "&mode=1"+
+		  "&msg="+encode(msg)+
+		  "&rnd="+(System.currentTimeMillis()/1000)+
+		  "&roomid="+roomId+
+		  "&bubble=0"+
+		  "&csrf_token="+MainActivity.instence.cookieToMap(cookie).get("bili_jct")+
+		  "&csrf="+MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+        connection.setRequestProperty("Content-Length",String.valueOf(content.length()));
         // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
         // 要注意的是connection.getOutputStream会隐含的进行 connect
         connection.connect();
@@ -124,42 +115,42 @@ public class NaiFragment extends Fragment {
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line;
         StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
+        while((line=reader.readLine())!=null){
             s.append(line);
-        }
+		  }
         final String ss = s.toString();
         reader.close();
         connection.disconnect();
-        try {
-            final ReturnData returnData = new Gson().fromJson(ss, ReturnData.class);
-            switch (returnData.code) {
+        try{
+            final ReturnData returnData = new Gson().fromJson(ss,ReturnData.class);
+            switch(returnData.code){
                 case 0:
-                    if (!returnData.message.equals("")) {
-                        MainActivity.instence.showToast(returnData.message);
-                    } else {
-                        MainActivity.instence.showToast(roomId + "已奶");
+				  if(!returnData.message.equals("")){
+					  MainActivity.instence.showToast(returnData.message);
+                    }else{
+					  MainActivity.instence.showToast(roomId+"已奶");
                     }
-                    break;
+				  break;
                 case 1990000:
-                    if (returnData.message.equals("risk")) {
-                        MainActivity.instence.showToast("需要在官方客户端进行账号风险验证");
+				  if(returnData.message.equals("risk")){
+					  MainActivity.instence.showToast("需要在官方客户端进行账号风险验证");
                     }
-                    break;
+				  break;
                 default:
-                    MainActivity.instence.showToast(ss);
-                    break;
-            }
-        } catch (Exception e) {
-            MainActivity.instence.showToast(ss);
-        }
-    }
+				  MainActivity.instence. showToast(ss);
+				  break;
+			  }
+		  }catch(Exception e){
+			MainActivity.instence. showToast(ss);
+		  }
+	  }
 
-    public String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "Issue while encoding" + e.getMessage();
-        }
-    }
+    public String encode(String url){
+        try{
+            return URLEncoder.encode(url,"UTF-8");
+		  }catch(UnsupportedEncodingException e){
+            return "Issue while encoding"+e.getMessage();
+		  }
+	  }
 
-}
+  }

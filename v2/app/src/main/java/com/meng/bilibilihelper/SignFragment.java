@@ -68,6 +68,6 @@ public class SignFragment extends Fragment{
         final String ss = s.toString();
         reader.close();
         connection.disconnect();
-        MainActivity.instence.showToast("end");
+        MainActivity.instence.showToast(ss);
 	  }
   }

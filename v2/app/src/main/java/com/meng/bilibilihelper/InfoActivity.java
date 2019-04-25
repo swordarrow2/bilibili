@@ -7,7 +7,7 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.javaBean.relation.*;
 import com.meng.bilibilihelper.javaBean.spaceToLive.*;
 import com.meng.bilibilihelper.javaBean.upstat.*;
@@ -44,7 +44,7 @@ public class InfoActivity extends Activity{
 			new DownloadImageThread(this,im,intent.getStringExtra("bid")).start();
 		  }
 		l1.addView(im);
-		
+
 		getBilibiliUserInfo(intent.getStringExtra("bid"));
 	  }
 
@@ -80,7 +80,27 @@ public class InfoActivity extends Activity{
 								l1.addView(new MengNetworkTextview(c,"生日",person.data.birthday));										
 								l1.addView(new MengNetworkTextview(c,"硬币",person.data.coins));
 								l1.addView(new MengNetworkTextview(c,"vip类型",person.data.vip.type));
-								l1.addView(new MengNetworkTextview(c,"vip状态",person.data.vip.status));		
+								l1.addView(new MengNetworkTextview(c,"vip状态",person.data.vip.status));	
+
+								int ii=InfoActivity.this.getIntent().getIntExtra("pos",0);
+								if(!MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name.equals(person.data.name)){
+									MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name=person.data.name;
+
+									runOnUiThread(new Runnable() {
+
+										  @Override
+										  public void run(){
+											  MainActivity.instence.loginInfoPeopleHashMap.clear();
+											  MainActivity.instence.arrayList.clear();
+											  for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople){
+												  MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name,loginInfoPeople);
+												  MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
+												}											
+											  MainActivity.instence.adapter.notifyDataSetChanged();
+											  MainActivity.instence.saveConfig();
+											}
+										});
+								  } 		
 							  }
 						  });				
 					  final SpaceToLiveJavaBean sjb = gson.fromJson(readHttpString("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+uid),SpaceToLiveJavaBean.class);

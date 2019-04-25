@@ -30,7 +30,8 @@ public class LoginCoinFragment extends Fragment{
 						@Override
 						public void run(){
 							try{
-								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie);
+						//		sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie);
+								MainActivity.instence.showToast(MainActivity.instence.getSourceCode("https://www.bilibili.com",MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie));
 							  }catch(Exception e){
 								MainActivity.instence.showToast(e.toString());
 								e.printStackTrace();
@@ -41,6 +42,7 @@ public class LoginCoinFragment extends Fragment{
 			});	
 	  }
 
+	  
     public void sendSignData(String cookie) throws IOException{
         URL postUrl = new URL("https://www.bilibili.com");
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();

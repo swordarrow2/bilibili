@@ -27,6 +27,7 @@ public class ManagerFragment extends Fragment{
 			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
 				  Intent intent = new Intent(getActivity(), InfoActivity.class);						
 				  intent.putExtra("bid", String.valueOf(MainActivity.instence.loginInfoPeopleHashMap.get(parent.getItemAtPosition(position)).personInfo.data.mid));
+				  intent.putExtra("pos",position);
 				  startActivity(intent);			
 				}
 			});

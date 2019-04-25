@@ -13,23 +13,8 @@ import java.net.*;
 
 public class NaiFragment extends Fragment{
 
-	public String[] strings = new String[]{
-		"发发发",
-		"你稳了",
-		"不会糟的",
-		"稳的很",
-		"今天,也是发气满满的一天",
-		"你这把全关稳了",
-		"点歌 信仰は儚き人間の為に",
-		"点歌 星条旗のピエロ",
-		"点歌 春の湊に-上海アリス幻樂団",
-		"点歌 the last crusade",
-		"点歌 ピュアヒューリーズ~心の在処",
-		"点歌 忘れがたき、よすがの緑",
-		"点歌 遥か38万キロのボヤージュ",
-		"点歌 プレイヤーズスコア"
-	  };
-
+	public CustomSentence cs;	  
+	File cusCen;
     AlertDialog ab;
 
     @Override
@@ -40,6 +25,36 @@ public class NaiFragment extends Fragment{
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
         super.onViewCreated(view,savedInstanceState);
+		cusCen=new File(Environment.getExternalStorageDirectory()+"/sjf.json");
+
+        if(!cusCen.exists()){
+            try{
+				cusCen.createNewFile();
+			  }catch(IOException e){}
+            cs=new CustomSentence();
+			String[] strings = new String[]{
+				"发发发","你稳了","不会糟的","稳的很",
+				"今天,也是发气满满的一天",
+				"你这把全关稳了",
+				"点歌 信仰は儚き人間の為に",
+				"点歌 星条旗のピエロ",
+				"点歌 春の湊に-上海アリス幻樂団",
+				"点歌 the last crusade",
+				"点歌 ピュアヒューリーズ~心の在処",
+				"点歌 忘れがたき、よすがの緑",
+				"点歌 遥か38万キロのボヤージュ",
+				"点歌 プレイヤーズスコア" };
+			for(String s:strings){
+				cs.sent.add(s);
+			  }			
+            saveConfig();
+		  }else{
+			String s="{}";
+			try{
+				s=readFileToString();
+			  }catch(IOException e){}
+			cs=new Gson().fromJson(s,CustomSentence.class);		
+		  }
 
         ListView list=(ListView)view.findViewById(R.id.list);
 		list.setAdapter(MainActivity.instence.adapter);
@@ -47,7 +62,7 @@ public class NaiFragment extends Fragment{
 			  @Override
 			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
 				  ListView l = new ListView(getActivity());
-				  l.setAdapter(new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,strings));
+				  l.setAdapter(new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,cs.sent));
 				  l.setOnItemClickListener(new OnItemClickListener() {
 
 						@Override
@@ -73,6 +88,31 @@ public class NaiFragment extends Fragment{
 					.setNegativeButton("我好了",null).show();
 				}
 			});
+	  }
+
+	public String readFileToString() throws IOException, UnsupportedEncodingException{
+        Long filelength = cusCen.length();
+        byte[] filecontent = new byte[filelength.intValue()];
+        FileInputStream in = new FileInputStream(cusCen);
+        in.read(filecontent);
+        in.close();
+        return new String(filecontent,"UTF-8");
+	  }
+
+	public void saveConfig(){
+        try{
+            FileOutputStream fos = null;
+            OutputStreamWriter writer = null;
+            fos=new FileOutputStream(cusCen);
+            writer=new OutputStreamWriter(fos,"utf-8");
+            writer.write(new Gson().toJson(cs));
+            writer.flush();
+            if(fos!=null){
+                fos.close();
+			  }
+		  }catch(IOException e){
+            e.printStackTrace();
+		  }
 	  }
 
 	public void sendDanmakuData(String msg,String cookie,final String roomId) throws IOException{

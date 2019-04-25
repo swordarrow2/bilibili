@@ -36,7 +36,7 @@ public class MainFrgment extends Fragment{
 							for(LoginInfoPeople l :MainActivity.instence. loginInfoPeopleHashMap.values()){
 								try{
 									Thread.sleep(1000);
-									MainActivity.instence.naiFragment. sendDanmakuData(MainActivity.instence.naiFragment.strings[new Random().nextInt(MainActivity.instence.naiFragment.strings.length)],l.cookie,editText.getText().toString());
+									MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.cs.sent.get(new Random().nextInt(MainActivity.instence.naiFragment.cs.sent.size())),l.cookie,editText.getText().toString());
 								  }catch(Exception e){
 									e.printStackTrace();
 								  }

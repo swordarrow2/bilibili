@@ -143,7 +143,6 @@ public class MainActivity extends Activity{
 				  mDrawerToggle.syncState();
 				  mDrawerLayout.closeDrawer(mDrawerList);
 				}
-
 			});
 	  }
 
@@ -227,7 +226,7 @@ public class MainActivity extends Activity{
 		  }
         transactionBusR.commit();
 	  }
-	  
+
     public void hideFragment(FragmentTransaction transaction){
         Fragment fs[] = {
 			mainFrgment,

@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" >
+
+		<Button
+			android:id="@+id/btn2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="全部奶一遍(" />
+		
+		<Button
+			android:id="@+id/btn3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="全部签到" />
+		
+	</LinearLayout>
+
+    <EditText
+		android:text="2409909"
+        android:id="@+id/et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="直播间号" />
+
+    <ListView
+        android:id="@+id/lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
+

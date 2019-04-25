@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center">
+
+	<TextView
+		android:id="@+id/meng_network_TextView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="start|center"
+		android:gravity="center_vertical"
+		android:minHeight="?android:attr/listPreferredItemHeightSmall"
+		android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+		android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+		android:text="gouliguojiashengsiyi"
+		android:textAppearance="?android:attr/textAppearanceListItemSmall"
+		android:textColor="#ffffff"/>
+
+	<TextView
+		android:autoLink="web"
+		android:maxWidth="230dp"
+		android:id="@+id/meng_network_TextView2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end|center"
+		android:gravity="center_vertical"
+		android:minHeight="?android:attr/listPreferredItemHeightSmall"
+		android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+		android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+		android:text="qiyinhuofubiquzhi"
+		android:textAppearance="?android:attr/textAppearanceListItemSmall"
+		android:textColor="#ffffff"/>
+
+	<ProgressBar
+		android:id="@+id/meng_network_ProgressBar"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end|center"
+		android:gravity="center_vertical"/>
+
+	<View
+		android:layout_height="1dp"
+		android:layout_gravity="top"
+		android:layout_width="match_parent"
+		android:background="#33B5E5"/>
+
+</FrameLayout>
+

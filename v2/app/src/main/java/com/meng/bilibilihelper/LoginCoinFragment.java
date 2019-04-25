@@ -1,15 +1,15 @@
 package com.meng.bilibilihelper;
 
 import android.app.*;
-import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import com.meng.bilibilihelper.*;
 import java.io.*;
 import java.net.*;
 
-public class SignFragment extends Fragment{
+public class LoginCoinFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState){
@@ -30,8 +30,9 @@ public class SignFragment extends Fragment{
 						@Override
 						public void run(){
 							try{
-								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie,MainActivity.instence.mainFrgment.editText.getText().toString());
+								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie);
 							  }catch(Exception e){
+								MainActivity.instence.showToast(e.toString());
 								e.printStackTrace();
 							  }
 						  }
@@ -40,21 +41,17 @@ public class SignFragment extends Fragment{
 			});	
 	  }
 
-    public void sendSignData(String cookie,String roomId) throws IOException{
-        URL postUrl = new URL("https://api.live.bilibili.com/sign/doSign");
+    public void sendSignData(String cookie) throws IOException{
+        URL postUrl = new URL("https://www.bilibili.com");
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
         connection.setDoOutput(false);
         connection.setDoInput(true);
         connection.setRequestMethod("GET");
         connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host","api.live.bilibili.com");
-        connection.setRequestProperty("Connection","keep-alive");
+        connection.setInstanceFollowRedirects(true);    
         connection.setRequestProperty("Accept","application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin","https://live.bilibili.com");
         connection.setRequestProperty("User-Agent",MainActivity.instence.userAgent);
         connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer","https://live.bilibili.com/"+roomId);
         connection.setRequestProperty("Accept-Encoding","gzip, deflate, br");
         connection.setRequestProperty("Accept-Language","zh-CN,zh;q=0.8");
         connection.setRequestProperty("cookie",cookie);
@@ -68,6 +65,6 @@ public class SignFragment extends Fragment{
         final String ss = s.toString();
         reader.close();
         connection.disconnect();
-        MainActivity.instence.showToast("end");
+        MainActivity.instence.showToast("结果"+ss);
 	  }
   }

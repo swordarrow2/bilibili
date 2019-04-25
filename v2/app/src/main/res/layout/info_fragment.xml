@@ -22,15 +22,17 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical">
+				android:orientation="horizontal">
 				<Button
-					android:id="@+id/btn2"
+					android:id="@+id/nai"
+					android:layout_weight="1"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="奶" />
 
 				<Button
-					android:id="@+id/btn3"
+					android:id="@+id/sign"
+					android:layout_weight="1"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="签到" />

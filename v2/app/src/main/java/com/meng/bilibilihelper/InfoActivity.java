@@ -14,6 +14,7 @@ import com.meng.bilibilihelper.javaBean.upstat.*;
 import com.meng.bilibilihelper.javaBean.user.*;
 import java.io.*;
 import java.net.*;
+import android.view.View.*;
 
 public class InfoActivity extends Activity{
 	public ProgressBar progressBar;
@@ -25,7 +26,7 @@ public class InfoActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		Intent intent=getIntent();
+		final Intent intent=getIntent();
 		if(intent.getStringExtra("bid")==null){
 			finish();
 		  }	
@@ -35,7 +36,16 @@ public class InfoActivity extends Activity{
 		c=this;
 		progressBar=(ProgressBar) findViewById(R.id.info_listProgressBar1);	
 		l1=(LinearLayout)findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
-		ImageView im=new ImageView(this);
+		final ImageView im=new ImageView(this);
+		im.setOnClickListener(new OnClickListener(){
+
+			  @Override
+			  public void onClick(View p1){
+				  File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");	
+				  imf.delete();
+				  new DownloadImageThread(InfoActivity.this,im,intent.getStringExtra("bid")).start();				
+				}
+			});
 
 		File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");
 		if(imf.exists()){

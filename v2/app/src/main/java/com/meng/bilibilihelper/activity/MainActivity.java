@@ -119,7 +119,7 @@ public class MainActivity extends Activity{
 				  }else{
 					  initNaiFragment(false);
 					  initNaiFragment(true);
-				  }         
+				  }
 			  }
 		  }
 	  }
@@ -314,10 +314,14 @@ public class MainActivity extends Activity{
 	  }
 
     public String getSourceCode(String url){
-        return getSourceCode(url,null);
+        return getSourceCode(url,null,null);
 	  }
 
     public String getSourceCode(String url,String cookie){
+        return getSourceCode(url,cookie,null);
+    }
+
+    public String getSourceCode(String url,String cookie,String refer){
         Connection.Response response = null;
         Connection connection = null;
         try{
@@ -325,6 +329,10 @@ public class MainActivity extends Activity{
             if(cookie!=null){
                 connection.cookies(cookieToMap(cookie));
 			  }
+			  if(refer!=null){
+                connection.referrer(refer);
+              }
+			  connection.userAgent(userAgent);
             connection.ignoreContentType(true).method(Connection.Method.GET);
             response=connection.execute();
             if(response.statusCode()!=200){

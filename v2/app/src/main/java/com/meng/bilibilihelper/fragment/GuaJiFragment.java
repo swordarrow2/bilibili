@@ -1,0 +1,39 @@
+package com.meng.bilibilihelper.fragment;
+
+import android.app.Fragment;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+
+import com.meng.bilibilihelper.R;
+import com.meng.bilibilihelper.GuaJiService;
+import com.meng.bilibilihelper.activity.MainActivity;
+
+public class GuaJiFragment extends Fragment {
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.list_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ListView l = (ListView) view.findViewById(R.id.list);
+        l.setAdapter(MainActivity.instence.adapter);
+        l.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
+                Intent intentOne = new Intent(getActivity(), GuaJiService.class);
+                intentOne.putExtra("pos", p3);
+                getActivity().startService(intentOne);
+            }
+        });
+    }
+}

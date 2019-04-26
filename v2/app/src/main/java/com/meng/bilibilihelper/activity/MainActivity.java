@@ -60,25 +60,24 @@ public class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instence=this;
-        findViews();
-        initFragment();
-        setActionBar();
-        setListener();
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
 				new AlertDialog.Builder(this)
 				  .setTitle("权限申请")
 				  .setMessage("本软件需要存储权限用于部分数据存储")
-				  .setPositiveButton("同意",new DialogInterface.OnClickListener() {
+				  .setPositiveButton("我知道了",new DialogInterface.OnClickListener() {
 					  @Override
 					  public void onClick(DialogInterface dialog,int which){
 						  ActivityCompat.requestPermissions(MainActivity.this,new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE },321);
 						}
-					}).setNegativeButton("取消",null).setCancelable(false).show();
+					}).setCancelable(false).show();
 			  }
 		  }
-
+		findViews();
+		initFragment();
+		setActionBar();
+		setListener();
         jsonPath=getApplicationContext().getFilesDir()+"/info.json";
         File f = new File(jsonPath);
         if(!f.exists()){
@@ -117,7 +116,10 @@ public class MainActivity extends Activity{
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
                 if(grantResults[0]!=PackageManager.PERMISSION_GRANTED){
                     showToast("缺失权限会使应用工作不正常");
-				  }            
+				  }else{
+					  initNaiFragment(false);
+					  initNaiFragment(true);
+				  }         
 			  }
 		  }
 	  }
@@ -196,7 +198,6 @@ public class MainActivity extends Activity{
 
     private void initFragment(){
         manager=getFragmentManager();
-        initNaiFragment(false);
         initSignFragment(false);
         initManagerFragment(false);
         initLoginCoinFragment(false);

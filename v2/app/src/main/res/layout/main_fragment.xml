@@ -28,6 +28,7 @@
 		</LinearLayout>
 
 		<EditText
+			android:inputType="number"
 			android:text="2409909"
 			android:id="@+id/et"
 			android:layout_width="match_parent"

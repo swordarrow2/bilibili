@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
 import android.content.*;
@@ -7,7 +7,8 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.bilibilihelper.*;
-import java.io.*;
+import com.meng.bilibilihelper.activity.InfoActivity;
+import com.meng.bilibilihelper.activity.MainActivity;
 
 public class ManagerFragment extends Fragment{
 
@@ -25,7 +26,7 @@ public class ManagerFragment extends Fragment{
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override
 			  public void onItemClick(final AdapterView<?> parent,View view,final int position,long id){
-				  Intent intent = new Intent(getActivity(), InfoActivity.class);						
+				  Intent intent = new Intent(getActivity(), InfoActivity.class);
 				  intent.putExtra("bid", String.valueOf(MainActivity.instence.loginInfoPeopleHashMap.get(parent.getItemAtPosition(position)).personInfo.data.mid));
 				  intent.putExtra("pos",position);
 				  startActivity(intent);			

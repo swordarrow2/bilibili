@@ -1,10 +1,12 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
+
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.*;
 import java.util.*;
 

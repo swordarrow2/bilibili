@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.activity;
 
 import android.app.*;
 import android.content.*;
@@ -7,6 +7,9 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
+import com.meng.bilibilihelper.DownloadImageThread;
+import com.meng.bilibilihelper.MengNetworkTextview;
+import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.javaBean.relation.*;
 import com.meng.bilibilihelper.javaBean.spaceToLive.*;
@@ -43,7 +46,7 @@ public class InfoActivity extends Activity{
 			  public void onClick(View p1){
 				  File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");	
 				  imf.delete();
-				  new DownloadImageThread(InfoActivity.this,im,intent.getStringExtra("bid")).start();				
+				  new DownloadImageThread(InfoActivity.this,im,intent.getStringExtra("bid")).start();
 				}
 			});
 

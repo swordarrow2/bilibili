@@ -1,12 +1,12 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
-import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.google.gson.*;
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;

@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
 import android.os.*;
@@ -6,6 +6,8 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.MainActivity;
+
 import java.io.*;
 import java.net.*;
 
@@ -30,7 +32,6 @@ public class LoginCoinFragment extends Fragment{
 						@Override
 						public void run(){
 							try{
-						//		sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie);
 								MainActivity.instence.showToast(MainActivity.instence.getSourceCode("https://www.bilibili.com",MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie));
 							  }catch(Exception e){
 								MainActivity.instence.showToast(e.toString());

@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper;
+package com.meng.bilibilihelper.activity;
 
 import android.app.*;
 import android.os.*;

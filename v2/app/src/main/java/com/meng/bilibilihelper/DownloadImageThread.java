@@ -5,6 +5,7 @@ import android.content.*;
 import android.graphics.*;
 import android.widget.*;
 import com.google.gson.*;
+import com.meng.bilibilihelper.activity.InfoActivity;
 import com.meng.bilibilihelper.javaBean.user.*;
 import java.io.*;
 import java.net.*;

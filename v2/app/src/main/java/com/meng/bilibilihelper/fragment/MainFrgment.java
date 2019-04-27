@@ -38,7 +38,20 @@ public class MainFrgment extends Fragment{
 							for(LoginInfoPeople l :MainActivity.instence. loginInfoPeopleHashMap.values()){
 								try{
 									Thread.sleep(1000);
-									MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.cs.sent.get(new Random().nextInt(MainActivity.instence.naiFragment.cs.sent.size())),l.cookie,editText.getText().toString());
+									String co="";
+									if(editText.getText().toString().equals("")){
+									  co=editText.getHint().toString();
+									}else{
+									  co=editText.getText().toString();
+									}
+									MainActivity.instence.naiFragment.sendDanmakuData(
+									  MainActivity.instence.naiFragment.cs.sent.get(
+										new Random().nextInt(
+										  MainActivity.instence.naiFragment.cs.sent.size()
+										)),
+									  l.cookie,
+									  co
+									);
 								  }catch(Exception e){
 									e.printStackTrace();
 								  }
@@ -47,7 +60,7 @@ public class MainFrgment extends Fragment{
 					  }).start();
 				}
 			});
-			
+
 		btn2.setOnClickListener(new OnClickListener() {
 
 			  @Override
@@ -59,7 +72,15 @@ public class MainFrgment extends Fragment{
 							for(LoginInfoPeople l : MainActivity.instence.loginInfoPeopleHashMap.values()){
 								try{
 									Thread.sleep(1000);
-									MainActivity.instence.signFragment.sendSignData(l.cookie,editText.getText().toString());
+									String co="";
+									if(editText.getText().toString().equals("")){
+										co=editText.getHint().toString();
+									  }else{
+										co=editText.getText().toString();
+									  }
+									MainActivity.instence.signFragment.sendSignData(
+									  l.cookie,co
+									);
 								  }catch(Exception e){
 									e.printStackTrace();
 								  }

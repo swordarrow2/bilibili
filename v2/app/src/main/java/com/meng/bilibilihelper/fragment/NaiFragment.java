@@ -74,7 +74,16 @@ public class NaiFragment extends Fragment{
 								  public void run(){
 									  try{
 										  String key = (String) parent.getItemAtPosition(position);
-										  sendDanmakuData((String) p1.getItemAtPosition(p3),MainActivity.instence. loginInfoPeopleHashMap.get(key).cookie,MainActivity.instence.mainFrgment.editText.getText().toString());
+										  String co="";
+										  if(MainActivity.instence.mainFrgment.editText.getText().toString().equals("")){
+											  co=MainActivity.instence.mainFrgment.editText.getHint().toString();
+											}else{
+											  co=MainActivity.instence.mainFrgment.editText.getText().toString();
+											}
+										  sendDanmakuData(
+											(String) p1.getItemAtPosition(p3),
+											MainActivity.instence.loginInfoPeopleHashMap.get(key).cookie,
+											co);
 										}catch(IOException e){
 										  e.printStackTrace();
 										}

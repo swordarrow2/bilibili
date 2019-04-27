@@ -35,7 +35,7 @@ public class MainFrgment extends Fragment{
 
 						@Override
 						public void run(){
-							for(LoginInfoPeople l :MainActivity.instence. loginInfoPeopleHashMap.values()){
+							for(LoginInfoPeople l :MainActivity.instence.loginInfoPeopleHashMap.values()){
 								try{
 									Thread.sleep(1000);
 									String co="";

@@ -9,6 +9,7 @@ import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.javaBean.liveCaptcha.*;
 import com.meng.bilibilihelper.javaBean.liveTimeStamp.*;
+import java.text.*;
 import java.util.*;
 
 public class GuaJiService extends Service{
@@ -56,33 +57,23 @@ public class GuaJiService extends Service{
 					  for(GuajiJavaBean g:guajijavabean){
 						  if(g.isNeedRefresh){
 							  try{
-								  LiveTimeStamp liveTimeStamp = getLiveTimeStamp(g.referer,g.cookie);
-								  LiveCaptcha liveCaptcha = getLiveCaptcha(g.referer,g.cookie);	
-								  g.timeStart=liveTimeStamp.data.time_start;
-								  g.timeEnd=liveTimeStamp.data.time_end;
-								  g.bitmap=liveCaptcha.data.img;
+								  g.liveTimeStamp=getLiveTimeStamp(g.referer,g.cookie);
 								  g.isNeedRefresh=false;
 								  g.isShowed=false;
+								  sendStartNotification(g);
 								}catch(Exception e){
 
 								}
 							}
-						  if(System.currentTimeMillis()/1000>g.timeEnd){	
+						  if(System.currentTimeMillis()/1000>g.liveTimeStamp.data.time_end){	
 							  if(g.isShowed)continue;
-							  Intent i=new Intent(getApplicationContext(),CaptchaDialogActivity.class);
-							  i.putExtra("start",g.timeStart);
-							  i.putExtra("end",g.timeEnd);
-							  i.putExtra("cookie",g.cookie);
-							  i.putExtra("base64",g.bitmap);
-							  i.putExtra("refer",g.referer);
-							  i.putExtra("pos",g.id);
-							  i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-							  getApplicationContext().startActivity(i);
+							  g.liveCaptcha=getLiveCaptcha(g.referer,g.cookie);							  
+							  sendNotification(g);
 							  g.isShowed=true;
 							}
 						}		
 					  try{
-						  Thread.sleep(5000);
+						  Thread.sleep(2000);
 						}catch(InterruptedException e){}
 					}
 				}
@@ -93,69 +84,64 @@ public class GuaJiService extends Service{
 
 	@Override
 	public int onStartCommand(final Intent intent,int flags,int startId){
-		sendNotification();
+
 		new Thread(new Runnable(){
 
 			  @Override
 			  public void run(){
-				  MainActivity.instence.showToast("任务"+intent.getIntExtra("pos",0)+"开始");
-				  GuajiJavaBean gua=new GuajiJavaBean();
-				  LoginInfoPeople loginInfoPeople = MainActivity.instence.loginInfo.loginInfoPeople.get(intent.getIntExtra("pos",0));
-				  gua.cookie=loginInfoPeople.cookie;
+				  MainActivity.instence.showToast("任务开始");		  
+				  GuajiJavaBean gua=new GuajiJavaBean(intent.getStringExtra("name"),intent.getStringExtra("refer"),intent.getStringExtra("cookie"));		
 				  for(GuajiJavaBean g:guajijavabean){
 					  if(g.cookie.equals(gua.cookie)){
 						  MainActivity.instence.showToast("任务已添加");
 						  return;
 						}
 					}
-				  gua.referer=intent.getStringExtra("refer");
-				  LiveTimeStamp liveTimeStamp = getLiveTimeStamp(gua.referer,gua.cookie);
-				  LiveCaptcha liveCaptcha = getLiveCaptcha(gua.referer,gua.cookie);	
-				  gua.timeStart=liveTimeStamp.data.time_start;
-				  gua.timeEnd=liveTimeStamp.data.time_end;
-				  gua.bitmap=liveCaptcha.data.img;
+				  gua.liveTimeStamp=getLiveTimeStamp(gua.referer,gua.cookie);
+				  gua.liveCaptcha=getLiveCaptcha(gua.referer,gua.cookie);	
 				  gua.id=m++;
 				  guajijavabean.add(gua);
+				  sendStartNotification(gua);
 				}
-			});
+			}).start();
 
 		return super.onStartCommand(intent,flags,startId);
 	  }
 
-	public void sendNotify(int iii){	
-
-		builder.setContentTitle("title")  
-		  .setContentText("content"+iii)
-		  .setSmallIcon(R.drawable.ic_launcher); 	  
-		Intent itt=new Intent(new Intent(GuaJiService.this,CaptchaDialogActivity.class));
-		itt.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-		PendingIntent intent = PendingIntent.getActivity(GuaJiService.this,0,itt,0);
-		builder.setContentIntent(intent);
-		manager.notify(iii,builder.build());
-
+	private void sendStartNotification(GuajiJavaBean g){
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("该账号正在运行:"+g.name)//设置通知栏标题
+		  .setContentText("下一次"+timeStampToDate(g.liveTimeStamp.data.time_end*1000))
+		  .setTicker("通知") //通知首次出现在通知栏，带上升动画效果的
+		  .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+		  .setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
+		Notification notification = builder.build();
+        if(notificationManager!=null){
+            notificationManager.notify(g.id,notification);
+		  }
 	  }
 
-
-	private void sendNotification(){
+	private void sendNotification(GuajiJavaBean g){
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         Intent notificationIntent = new Intent(this,CaptchaDialogActivity.class);
-		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);      
-		builder.setContentTitle("通知标题"+m)//设置通知栏标题
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		notificationIntent.putExtra("data",new Gson().toJson(g));
+		PendingIntent pendingIntent = PendingIntent.getActivity(this,g.id,notificationIntent,PendingIntent.FLAG_CANCEL_CURRENT);      	
+		builder.setContentTitle(g.name+"验证")//设置通知栏标题
 		  .setContentIntent(pendingIntent) //设置通知栏点击意图
-		  .setContentText("通知内容"+m)
+		  .setContentText("为该账号输入验证码:"+g.name)
 		  .setTicker("通知内容") //通知首次出现在通知栏，带上升动画效果的
 		  .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
 		  .setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
 		Notification notification = builder.build();
-        notification.flags|=Notification.FLAG_AUTO_CANCEL;
+        notification.flags|=Notification.FLAG_NO_CLEAR;
+		notification.flags|=Notification.FLAG_ONGOING_EVENT;
         if(notificationManager!=null){
-            notificationManager.notify(m++,notification);
+            notificationManager.notify(g.id,notification);
 		  }
 	  }
-
-
 
     public LiveTimeStamp getLiveTimeStamp(String refer,String cookie){
         return new Gson().fromJson(
@@ -222,5 +208,14 @@ public class GuaJiService extends Service{
         alertDialog.show();
         return succeess;
 	  }
-
+	  
+	public static String timeStampToDate(long tsp, String... format) {
+        SimpleDateFormat sdf;
+        if (format.length < 1) {
+            sdf = new SimpleDateFormat("HH:mm:ss",Locale.getDefault());
+		  } else {
+            sdf = new SimpleDateFormat(format[0], Locale.getDefault());
+		  }
+        return sdf.format(tsp);
+	 } 
   }

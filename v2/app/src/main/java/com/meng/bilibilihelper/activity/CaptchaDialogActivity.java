@@ -12,6 +12,7 @@ import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.getAward.*;
 import com.meng.bilibilihelper.javaBean.liveCaptcha.*;
 import java.io.*;
+import com.meng.bilibilihelper.javaBean.*;
 
 public class CaptchaDialogActivity extends Activity{
 
@@ -23,12 +24,12 @@ public class CaptchaDialogActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_fragment);
 		editText=(EditText)findViewById(R.id.et);
-		final Intent inte=getIntent();
 		ll=(LinearLayout)findViewById(R.id.drawer_layout);
 		im=new ImageView(this);
 		ll.addView(im);
+		final GuajiJavaBean guaji=new Gson().fromJson(getIntent().getStringExtra("data"),GuajiJavaBean.class);
 		Button btn = (Button) findViewById(R.id.naiAll);
-		String s=inte.getStringExtra("base64");
+		String s=guaji.liveCaptcha.data.img;
 		Bitmap b=getCaptcha(s.substring(s.indexOf(",")+1));
 		im.setImageBitmap(b);
 		btn.setText("send");
@@ -42,15 +43,15 @@ public class CaptchaDialogActivity extends Activity{
 
 						@Override
 						public void run(){
-							GetAward ge=getGetAward(inte.getStringExtra("start"),
-													inte.getStringExtra("end"),
+							GetAward ge=getGetAward(guaji.liveTimeStamp.data.time_start,
+													guaji.liveTimeStamp.data.time_end,
 													editText.getText().toString(),
-													inte.getStringExtra("cookie"),
-													inte.getStringExtra("refer"));
+													guaji.cookie,
+													guaji.referer);
 							MainActivity.instence.showToast(new Gson().toJson(ge));
 							if(ge.code!=0){
 								showToast("验证码错误");					  
-								final LiveCaptcha liveCaptcha = getLiveCaptcha(inte.getStringExtra("refer"),inte.getStringExtra("cookie"));
+								final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer,guaji.cookie);
 								runOnUiThread(new Runnable(){
 
 									  @Override
@@ -60,8 +61,8 @@ public class CaptchaDialogActivity extends Activity{
 										}
 									});					  
 							  }else{
-								MainActivity.instence.showToast(inte.getIntExtra("pos",0)+"成功");
-								GuaJiService.guajijavabean.get(inte.getIntExtra("pos",0)).isNeedRefresh=true;
+								MainActivity.instence.showToast(guaji.id+"成功");
+								GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
 								finish();
 							  }
 
@@ -90,7 +91,7 @@ public class CaptchaDialogActivity extends Activity{
 		  LiveCaptcha.class);
 	  }
 
-	public GetAward getGetAward(String time_start,String time_end,String captcha,String cookie,String refer){
+	public GetAward getGetAward(long time_start,long time_end,String captcha,String cookie,String refer){
         return new Gson().fromJson(
 		  MainActivity.instence.getSourceCode(
 			"https://api.live.bilibili.com/lottery/v1/SilverBox/getAward?time_start="+time_start+

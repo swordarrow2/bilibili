@@ -31,7 +31,8 @@ public class GuaJiFragment extends Fragment {
             @Override
             public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
                 Intent intentOne = new Intent(getActivity(), GuaJiService.class);
-                intentOne.putExtra("pos", p3);
+				intentOne.putExtra("name",(String)p1.getItemAtPosition(p3));
+                intentOne.putExtra("cookie", MainActivity.instence.loginInfo.loginInfoPeople.get(p3).cookie);
 				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.mainFrgment.editText.getText().toString());
                 getActivity().startService(intentOne);
             }

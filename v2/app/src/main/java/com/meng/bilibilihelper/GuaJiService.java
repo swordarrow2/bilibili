@@ -9,58 +9,113 @@ import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.javaBean.liveCaptcha.*;
 import com.meng.bilibilihelper.javaBean.liveTimeStamp.*;
+import java.util.*;
 
-public class GuaJiService extends IntentService{
+public class GuaJiService extends Service{
 
-    int m=0;
-
-	public GuaJiService(){
-		super("guaji");
+	@Override
+	public IBinder onBind(Intent p1){
+		return null;
 	  }
 
-    @Override
-	protected void onHandleIntent(final Intent intent){
-		/*	Intent ii=new Intent(getApplicationContext(),CaptchaDialogActivity.class);
-		 ii.putExtra("start","liveTimeStamp.data.time_start");
-		 ii.putExtra("end","liveTimeStamp.data.time_end");
-		 ii.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-		 getApplicationContext().startActivity(ii);
+    int m=0;
+	public static ArrayList<GuajiJavaBean> guajijavabean=new ArrayList<>();
 
-		 if(1==1)return;*/
-		MainActivity.instence.showToast("start");
-		LoginInfoPeople loginInfoPeople = MainActivity.instence.loginInfo.loginInfoPeople.get(intent.getIntExtra("pos",0));
-		String cookie = loginInfoPeople.cookie;
-		String refer = intent.getStringExtra("refer");
-		sendHeartBeat(true);
-		while(true){
-			LiveTimeStamp liveTimeStamp = getLiveTimeStamp(refer,cookie);
-			LiveCaptcha liveCaptcha = getLiveCaptcha(refer,cookie);	
-			MainActivity.instence.showToast(refer+"\n"+liveTimeStamp.data.time_start+"\n"+liveCaptcha.data.img);	
-			if(System.currentTimeMillis()/1000>liveTimeStamp.data.time_end){
-				//	showDialog(liveTimeStamp, liveCaptcha);
-				Intent i=new Intent(getApplicationContext(),CaptchaDialogActivity.class);
-				i.putExtra("start",liveTimeStamp.data.time_start);
-				i.putExtra("end",liveTimeStamp.data.time_end);
-				i.putExtra("cookie",cookie);
-				i.putExtra("base64",liveCaptcha.data.img);
-				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-				getApplicationContext().startActivity(i);
-			  }
-			try{
-				Thread.sleep(30000);
-			  }catch(InterruptedException e){
-				e.printStackTrace();
-			  }
-			sendHeartBeat(false);
-		  }
+	@Override
+	public void onCreate(){
+		super.onCreate();
+		new Thread(new Runnable(){
 
+			  @Override
+			  public void run(){
+				  while(true){
+					  for(GuajiJavaBean g:guajijavabean){
+						  sendHeartBeat(g.isFirstHeartBeat,g.cookie);
+						  g.isFirstHeartBeat=false;
+						}
+					  try{
+						  Thread.sleep(30000);
+						}catch(InterruptedException e){}
+					}
+				}
+			}).start();
+		new Thread(new Runnable(){
+
+			  @Override
+			  public void run(){
+				  while(true){
+					String s="";
+					  for(GuajiJavaBean g:guajijavabean){
+						if(g.isNeedRefresh){
+							LiveTimeStamp liveTimeStamp = getLiveTimeStamp(g.referer,g.cookie);
+							LiveCaptcha liveCaptcha = getLiveCaptcha(g.referer,g.cookie);	
+							g.timeStart=liveTimeStamp.data.time_start;
+							g.timeEnd=liveTimeStamp.data.time_end;
+							g.bitmap=liveCaptcha.data.img;
+							g.isNeedRefresh=false;
+							g.isShowed=false;
+						}
+						s+=g.id+"正在运行\n";
+						  if(System.currentTimeMillis()/1000>g.timeEnd){	
+						  if(g.isShowed)continue;
+							  Intent i=new Intent(getApplicationContext(),CaptchaDialogActivity.class);
+							  i.putExtra("start",g.timeStart);
+							  i.putExtra("end",g.timeEnd);
+							  i.putExtra("cookie",g.cookie);
+							  i.putExtra("base64",g.bitmap);
+							  i.putExtra("refer",g.referer);
+							  i.putExtra("pos",g.id);
+							  i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+							  getApplicationContext().startActivity(i);
+							  g.isShowed=true;
+							}
+						}
+						MainActivity.instence.showToast(s);
+					  try{
+						  Thread.sleep(5000);
+						}catch(InterruptedException e){}
+					}
+				}
+			}).start();
+			
+	  }
+
+	
+	@Override
+	public int onStartCommand(final Intent intent,int flags,int startId){
+		new Thread(new Runnable(){
+
+			  @Override
+			  public void run(){
+				  MainActivity.instence.showToast("任务"+intent.getIntExtra("pos",0)+"开始");
+				  GuajiJavaBean gua=new GuajiJavaBean();
+				  LoginInfoPeople loginInfoPeople = MainActivity.instence.loginInfo.loginInfoPeople.get(intent.getIntExtra("pos",0));
+				  gua.cookie = loginInfoPeople.cookie;
+				  for(GuajiJavaBean g:guajijavabean){
+					if(g.cookie.equals(gua.cookie)){
+					  MainActivity.instence.showToast("任务已添加");
+					  return;
+					}
+				  }
+				  gua.referer= intent.getStringExtra("refer");
+				  LiveTimeStamp liveTimeStamp = getLiveTimeStamp(gua.referer,gua.cookie);
+				  LiveCaptcha liveCaptcha = getLiveCaptcha(gua.referer,gua.cookie);	
+				  gua.timeStart=liveTimeStamp.data.time_start;
+				  gua.timeEnd=liveTimeStamp.data.time_end;
+				  gua.bitmap=liveCaptcha.data.img;
+				  gua.id=m++;
+				  guajijavabean.add(gua);
+				}
+			}).start();
+		
+		return super.onStartCommand(intent,flags,startId);
 	  }
 
     public LiveTimeStamp getLiveTimeStamp(String refer,String cookie){
         return new Gson().fromJson(
 		  MainActivity.instence.getSourceCode(
 			"https://api.live.bilibili.com/lottery/v1/SilverBox/getCurrentTask",
-			cookie,refer),
+			cookie),
 		  LiveTimeStamp.class);
 	  }
 
@@ -74,19 +129,19 @@ public class GuaJiService extends IntentService{
 
 
 
-    public void sendHeartBeat(boolean isFirst){
+    public void sendHeartBeat(boolean isFirst,String cookie){
         if(isFirst){
 			/*      return new Gson().fromJson(
 			 MainActivity.instence.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis()),
 			 GetAward.class);*/
-            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/feed/heartBeat?_="+System.currentTimeMillis());
+            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/feed/heartBeat?_="+System.currentTimeMillis(),cookie);
 		  }else{
 			/*    return new Gson().fromJson(
 			 MainActivity.instence.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/Feed/heartBeat"),
 			 GetAward.class);*/
-            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat");
+            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat",cookie);
 		  }
 	  }
 

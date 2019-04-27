@@ -152,7 +152,9 @@ public class MainActivity extends Activity{
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,new String[]{
-															"首页(大概)", "添加账号", "管理账号", "签到(测试)", "奶","挂机", "签到-直播间", "退出"
+															"首页(大概)", "添加账号", "管理账号", "签到(测试)", "奶",
+															"挂机", 
+															"签到-直播间", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override

@@ -23,11 +23,15 @@
             </intent-filter>
         </activity>
 		<activity android:name=".activity.Login"/>
+		<activity 
+			android:name=".activity.CaptchaDialogActivity"
+			android:theme="@android:style/Theme.Material.Dialog"
+            android:label="详细信息" />/>
         <activity
             android:theme="@android:style/Theme.Material.Dialog"
             android:name=".activity.InfoActivity"
             android:label="详细信息" />
-		<service android:name=".GuaJiService" />
+		<service android:name=".GuaJiService" />	
     </application>
 
 </manifest>

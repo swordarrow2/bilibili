@@ -40,6 +40,7 @@ public class MainActivity extends Activity{
     public SignFragment signFragment;
     public ManagerFragment managerFragment;
     public LoginCoinFragment loginCoinFragment;
+	public GuaJiFragment guaJiFragment;
 
     public FragmentManager manager;
     public RelativeLayout rt;
@@ -151,7 +152,7 @@ public class MainActivity extends Activity{
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,new String[]{
-															"首页(大概)", "添加账号", "管理账号", "签到(测试)", "奶", "签到-直播间", "退出"
+															"首页(大概)", "添加账号", "管理账号", "签到(测试)", "奶","挂机", "签到-直播间", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override
@@ -168,6 +169,9 @@ public class MainActivity extends Activity{
                         break;
 					  case "奶":
                         initNaiFragment(true);
+                        break;
+					  case "挂机":
+                        initGuajiFragment(true);
                         break;
 					  case "签到-直播间":
                         initSignFragment(true);
@@ -201,6 +205,7 @@ public class MainActivity extends Activity{
         initSignFragment(false);
         initManagerFragment(false);
         initLoginCoinFragment(false);
+		initGuajiFragment(false);
         initMainFragment(true);
 	  }
 
@@ -268,14 +273,28 @@ public class MainActivity extends Activity{
 		  }
         transactionBusR.commit();
 	  }
-
+	  
+	private void initGuajiFragment(boolean showNow){
+        FragmentTransaction transactionBusR = manager.beginTransaction();
+        if(guaJiFragment==null){
+            guaJiFragment=new GuaJiFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout,guaJiFragment);
+		  }
+        hideFragment(transactionBusR);
+        if(showNow){
+            transactionBusR.show(guaJiFragment);
+		  }
+        transactionBusR.commit();
+	  }
+	
     public void hideFragment(FragmentTransaction transaction){
         Fragment fs[] = {
 			mainFrgment,
 			naiFragment,
 			signFragment,
 			managerFragment,
-			loginCoinFragment
+			loginCoinFragment,
+			guaJiFragment
 		  };
         for(Fragment f : fs){
             if(f!=null){

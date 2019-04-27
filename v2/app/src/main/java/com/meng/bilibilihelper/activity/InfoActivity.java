@@ -20,6 +20,7 @@ import java.net.*;
 import android.view.View.*;
 
 public class InfoActivity extends Activity{
+
 	public ProgressBar progressBar;
 	public static String mainDic = "";
 

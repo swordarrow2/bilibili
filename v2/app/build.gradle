@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "com.meng.bilibilihelper"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 23
         versionCode 2
         versionName "0.2"
     }

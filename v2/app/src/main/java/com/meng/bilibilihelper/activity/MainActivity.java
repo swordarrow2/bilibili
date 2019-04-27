@@ -28,7 +28,8 @@ import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.materialDesign.ActionBarDrawerToggle;
 
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity{	
+
     public static MainActivity instence;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;

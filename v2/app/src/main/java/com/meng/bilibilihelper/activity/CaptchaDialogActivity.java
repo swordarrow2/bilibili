@@ -60,6 +60,7 @@ public class CaptchaDialogActivity extends Activity{
 										}
 									});					  
 							  }else{
+								MainActivity.instence.showToast(inte.getIntExtra("pos",0)+"成功");
 								GuaJiService.guajijavabean.get(inte.getIntExtra("pos",0)).isNeedRefresh=true;
 								finish();
 							  }

@@ -3,6 +3,7 @@ package com.meng.bilibilihelper;
 import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
@@ -57,7 +58,17 @@ public class GuaJiService extends Service{
 					  for(GuajiJavaBean g:guajijavabean){
 						  if(g.isNeedRefresh){
 							  try{
+								  if(g.finish){
+									  continue;
+									}
 								  g.liveTimeStamp=getLiveTimeStamp(g.referer,g.cookie);
+								  Log.e("iii|,",new Gson().toJson(g));
+								  if(g.liveTimeStamp.code==-10017){
+									  g.finish=true;
+									  MainActivity.instence.showToast(g.liveTimeStamp.message);
+									  sendEndNotification(g);
+									  continue;
+									}
 								  g.isNeedRefresh=false;
 								  g.isShowed=false;
 								  sendStartNotification(g);
@@ -66,14 +77,18 @@ public class GuaJiService extends Service{
 								}
 							}
 						  if(System.currentTimeMillis()/1000>g.liveTimeStamp.data.time_end){	
-							  if(g.isShowed)continue;
-							  g.liveCaptcha=getLiveCaptcha(g.referer,g.cookie);							  
-							  sendNotification(g);
-							  g.isShowed=true;
+							  if(g.isShowed||g.finish)continue;
+							  try{
+								  g.liveCaptcha=getLiveCaptcha(g.referer,g.cookie);							  
+								  sendNotification(g);
+								  g.isShowed=true;
+								}catch(Exception e){
+
+								}
 							}
 						}		
 					  try{
-						  Thread.sleep(2000);
+						  Thread.sleep(500);
 						}catch(InterruptedException e){}
 					}
 				}
@@ -112,7 +127,22 @@ public class GuaJiService extends Service{
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle("该账号正在运行:"+g.name)//设置通知栏标题
-		  .setContentText("下一次"+timeStampToDate(g.liveTimeStamp.data.time_end*1000))
+		  .setContentText("下一次"+timeStampToDate(g.liveTimeStamp.data.time_end*1000)+"  正在进行第"+g.liveTimeStamp.data.times+"波")
+		  .setTicker("通知") //通知首次出现在通知栏，带上升动画效果的
+		  .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+		  .setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
+		Notification notification = builder.build();
+        if(notificationManager!=null){
+            notificationManager.notify(g.id,notification);
+		  }
+	  }
+
+
+	private void sendEndNotification(GuajiJavaBean g){
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("该账号已挂机完毕:"+g.name)//设置通知栏标题
+		  .setContentText(g.name+"没有新的宝箱了")
 		  .setTicker("通知") //通知首次出现在通知栏，带上升动画效果的
 		  .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
 		  .setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
@@ -208,14 +238,14 @@ public class GuaJiService extends Service{
         alertDialog.show();
         return succeess;
 	  }
-	  
-	public static String timeStampToDate(long tsp, String... format) {
+
+	public static String timeStampToDate(long tsp,String... format){
         SimpleDateFormat sdf;
-        if (format.length < 1) {
-            sdf = new SimpleDateFormat("HH:mm:ss",Locale.getDefault());
-		  } else {
-            sdf = new SimpleDateFormat(format[0], Locale.getDefault());
+        if(format.length<1){
+            sdf=new SimpleDateFormat("HH:mm:ss",Locale.getDefault());
+		  }else{
+            sdf=new SimpleDateFormat(format[0],Locale.getDefault());
 		  }
         return sdf.format(tsp);
-	 } 
+	  } 
   }

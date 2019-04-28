@@ -22,18 +22,15 @@ public class CaptchaDialogActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_fragment);
+		setContentView(R.layout.captcha);
 		editText=(EditText)findViewById(R.id.et);
 		ll=(LinearLayout)findViewById(R.id.drawer_layout);
-		im=new ImageView(this);
-		ll.addView(im);
+		im=(ImageView)findViewById(R.id.captchaImageView);
 		final GuajiJavaBean guaji=new Gson().fromJson(getIntent().getStringExtra("data"),GuajiJavaBean.class);
 		Button btn = (Button) findViewById(R.id.naiAll);
 		String s=guaji.liveCaptcha.data.img;
 		Bitmap b=getCaptcha(s.substring(s.indexOf(",")+1));
 		im.setImageBitmap(b);
-		btn.setText("send");
-		((Button)findViewById(R.id.signAll)).setVisibility(View.GONE);
 		btn.setOnClickListener(new OnClickListener() {
 
 			  @Override
@@ -49,24 +46,35 @@ public class CaptchaDialogActivity extends Activity{
 													guaji.cookie,
 													guaji.referer);
 							MainActivity.instence.showToast(new Gson().toJson(ge));
-							if(ge.code!=0){
-								showToast("验证码错误");					  
-								final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer,guaji.cookie);
-								runOnUiThread(new Runnable(){
+							switch(ge.code){
+								case 0:
+								  showToast(guaji.name+"成功");
+								  GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
+								  finish(); 
+								  break;
+								case -500:
+								  showToast(ge.msg);
+								  break;
+								case -901:								
+								case -902:
+								  showToast(ge.message);			
+								  final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer,guaji.cookie);
+								  runOnUiThread(new Runnable(){
 
-									  @Override
-									  public void run(){
-										  Bitmap b=getCaptcha(liveCaptcha.data.img.substring(liveCaptcha.data.img.indexOf(",")+1));
-										  im.setImageBitmap(b);
-										}
-									});					  
-							  }else{
-								MainActivity.instence.showToast(guaji.id+"成功");
-								GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
-								finish();
+										@Override
+										public void run(){
+											Bitmap b=getCaptcha(liveCaptcha.data.img.substring(liveCaptcha.data.img.indexOf(",")+1));
+											im.setImageBitmap(b);
+										  }
+									  });				
+								  break;
+								case -903:
+								  MainActivity.instence.showToast(ge.message);
+								  GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
+								  finish();
+								  break;
 							  }
-
-						  }
+						  }						
 					  }).start();
 
 				}

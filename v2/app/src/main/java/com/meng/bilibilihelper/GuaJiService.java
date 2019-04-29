@@ -12,6 +12,7 @@ import com.meng.bilibilihelper.javaBean.liveCaptcha.*;
 import com.meng.bilibilihelper.javaBean.liveTimeStamp.*;
 import java.text.*;
 import java.util.*;
+import android.widget.*;
 
 public class GuaJiService extends Service{
 
@@ -66,12 +67,18 @@ public class GuaJiService extends Service{
 								  if(g.liveTimeStamp.code==-10017){
 									  g.finish=true;
 									  MainActivity.instence.showToast(g.liveTimeStamp.message);
-									  sendEndNotification(g);
+									  if(!SharedPreferenceHelper.getBoolean("notifi",false)){
+										  sendEndNotification(g);
+										}
 									  continue;
 									}
 								  g.isNeedRefresh=false;
 								  g.isShowed=false;
-								  sendStartNotification(g);
+								  if(SharedPreferenceHelper.getBoolean("notifi",false)){
+									  sendRunningNotifi();
+									}else{
+									  sendStartNotification(g);
+									}
 								}catch(Exception e){
 
 								}
@@ -79,8 +86,8 @@ public class GuaJiService extends Service{
 						  if(System.currentTimeMillis()/1000>g.liveTimeStamp.data.time_end){	
 							  if(g.isShowed||g.finish)continue;
 							  try{
-								  g.liveCaptcha=getLiveCaptcha(g.referer,g.cookie);							  
-								  sendNotification(g);
+								  g.liveCaptcha=getLiveCaptcha(g.referer,g.cookie);										  
+								  sendNotification(g);								
 								  g.isShowed=true;
 								}catch(Exception e){
 
@@ -116,7 +123,12 @@ public class GuaJiService extends Service{
 				  gua.liveCaptcha=getLiveCaptcha(gua.referer,gua.cookie);	
 				  gua.id=m++;
 				  guajijavabean.add(gua);
-				  sendStartNotification(gua);
+				  if(SharedPreferenceHelper.getBoolean("notifi",false)){
+					  sendRunningNotifi();
+					}else{
+					  sendStartNotification(gua);
+					}
+
 				}
 			}).start();
 
@@ -149,6 +161,27 @@ public class GuaJiService extends Service{
 		Notification notification = builder.build();
         if(notificationManager!=null){
             notificationManager.notify(g.id,notification);
+		  }
+	  }
+
+	private void sendRunningNotifi(){
+		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		Notification.Builder builder = new Notification.Builder(this);
+		StringBuilder sb=new StringBuilder();
+		for(GuajiJavaBean gu:guajijavabean){
+		  if(gu.finish)continue;
+			sb.append(gu.name).append(" ");
+		  }
+		builder.setContentTitle("直播间挂机正在进行")//设置通知栏标题		
+		  .setContentText(sb.toString())
+		  .setTicker("发发发") //通知首次出现在通知栏，带上升动画效果的
+		  .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+		  .setSmallIcon(R.drawable.ic_launcher);//设置通知小ICON
+		Notification notification = builder.build();
+		notification.flags|=Notification.FLAG_NO_CLEAR;
+		notification.flags|=Notification.FLAG_ONGOING_EVENT;
+		if(notificationManager!=null){
+			notificationManager.notify(-1,notification);
 		  }
 	  }
 

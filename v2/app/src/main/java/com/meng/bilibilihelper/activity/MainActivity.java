@@ -42,6 +42,7 @@ public class MainActivity extends Activity{
     public ManagerFragment managerFragment;
     public LoginCoinFragment loginCoinFragment;
 	public GuaJiFragment guaJiFragment;
+	public SettingsFragment stf;
 
     public FragmentManager manager;
     public RelativeLayout rt;
@@ -62,6 +63,8 @@ public class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instence=this;
+		ExceptionCatcher.getInstance().init(this);
+		SharedPreferenceHelper.init(this,"settings");
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
@@ -103,6 +106,11 @@ public class MainActivity extends Activity{
 			  }
 		  }
         adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
+		if(SharedPreferenceHelper.getBoolean("opendraw",true)){
+		  mDrawerLayout.openDrawer(mDrawerList);
+		}else{
+		  mDrawerLayout.closeDrawer(mDrawerList);
+		}
 	  }
 
     private void setActionBar(){
@@ -155,7 +163,7 @@ public class MainActivity extends Activity{
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,new String[]{
 															"首页(大概)", "添加账号", "管理账号", "签到(测试)", "奶",
 															"挂机", 
-															"签到-直播间", "退出"
+															"签到-直播间","设置", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			  @Override
@@ -179,11 +187,14 @@ public class MainActivity extends Activity{
 					  case "签到-直播间":
                         initSignFragment(true);
                         break;
+					  case "设置":
+                        initStFragment(true);
+                        break;
 					  case "签到(测试)":
                         initLoginCoinFragment(true);
                         break;
 					  case "退出":
-                        if(true){
+                        if(SharedPreferenceHelper.getBoolean("exit",false)){
                             System.exit(0);
 						  }else{
                             finish();
@@ -209,6 +220,7 @@ public class MainActivity extends Activity{
         initManagerFragment(false);
         initLoginCoinFragment(false);
 		initGuajiFragment(false);
+		initStFragment(false);
         initMainFragment(true);
 	  }
 
@@ -289,7 +301,20 @@ public class MainActivity extends Activity{
 		  }
         transactionBusR.commit();
 	  }
-	
+	private void initStFragment(boolean showNow){
+        FragmentTransaction transactionBusR = manager.beginTransaction();
+        if(stf==null){
+            stf=new SettingsFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout,stf);
+		  }
+        hideFragment(transactionBusR);
+        if(showNow){
+            transactionBusR.show(stf);
+		  }
+        transactionBusR.commit();
+	  }
+	  
+	  
     public void hideFragment(FragmentTransaction transaction){
         Fragment fs[] = {
 			mainFrgment,
@@ -297,7 +322,8 @@ public class MainActivity extends Activity{
 			signFragment,
 			managerFragment,
 			loginCoinFragment,
-			guaJiFragment
+			guaJiFragment,
+			stf
 		  };
         for(Fragment f : fs){
             if(f!=null){

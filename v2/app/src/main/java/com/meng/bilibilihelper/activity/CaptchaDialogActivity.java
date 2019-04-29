@@ -46,17 +46,26 @@ public class CaptchaDialogActivity extends Activity{
 													guaji.cookie,
 													guaji.referer);
 							MainActivity.instence.showToast(new Gson().toJson(ge));
+							NotificationManager manager=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);						
 							switch(ge.code){
 								case 0:
 								  showToast(guaji.name+"成功");
 								  GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
+								  if(SharedPreferenceHelper.getBoolean("notifi",false)){								  
+									  manager.cancel(guaji.id);
+									}
 								  finish(); 
 								  break;
-								case -500:
+								case -500:  //时间未到
 								  showToast(ge.msg);
+								  if(SharedPreferenceHelper.getBoolean("notifi",false)){								  
+									  manager.cancel(guaji.id);
+									}
+								  GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
+								  finish();
 								  break;
-								case -901:								
-								case -902:
+								case -901:	//过期					  
+								case -902:  //错误
 								  showToast(ge.message);			
 								  final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer,guaji.cookie);
 								  runOnUiThread(new Runnable(){
@@ -69,7 +78,10 @@ public class CaptchaDialogActivity extends Activity{
 									  });				
 								  break;
 								case -903:
-								  MainActivity.instence.showToast(ge.message);
+								  MainActivity.instence.showToast("已经领取过了");
+								  if(SharedPreferenceHelper.getBoolean("notifi",false)){								  
+									  manager.cancel(guaji.id);
+									}
 								  GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh=true;
 								  finish();
 								  break;

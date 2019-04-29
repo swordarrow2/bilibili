@@ -66,6 +66,7 @@ public class GuaJiService extends Service{
 								  Log.e("iii|,",new Gson().toJson(g));
 								  if(g.liveTimeStamp.code==-10017){
 									  g.finish=true;
+									  sendRunningNotifi();
 									  MainActivity.instence.showToast(g.liveTimeStamp.message);
 									  if(!SharedPreferenceHelper.getBoolean("notifi",false)){
 										  sendEndNotification(g);

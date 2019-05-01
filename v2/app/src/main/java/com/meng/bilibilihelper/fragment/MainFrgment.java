@@ -8,6 +8,8 @@ import android.widget.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 
 public class MainFrgment extends Fragment{
@@ -89,8 +91,26 @@ public class MainFrgment extends Fragment{
 					  }).start();
 				}
 			});
-
-
-
 	  }
+	  
+	public String readStringFromNetwork(String url) {
+        try {
+            URL u = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+            InputStream in = connection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+			  }
+            return sb.toString();
+		  } catch (Exception e) {
+            return "{}";
+		  }
+	  }
+	
   }

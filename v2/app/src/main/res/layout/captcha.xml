@@ -18,11 +18,18 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="发送" />
+			
 		<ImageView
 			android:layout_gravity="center"
 			android:scaleType="fitCenter"
 			android:layout_width="320dp"
 			android:layout_height="80dp" 
 			android:id="@+id/captchaImageView" />
+		
+		<WebView
+			android:id="@+id/webview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+		
 	</LinearLayout>
 </RelativeLayout>

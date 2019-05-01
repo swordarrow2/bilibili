@@ -168,10 +168,15 @@ public class GuaJiService extends Service{
 	private void sendRunningNotifi(){
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		Notification.Builder builder = new Notification.Builder(this);
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb=new StringBuilder("");
 		for(GuajiJavaBean gu:guajijavabean){
 		  if(gu.finish)continue;
 			sb.append(gu.name).append(" ");
+		  }
+		  if(sb.toString().equals("")){
+			stopSelf();
+			manager.cancel(-1);
+			return;
 		  }
 		builder.setContentTitle("直播间挂机正在进行")//设置通知栏标题		
 		  .setContentText(sb.toString())

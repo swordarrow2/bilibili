@@ -50,7 +50,7 @@ public class NaiFragment extends Fragment {
                     "点歌 忘れがたき、よすがの緑",
                     "点歌 遥か38万キロのボヤージュ",
                     "点歌 プレイヤーズスコア"};
-            customSentence.sentense.addAll(Arrays.asList(strings));
+            customSentence.sent.addAll(Arrays.asList(strings));
             saveConfig();
         } else {
             String s = "{}";
@@ -67,7 +67,7 @@ public class NaiFragment extends Fragment {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
                 ListView naiSentenseListview = new ListView(getActivity());
-                naiSentenseListview.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sentense));
+                naiSentenseListview.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent));
                 naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
                     @Override
@@ -124,7 +124,7 @@ public class NaiFragment extends Fragment {
     }
 
     public String getRandomSentense(){
-        return customSentence.sentense.get(new Random().nextInt(customSentence.sentense.size()));
+        return customSentence.sent.get(new Random().nextInt(customSentence.sent.size()));
     }
 
     public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {

@@ -2,146 +2,175 @@ package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
 import android.os.*;
-import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
+import android.text.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
-
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.persionInfo.PlanePlayer;
-import com.meng.bilibilihelper.javaBean.persionInfo.PlanePlayerList;
-
+import com.meng.bilibilihelper.javaBean.persionInfo.*;
+import com.meng.bilibilihelper.javaBean.spaceToLive.*;
+import com.meng.bilibilihelper.javaBean.user.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class MainFrgment extends Fragment {
+public class MainFrgment extends Fragment{
 
     public AutoCompleteTextView autoCompleteTextView;
     public PlanePlayerList planePlayerList = null;
+	public LinearLayout l1;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_fragment, container, false);
-    }
+    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState){
+        return inflater.inflate(R.layout.main_fragment,container,false);
+	  }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.autoCompleteTextview);
+    public void onViewCreated(View view,Bundle savedInstanceState){
+        super.onViewCreated(view,savedInstanceState);
+        autoCompleteTextView=(AutoCompleteTextView) view.findViewById(R.id.autoCompleteTextview);
         autoCompleteTextView.addTextChangedListener(textWatcher);
         Button btn = (Button) view.findViewById(R.id.naiAll);
         Button btn2 = (Button) view.findViewById(R.id.signAll);
+		l1=(LinearLayout)view.findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
         btn.setOnClickListener(onClickListener);
         btn2.setOnClickListener(onClickListener);
         new Thread(new Runnable() {
-            @Override
-            public void run() {
-                planePlayerList = new Gson().fromJson(readStringFromNetwork("https://github.com/swordarrow2/swordarrow2.github.io/blob/master/configV2.json"), PlanePlayerList.class);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<String> list = new ArrayList<>();
-                        for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
-                            list.add(planePlayer.name);
-                            list.add(String.valueOf(planePlayer.bliveRoom));
-                        }
-                        autoCompleteTextView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
-                        Toast.makeText(getActivity(), "飞机佬信息服务器连接成功", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        }).start();
-    }
+			  @Override
+			  public void run(){
+				  planePlayerList=new Gson().fromJson(readStringFromNetwork("https://swordarrow2.github.io/configV2.json"),PlanePlayerList.class);
+
+				  getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run(){
+							if(planePlayerList.planePlayers.size()==0){				  
+								Toast.makeText(getActivity(),"飞机佬信息服务器连接失败",Toast.LENGTH_SHORT).show();
+							  }else{
+								Toast.makeText(getActivity(),"飞机佬信息服务器连接成功",Toast.LENGTH_SHORT).show();
+								ArrayList<String> list = new ArrayList<>();
+								for(PlanePlayer planePlayer : planePlayerList.planePlayers){
+									list.add(planePlayer.name);
+									list.add(String.valueOf(planePlayer.bliveRoom));
+								  }
+								autoCompleteTextView.setAdapter(new ArrayAdapter<String>(getActivity(),android.R.layout.simple_dropdown_item_1line,list));   
+							  }
+						  }
+					  });
+				}
+			}).start();
+	  }
 
     OnClickListener onClickListener = new OnClickListener() {
         @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
+        public void onClick(View v){
+            switch(v.getId()){
                 case R.id.naiAll:
-                    new Thread(new Runnable() {
+				  new Thread(new Runnable() {
 
                         @Override
-                        public void run() {
-                            for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfoPeopleHashMap.values()) {
-                                try {
+                        public void run(){
+                            for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfoPeopleHashMap.values()){
+                                try{
                                     Thread.sleep(1000);
-                                    String room = autoCompleteTextView.getText().toString().equals("") ? autoCompleteTextView.getHint().toString() : autoCompleteTextView.getText().toString();
-                                    MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.getRandomSentense(), loginInfoPeople.cookie, room);
-                                } catch (Exception e) {
+                                    String room = autoCompleteTextView.getText().toString().equals("")? autoCompleteTextView.getHint().toString() :autoCompleteTextView.getText().toString();
+                                    MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.getRandomSentense(),loginInfoPeople.cookie,room);
+								  }catch(Exception e){
                                     e.printStackTrace();
-                                }
-                            }
-                        }
-                    }).start();
-                    break;
+								  }
+							  }
+						  }
+					  }).start();
+				  break;
                 case R.id.signAll:
-                    new Thread(new Runnable() {
+				  new Thread(new Runnable() {
 
                         @Override
-                        public void run() {
-                            String room = autoCompleteTextView.getText().toString().equals("") ? autoCompleteTextView.getHint().toString() : autoCompleteTextView.getText().toString();
-                            for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfoPeopleHashMap.values()) {
-                                try {
+                        public void run(){
+                            String room = autoCompleteTextView.getText().toString().equals("")? autoCompleteTextView.getHint().toString() :autoCompleteTextView.getText().toString();
+                            for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfoPeopleHashMap.values()){
+                                try{
                                     Thread.sleep(1000);
-                                    MainActivity.instence.signFragment.sendSignData(loginInfoPeople.cookie, room);
-                                } catch (Exception e) {
+                                    MainActivity.instence.signFragment.sendSignData(loginInfoPeople.cookie,room);
+								  }catch(Exception e){
                                     e.printStackTrace();
-                                }
-                            }
-                        }
-                    }).start();
-                    break;
-            }
-        }
-    };
+								  }
+							  }
+						  }
+					  }).start();
+				  break;
+			  }
+		  }
+	  };
 
     TextWatcher textWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        public void beforeTextChanged(CharSequence s,int start,int count,int after){
 
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
+		  }
 
         @Override
-        public void afterTextChanged(Editable s) {
-            if (planePlayerList != null) {
-                for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
-                    if (s.toString().equals(planePlayer.name)) {
-                        s = new SpannableStringBuilder(String.valueOf(planePlayer.bliveRoom));
-                    }
-                }
-            }
-        }
-    };
+        public void onTextChanged(CharSequence s,int start,int before,int count){
 
-    public String readStringFromNetwork(String url) {
-        try {
+		  }
+
+        @Override
+        public void afterTextChanged(Editable s){
+            if(planePlayerList!=null){
+                for(final PlanePlayer planePlayer : planePlayerList.planePlayers){
+                    if(s.toString().equals(planePlayer.name)){
+						autoCompleteTextView.setText(String.valueOf(planePlayer.bliveRoom));
+						new Thread(new Runnable(){
+
+							  @Override
+							  public void run(){
+								  final BilibiliPersonInfo person = new Gson().fromJson(readStringFromNetwork("https://api.bilibili.com/x/space/acc/info?mid="+planePlayer.bid+"&jsonp=jsonp"),BilibiliPersonInfo.class);
+								  final SpaceToLiveJavaBean sjb = new Gson().fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+planePlayer.bid),SpaceToLiveJavaBean.class);							  
+								  getActivity().runOnUiThread(new Runnable(){
+										@Override
+										public void run(){
+											l1.removeAllViews();
+											l1.addView(new MengTextview(getActivity(),"屑站ID",person.data.mid));
+											l1.addView(new MengTextview(getActivity(),"用户名",person.data.name));
+											l1.addView(new MengTextview(getActivity(),"直播URL",sjb.data.url));
+											l1.addView(new MengTextview(getActivity(),"标题",sjb.data.title));
+											l1.addView(new MengTextview(getActivity(),"状态",sjb.data.liveStatus==1?"正在直播":"未直播"));																
+										  }
+									  });		
+								}
+							}).start();
+						break;
+					  }
+				  }
+			  }
+		  }
+	  };
+
+    public String readStringFromNetwork(final String url){
+        try{
             URL u = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) u.openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
             InputStream in = connection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             StringBuilder sb = new StringBuilder();
             String line;
-            while ((line = br.readLine()) != null) {
+            while((line=br.readLine())!=null){
                 sb.append(line);
-            }
+			  }	
             return sb.toString();
-        } catch (Exception e) {
-            return "{\"personInfo\":[]}";
-        }
-    }
+		  }catch(final Exception e){
+			getActivity().runOnUiThread(new Runnable(){
 
-}
+				  @Override
+				  public void run(){
+					  Toast.makeText(getActivity(),url+" "+e.toString(),Toast.LENGTH_SHORT).show();
+					}
+				});
+            return "{\"personInfo\":[]}";
+		  }
+	  }
+
+  }

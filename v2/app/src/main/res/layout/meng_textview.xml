@@ -15,12 +15,11 @@
 		android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
 		android:paddingRight="?android:attr/listPreferredItemPaddingRight"
 		android:text="gouliguojiashengsiyi"
-		android:textAppearance="?android:attr/textAppearanceListItemSmall"
-		android:textColor="#ffffff"/>
+		android:textAppearance="?android:attr/textAppearanceListItemSmall" />
 
 	<TextView
 		android:autoLink="web"
-		android:maxWidth="230dp"
+		android:maxWidth="270dp"
 		android:id="@+id/meng_network_TextView2"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -30,8 +29,7 @@
 		android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
 		android:paddingRight="?android:attr/listPreferredItemPaddingRight"
 		android:text="qiyinhuofubiquzhi"
-		android:textAppearance="?android:attr/textAppearanceListItemSmall"
-		android:textColor="#ffffff"/>
+		android:textAppearance="?android:attr/textAppearanceListItemSmall" />
 
 	<ProgressBar
 		android:id="@+id/meng_network_ProgressBar"

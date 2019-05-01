@@ -4,27 +4,26 @@ import android.app.*;
 import android.content.*;
 import android.util.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 
-public class MengNetworkTextview extends LinearLayout{
+public class MengTextview extends LinearLayout{
 	private Context context;
 
 	private TextView textViewTitle;
 	private TextView textViewSummry;
 	private ProgressBar progressBar;
 
-	public MengNetworkTextview(Context context,String title,long summry){
+	public MengTextview(Context context, String title, long summry){
 		this(context,title,String.valueOf(summry));
 	  }
-	public MengNetworkTextview(Context context,String title,float summry){
+	public MengTextview(Context context, String title, float summry){
 		this(context,title,String.valueOf(summry));
 	  }
 
-	public MengNetworkTextview(final Context context,String title,String summry){
+	public MengTextview(final Context context, String title, String summry){
 		super(context);
 		this.context=context;
-		LayoutInflater.from(context).inflate(R.layout.meng_network_textview,this);
+		LayoutInflater.from(context).inflate(R.layout.meng_textview,this);
 		textViewTitle=(TextView) findViewById(R.id.meng_network_TextView);
 		textViewSummry=(TextView) findViewById(R.id.meng_network_TextView2);
 		progressBar=(ProgressBar) findViewById(R.id.meng_network_ProgressBar);
@@ -42,10 +41,10 @@ public class MengNetworkTextview extends LinearLayout{
 				}
 			});
 	  }
-	public MengNetworkTextview(final Context context,AttributeSet attributeSet){
+	public MengTextview(final Context context, AttributeSet attributeSet){
 		super(context,attributeSet);
 		this.context=context;
-		LayoutInflater.from(context).inflate(R.layout.meng_network_textview,this);
+		LayoutInflater.from(context).inflate(R.layout.meng_textview,this);
 		textViewTitle=(TextView) findViewById(R.id.meng_network_TextView);
 		textViewSummry=(TextView) findViewById(R.id.meng_network_TextView2);
 		progressBar=(ProgressBar) findViewById(R.id.meng_network_ProgressBar);
@@ -77,7 +76,7 @@ public class MengNetworkTextview extends LinearLayout{
 			  public void run(){
 				  textViewSummry.setText(s);
 				  progressBar.setVisibility(GONE);
-				  MengNetworkTextview.this.setVisibility(VISIBLE);
+				  MengTextview.this.setVisibility(VISIBLE);
 				}
 			});
 	  }

@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.javaBean;
+package com.meng.bilibilihelper.javaBean.liveCaptcha;
 
 public class ReturnData {
     public int code = 0;

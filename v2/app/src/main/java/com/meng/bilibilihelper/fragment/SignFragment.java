@@ -31,7 +31,7 @@ public class SignFragment extends Fragment{
 						@Override
 						public void run(){
 							try{
-								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie,MainActivity.instence.mainFrgment.editText.getText().toString());
+								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie,MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString());
 							  }catch(Exception e){
 								e.printStackTrace();
 							  }

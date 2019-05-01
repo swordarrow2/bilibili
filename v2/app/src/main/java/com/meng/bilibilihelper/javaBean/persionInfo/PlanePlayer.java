@@ -1,6 +1,6 @@
-package com.meng.bilibilihelper.javaBean;
+package com.meng.bilibilihelper.javaBean.persionInfo;
 
-public class PersonInfo{
+public class PlanePlayer {
 	public String name = "";
 	public long qq = 0;
 	public int bid = 0;

@@ -10,7 +10,7 @@
 		android:orientation="vertical">
 		<EditText
 			android:inputType="number"
-			android:id="@+id/et"
+			android:id="@+id/autoCompleteTextview"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 		<Button

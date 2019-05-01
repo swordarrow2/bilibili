@@ -24,7 +24,7 @@ public class CaptchaDialogActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.captcha);
-		editText=(EditText)findViewById(R.id.et);
+		editText=(EditText)findViewById(R.id.autoCompleteTextview);
 		ll=(LinearLayout)findViewById(R.id.drawer_layout);
 		im=(ImageView)findViewById(R.id.captchaImageView);
 		final GuajiJavaBean guaji=new Gson().fromJson(getIntent().getStringExtra("data"),GuajiJavaBean.class);
@@ -60,7 +60,7 @@ public class CaptchaDialogActivity extends Activity{
 			});
 
 		long timeRequired = System.currentTimeMillis()-start;
-		//editText.setHint("识别结果"+textResult+"时间"+timeRequired);
+		//autoCompleteTextView.setHint("识别结果"+textResult+"时间"+timeRequired);
 	*/	btn.setOnClickListener(new OnClickListener() {
 
 			  @Override

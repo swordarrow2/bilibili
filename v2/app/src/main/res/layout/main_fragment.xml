@@ -1,40 +1,42 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-	
-	<LinearLayout 
-		android:id="@+id/drawer_layout"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:orientation="vertical">
+    android:layout_height="match_parent">
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal" >
+    <LinearLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-			<Button
-				android:id="@+id/naiAll"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="全部奶一遍(" />
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:completionThreshold="1"
+            android:hint="2409909"
+            android:inputType="number" />
 
-			<Button
-				android:id="@+id/signAll"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="全部签到" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-		</LinearLayout>
+            <Button
+                android:id="@+id/naiAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="全部奶一遍(" />
 
-		<EditText
-			android:inputType="number"
-			android:hint="2409909"
-			android:id="@+id/et"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/signAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="全部签到" />
 
-	</LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>           
 
 

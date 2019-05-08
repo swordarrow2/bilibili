@@ -24,11 +24,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.Login"/>
-		<activity 
+		<activity
+            android:launchMode="singleTop"
 			android:name=".activity.CaptchaDialogActivity"
 			android:theme="@android:style/Theme.Material.Dialog"
             android:label="验证码" />/>
         <activity
+            android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material.Dialog"
             android:name=".activity.InfoActivity"
             android:label="详细信息" />

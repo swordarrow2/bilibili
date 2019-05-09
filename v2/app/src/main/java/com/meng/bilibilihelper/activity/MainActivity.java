@@ -111,6 +111,7 @@ public class MainActivity extends Activity{
 		}else{
 		  mDrawerLayout.closeDrawer(mDrawerList);
 		}
+		new GithubUpdateManager(this,"swordarrow2","bilibili");
 	  }
 
     private void setActionBar(){

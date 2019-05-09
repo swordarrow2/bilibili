@@ -32,36 +32,7 @@ public class CaptchaDialogActivity extends Activity{
 		String s=guaji.liveCaptcha.data.img;
 		Bitmap b=getCaptcha(s.substring(s.indexOf(",")+1));
 		im.setImageBitmap(b);
-/*
-		try{
-			saveMyBitmap("/storage/emulated/0/a.bmp",b);
-		  }catch(IOException e){}
-
-		
-		long start = System.currentTimeMillis();
-
-		webView=(WebView)findViewById(R.id.webview);
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.loadUrl("file:///android_asset/show.html");
-		webView.addJavascriptInterface(this,"justTest");
-		
-		WebSettings ws=webView.getSettings();
-		ws.setAppCacheEnabled(true);//启用localstorage本地存储api
-		ws.setLightTouchEnabled(true);//启用选中功能
-		ws.setDomStorageEnabled(true);//启用dom存储(关键就是这句)，貌似网上twitter显示有问题也是这个属性没有设置的原因
-		ws.setDatabaseEnabled(true);//启用html5数据库功能
-		
-		im.setOnClickListener(new OnClickListener(){
-
-			  @Override
-			  public void onClick(View p1){
-				  testJS();
-				}
-			});
-
-		long timeRequired = System.currentTimeMillis()-start;
-		//autoCompleteTextView.setHint("识别结果"+textResult+"时间"+timeRequired);
-	*/	btn.setOnClickListener(new OnClickListener() {
+		btn.setOnClickListener(new OnClickListener() {
 
 			  @Override
 			  public void onClick(View p1){

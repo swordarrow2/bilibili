@@ -1,6 +1,10 @@
 package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -123,7 +127,7 @@ public class NaiFragment extends Fragment {
         }
     }
 
-    public String getRandomSentense(){
+    public String getRandomSentense() {
         return customSentence.sent.get(new Random().nextInt(customSentence.sent.size()));
     }
 
@@ -187,7 +191,16 @@ public class NaiFragment extends Fragment {
                     break;
                 case 1990000:
                     if (returnData.message.equals("risk")) {
-                        MainActivity.instence.showToast("需要在官方客户端进行账号风险验证");
+                        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                        if (wifiNetworkInfo.isConnected()) {
+                            Intent intent = new Intent(getActivity(), LiveWebActivity.class);
+                            intent.putExtra("cookie", cookie);
+                            intent.putExtra("url", "https://live.bilibili.com/" + roomId);
+                            getActivity().startActivity(intent);
+                        } else {
+                            MainActivity.instence.showToast("需要在官方客户端进行账号风险验证");
+                        }
                     }
                     break;
                 default:

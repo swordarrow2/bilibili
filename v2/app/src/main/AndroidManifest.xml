@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.meng.bilibilihelper" >
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -34,7 +35,9 @@
             android:theme="@android:style/Theme.Material.Dialog"
             android:name=".activity.InfoActivity"
             android:label="详细信息" />
-		<service android:name=".GuaJiService" />	
+        <activity android:name=".activity.LiveWebActivity" />
+
+        <service android:name=".GuaJiService" />
     </application>
 
 </manifest>

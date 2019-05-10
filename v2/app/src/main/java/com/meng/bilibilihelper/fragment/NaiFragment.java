@@ -101,7 +101,7 @@ public class NaiFragment extends Fragment {
         });
     }
 
-	private String getLiveId(){
+	public String getLiveId(){
 	  String lid="";
 	  if(MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()){
 		   lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?

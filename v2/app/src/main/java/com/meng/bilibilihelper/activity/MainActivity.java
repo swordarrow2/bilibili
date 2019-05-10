@@ -260,6 +260,7 @@ public class MainActivity extends Activity {
 		initStFragment(false);
 		initpiFragment(false);
 		initpSdcFragment(false);
+		initNaiFragment(false);
         initMainFragment(true);
 	  }
 

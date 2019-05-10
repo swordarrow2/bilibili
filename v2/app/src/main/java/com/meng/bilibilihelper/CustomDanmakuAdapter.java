@@ -53,7 +53,7 @@ public class CustomDanmakuAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
 		  }
         final LoginInfoPeople groupReply = groupReplies.get(position);
-        holder.groupNumber.setText(String.valueOf(groupReply.personInfo.data.mid));
+        holder.groupNumber.setText(groupReply.personInfo.data.name);
         holder.replySwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			  @Override

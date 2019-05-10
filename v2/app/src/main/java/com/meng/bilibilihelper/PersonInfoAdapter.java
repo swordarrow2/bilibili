@@ -19,6 +19,7 @@ public class PersonInfoAdapter extends BaseAdapter {
         this.infos = infos;
 	  }
 
+	  
     public int getCount() {
         return infos.size();
 	  }

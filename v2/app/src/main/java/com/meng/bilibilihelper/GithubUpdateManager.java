@@ -20,12 +20,12 @@ import org.jsoup.*;
 public class GithubUpdateManager {
     private Activity activity;
 
-    public GithubUpdateManager(Activity activity, String userName, String nameOnGithub) {
+    public GithubUpdateManager(Activity activity, String userName, String nameOnGithub,String apkFileName) {
         this.activity = activity;
-        checkUpdate(userName, nameOnGithub);
+        checkUpdate(userName, nameOnGithub,apkFileName);
     }
 
-    private void checkUpdate(final String userName, final String nameOnGithub) {
+    private void checkUpdate(final String userName, final String nameOnGithub, final String apkFileName) {
         new Thread(new Runnable() {
 
             @Override
@@ -60,7 +60,7 @@ public class GithubUpdateManager {
                                             public void onClick(DialogInterface p1, int p2) {
                                                 Intent intent = new Intent();
                                                 intent.setAction("android.intent.action.VIEW");
-                                                Uri contentUrl = Uri.parse("https://github.com/" + userName + "/" + nameOnGithub + "/releases/download/" + updateInfo.getVersionName() + "/pictool.apk");
+                                                Uri contentUrl = Uri.parse("https://github.com/" + userName + "/" + nameOnGithub + "/releases/download/" + updateInfo.getVersionName() + "/"+apkFileName);
                                                 intent.setData(contentUrl);
                                                 activity.startActivity(intent);
                                             }

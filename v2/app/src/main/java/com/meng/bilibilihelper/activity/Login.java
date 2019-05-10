@@ -38,7 +38,6 @@ public class Login extends Activity{
 					}
 				  CookieManager cookieManager = CookieManager.getInstance();
 				  final String cookieStr = cookieManager.getCookie(url)==null? "null" :cookieManager.getCookie(url);
-
 				  new Thread(new Runnable() {
 						@Override
 						public void run(){

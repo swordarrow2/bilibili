@@ -1,36 +1,60 @@
 package com.meng.bilibilihelper;
 
-import android.app.*;
 import android.content.*;
 import android.graphics.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.activity.InfoActivity;
+import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.user.*;
 import java.io.*;
 import java.net.*;
+import android.app.*;
 
-public class DownloadImageThread extends Thread {
-    private ImageView imageView;
+public class DownloadImageRunnable implements Runnable {
+
+	private ImageView imageView;
+    private HeadType headType;
     private String id = "";
     private File imageFile;
     private Context context;
 
-    public DownloadImageThread(Context context, ImageView imageView, String id) {
+    public DownloadImageRunnable(Context context, ImageView imageView, String id, HeadType headType) {
         this.context = context;
         this.imageView = imageView;
+        this.headType = headType;
         this.id = id;
 	  }
 
     @Override
-    public void run() {      
-			  imageFile = new File(InfoActivity.mainDic + "bilibili/" + id + ".jpg");
+    public void run() {
+        switch (headType) {
+            case QQGroup:
+			  imageFile = new File(MainActivity.mainDic + "group/" + id + ".jpg");
 			  if (imageFile.exists()) {
 				  return;
                 }
-			  downloadFile(getBilibiliHeadUrl(id));		  
+			  downloadFile("http://p.qlogo.cn/gh/" + id + "/" + id + "/100/");
+			  break;
+            case QQUser:
+			  imageFile = new File(MainActivity.mainDic + "user/" + id + ".jpg");
+			  if (imageFile.exists()) {
+				  return;
+                }
+			  downloadFile("http://q2.qlogo.cn/headimg_dl?bs=" + id + "&dst_uin=" + id + "&dst_uin=" + id + "&;dst_uin=" + id + "&spec=100&url_enc=0&referer=bu_interface&term_type=PC");
+			  break;
+            case BilibiliUser:
+			  imageFile = new File(MainActivity.mainDic + "bilibili/" + id + ".jpg");
+			  if (imageFile.exists()) {
+				  return;
+                }
+			  downloadFile(getBilibiliHeadUrl(id));
+			  break;
 		  }
-		  
+		try {
+			Thread.sleep(1000);
+		  } catch (InterruptedException e) {}
+	  }
+
     private String getBilibiliHeadUrl(String uid) {
         try {
             URL url = new URL("https://api.bilibili.com/x/space/acc/info?mid=" + uid + "&jsonp=jsonp");

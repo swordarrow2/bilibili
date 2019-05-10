@@ -26,8 +26,8 @@ public class MainFrgment extends Fragment {
     public AutoCompleteTextView autoCompleteTextView;
     public PlanePlayerList planePlayerList = null;
     public LinearLayout l1;
-    private RadioButton radioButtonUID;
-    private RadioButton radioButtonLiveID;
+    public RadioButton radioButtonUID;
+    public RadioButton radioButtonLiveID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +46,17 @@ public class MainFrgment extends Fragment {
         l1 = (LinearLayout) view.findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
         btn.setOnClickListener(onClickListener);
         btn2.setOnClickListener(onClickListener);
+		planePlayerList=new Gson().fromJson(getFromAssets("list.json"),PlanePlayerList.class);
+		PersonInfoAdapter personInfoAdapter=new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.planePlayers);
+		MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
+		ArrayList<String> list = new ArrayList<>();
+		for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
+		  if(planePlayer.bliveRoom==0)continue;
+			list.add(planePlayer.name);
+			list.add(String.valueOf(planePlayer.bliveRoom));
+		  }
+		autoCompleteTextView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
+		
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -58,8 +69,11 @@ public class MainFrgment extends Fragment {
                             Toast.makeText(getActivity(), "飞机佬信息服务器连接失败", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getActivity(), "飞机佬信息服务器连接成功", Toast.LENGTH_SHORT).show();
+							PersonInfoAdapter personInfoAdapter=new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.planePlayers);
+							MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
                             ArrayList<String> list = new ArrayList<>();
                             for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
+								if(planePlayer.bliveRoom==0)continue;
                                 list.add(planePlayer.name);
                                 list.add(String.valueOf(planePlayer.bliveRoom));
                             }
@@ -70,7 +84,21 @@ public class MainFrgment extends Fragment {
             }
         }).start();
     }
-
+	
+	public String getFromAssets(String fileName){
+		try {
+			InputStreamReader inputReader = new InputStreamReader( getResources().getAssets().open(fileName) );
+			BufferedReader bufReader = new BufferedReader(inputReader);
+			String line="";
+			String Result="";
+			while((line = bufReader.readLine()) != null)
+			  Result += line;
+			return Result;
+		  } catch (Exception e) {
+			e.printStackTrace();
+		  }
+		return "";
+	  }
     OnClickListener onClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -125,8 +153,8 @@ public class MainFrgment extends Fragment {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-            Gson gson = new Gson();
+        public void afterTextChanged(final Editable s) {
+            final Gson gson = new Gson();
             if (planePlayerList != null) {
                 for (final PlanePlayer planePlayer : planePlayerList.planePlayers) {
                     if (s.toString().equals(planePlayer.name)) {
@@ -135,47 +163,67 @@ public class MainFrgment extends Fragment {
                     }
                 }
             }
-            if (radioButtonUID.isChecked()) {
-                final BilibiliPersonInfo person = gson.fromJson(readStringFromNetwork("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliPersonInfo.class);
-                final SpaceToLiveJavaBean sjb = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), SpaceToLiveJavaBean.class);
-                final LiveAddress la = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + sjb.data.roomid + "&quality=4&platform=web"), LiveAddress.class);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            l1.removeAllViews();
-                            l1.addView(new MengTextview(getActivity(), "屑站ID", person.data.mid));
-                            l1.addView(new MengTextview(getActivity(), "用户名", person.data.name));
-                            l1.addView(new MengTextview(getActivity(), "直播URL", sjb.data.url));
-                            l1.addView(new MengTextview(getActivity(), "标题", sjb.data.title));
-                            l1.addView(new MengTextview(getActivity(), "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
-                            l1.addView(new MengTextview(getActivity(), "视频地址1", la.data.durl.get(0).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址2", la.data.durl.get(1).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址3", la.data.durl.get(2).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址4", la.data.durl.get(3).url));
-                        } catch (Exception e) {
+            new Thread(new Runnable(){
 
-                        }
-                    }
-                });
-            } else if (radioButtonLiveID.isChecked()) {
-                final LiveAddress la = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + s.toString() + "&quality=4&platform=web"), LiveAddress.class);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            l1.removeAllViews();
-                            l1.addView(new MengTextview(getActivity(), "视频地址1", la.data.durl.get(0).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址2", la.data.durl.get(1).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址3", la.data.durl.get(2).url));
-                            l1.addView(new MengTextview(getActivity(), "视频地址4", la.data.durl.get(3).url));
-                        } catch (Exception e) {
+				  @Override
+				  public void run() {
+					try{
+						if(s.toString().equals("0")){
+							return;
+						  }
+						if (radioButtonUID.isChecked()) {
+							final BilibiliPersonInfo person = gson.fromJson(readStringFromNetwork("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliPersonInfo.class);
+							final SpaceToLiveJavaBean sjb = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), SpaceToLiveJavaBean.class);
+							final LiveAddress la = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + sjb.data.roomid + "&quality=4&platform=web"), LiveAddress.class);
+							getActivity().runOnUiThread(new Runnable() {
+								  @Override
+								  public void run() {
+									  try {
+										  l1.removeAllViews();
+										  l1.addView(new MengTextview(getActivity(), "屑站ID", person.data.mid));
+										  l1.addView(new MengTextview(getActivity(), "用户名", person.data.name));
+										  l1.addView(new MengTextview(getActivity(),"性别",person.data.sex));
+										  l1.addView(new MengTextview(getActivity(),"签名",person.data.sign));
+										  l1.addView(new MengTextview(getActivity(),"等级",person.data.level));
+										  l1.addView(new MengTextview(getActivity(),"生日",person.data.birthday));
+										  l1.addView(new MengTextview(getActivity(),"硬币",person.data.coins));
+										  l1.addView(new MengTextview(getActivity(),"vip类型",person.data.vip.type));
+										  l1.addView(new MengTextview(getActivity(),"vip状态",person.data.vip.status));
+										  l1.addView(new MengTextview(getActivity(), "直播URL", sjb.data.url));
+										  l1.addView(new MengTextview(getActivity(), "标题", sjb.data.title));
+										  l1.addView(new MengTextview(getActivity(), "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
+										  l1.addView(new MengTextview(getActivity(), "视频地址1", la.data.durl.get(0).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址2", la.data.durl.get(1).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址3", la.data.durl.get(2).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址4", la.data.durl.get(3).url));
+										} catch (Exception e) {
 
-                        }
-                    }
-                });
+										}
+									}
+								});
+						  } else if (radioButtonLiveID.isChecked()) {
+							final LiveAddress la = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + s.toString() + "&quality=4&platform=web"), LiveAddress.class);
+							getActivity().runOnUiThread(new Runnable() {
+								  @Override
+								  public void run() {
+									  try {
+										  l1.removeAllViews();
+										  l1.addView(new MengTextview(getActivity(), "视频地址1", la.data.durl.get(0).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址2", la.data.durl.get(1).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址3", la.data.durl.get(2).url));
+										  l1.addView(new MengTextview(getActivity(), "视频地址4", la.data.durl.get(3).url));
+										} catch (Exception e) {
 
-            }
+										}
+									}
+								});
+
+						  } 
+					}catch(Exception e){
+					  e.printStackTrace();
+					}
+					}
+				}).start();
         }
     };
 

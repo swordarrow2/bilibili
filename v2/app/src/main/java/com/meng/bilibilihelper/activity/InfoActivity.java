@@ -5,11 +5,10 @@ import android.content.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
+import android.view.View.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.DownloadImageThread;
-import com.meng.bilibilihelper.MengTextview;
-import com.meng.bilibilihelper.R;
+import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.javaBean.relation.*;
 import com.meng.bilibilihelper.javaBean.spaceToLive.*;
@@ -17,7 +16,6 @@ import com.meng.bilibilihelper.javaBean.upstat.*;
 import com.meng.bilibilihelper.javaBean.user.*;
 import java.io.*;
 import java.net.*;
-import android.view.View.*;
 
 public class InfoActivity extends Activity{
 
@@ -46,8 +44,8 @@ public class InfoActivity extends Activity{
 			  @Override
 			  public void onClick(View p1){
 				  File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");	
-				  imf.delete();
-				  new DownloadImageThread(InfoActivity.this,im,intent.getStringExtra("bid")).start();
+				  imf.delete();		
+				  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this,im,intent.getStringExtra("bid"),HeadType.BilibiliUser));
 				}
 			});
 
@@ -55,7 +53,7 @@ public class InfoActivity extends Activity{
 		if(imf.exists()){
 			im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
 		  }else{
-			new DownloadImageThread(this,im,intent.getStringExtra("bid")).start();
+			  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this,im,intent.getStringExtra("bid"),HeadType.BilibiliUser));
 		  }
 		l1.addView(im);
 

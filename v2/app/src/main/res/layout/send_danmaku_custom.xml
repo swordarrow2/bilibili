@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/send_danmaku_customEditText"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"/>
+
+			<Button
+				android:id="@+id/send_danmaku_customButton"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="Button"/>
+
+		</LinearLayout>
+
+		<ListView
+			android:choiceMode="multipleChoice"
+			android:id="@+id/send_danmaku_customListView"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"/>
+
+	</LinearLayout>
+
+</RelativeLayout>
+

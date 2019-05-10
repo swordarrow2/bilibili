@@ -20,6 +20,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
+import com.meng.bilibilihelper.javaBean.persionInfo.*;
 
 public class NaiFragment extends Fragment {
 
@@ -82,9 +83,7 @@ public class NaiFragment extends Fragment {
                             public void run() {
                                 try {
                                     String key = (String) parent.getItemAtPosition(position);
-                                    String room = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?
-                                            MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
-                                            MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+                                    String room = getLiveId();
                                     sendDanmakuData((String) p1.getItemAtPosition(p3), MainActivity.instence.loginInfoPeopleHashMap.get(key).cookie, room);
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -102,6 +101,22 @@ public class NaiFragment extends Fragment {
         });
     }
 
+	private String getLiveId(){
+	  String lid="";
+	  if(MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()){
+		   lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?
+			MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
+			MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+	  }else if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
+		for(PlanePlayer pp:MainActivity.instence.mainFrgment.planePlayerList.planePlayers){
+			if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))){
+			  lid=pp.bliveRoom+"";
+			}
+		}
+	  }
+	  return lid;
+	}
+	
     public String readFileToString() throws IOException, UnsupportedEncodingException {
         Long filelength = customSentenseFile.length();
         byte[] filecontent = new byte[filelength.intValue()];

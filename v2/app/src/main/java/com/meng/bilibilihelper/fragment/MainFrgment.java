@@ -89,10 +89,10 @@ public class MainFrgment extends Fragment {
 			InputStreamReader inputReader = new InputStreamReader( getResources().getAssets().open(fileName) );
 			BufferedReader bufReader = new BufferedReader(inputReader);
 			String line="";
-			String Result="";
+			StringBuilder Result= new StringBuilder();
 			while((line = bufReader.readLine()) != null)
-			  Result += line;
-			return Result;
+			  Result.append(line);
+			return Result.toString();
 		  } catch (Exception e) {
 			e.printStackTrace();
 		  }

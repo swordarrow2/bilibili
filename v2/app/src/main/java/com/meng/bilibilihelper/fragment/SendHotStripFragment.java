@@ -97,7 +97,7 @@ public class SendHotStripFragment extends Fragment {
                 "&gift_id=1" +
                 "&ruid=" + ruid +
                 "&gift_num=1" +
-                "&coin_type=sliver" +
+                "&coin_type=silver" +
                 "&bag_id=0" +
                 "&platform=pc" +
                 "&biz_code=live" +

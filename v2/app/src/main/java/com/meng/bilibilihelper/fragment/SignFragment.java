@@ -7,6 +7,8 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
+
 import java.io.*;
 import java.net.*;
 
@@ -31,7 +33,7 @@ public class SignFragment extends Fragment{
 						@Override
 						public void run(){
 							try{
-								sendSignData(MainActivity.instence.loginInfoPeopleHashMap.get(p1.getItemAtPosition(p3)).cookie,MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString());
+								sendSignData(((LoginInfoPeople)(p1.getItemAtPosition(p3))).cookie,MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString());
 							  }catch(Exception e){
 								e.printStackTrace();
 							  }

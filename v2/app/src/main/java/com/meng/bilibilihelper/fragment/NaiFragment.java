@@ -81,9 +81,8 @@ public class NaiFragment extends Fragment {
                             @Override
                             public void run() {
                                 try {
-                                    String key = (String) parent.getItemAtPosition(position);
                                     String room = getLiveId();
-                                    sendDanmakuData((String) p1.getItemAtPosition(p3), MainActivity.instence.loginInfoPeopleHashMap.get(key).cookie, room);
+                                    sendDanmakuData((String) p1.getItemAtPosition(p3), ((LoginInfoPeople)parent.getItemAtPosition(position)).cookie, room);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

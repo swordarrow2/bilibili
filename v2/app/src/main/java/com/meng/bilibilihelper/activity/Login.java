@@ -56,10 +56,8 @@ public class Login extends Activity{
 								  @Override
 								  public void run(){
 									  if(MainActivity.instence.loginInfo!=null){
-										  MainActivity.instence.loginInfoPeopleHashMap.clear();
 										  MainActivity.instence.arrayList.clear();
 										  for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople){
-											  MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name,loginInfoPeople);
 											  MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
 											}
 										}

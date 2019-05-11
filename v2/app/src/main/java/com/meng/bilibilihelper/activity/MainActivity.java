@@ -56,7 +56,6 @@ public class MainActivity extends Activity {
 
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public Gson gson = new Gson();
-    public HashMap<String, LoginInfoPeople> loginInfoPeopleHashMap = new HashMap<>();
     public LoginInfo loginInfo;
 
     public MainListAdapter adapter;
@@ -109,8 +108,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
 		  }
         if (loginInfo != null) {
-            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
-                loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name, loginInfoPeople);
+            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {;
                 arrayList.add(loginInfoPeople.personInfo.data.name);
 			  }
 		  }

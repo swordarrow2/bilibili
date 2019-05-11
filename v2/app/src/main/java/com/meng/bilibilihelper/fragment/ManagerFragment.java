@@ -46,7 +46,6 @@ public class ManagerFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface p1, int p2) {
                                 MainActivity.instence.loginInfo.loginInfoPeople.remove(p3);
-                                MainActivity.instence.loginInfoPeopleHashMap.remove(String.valueOf(((LoginInfoPeople) p11.getItemAtPosition(p3)).personInfo.data.mid));
                                 MainActivity.instence.arrayList.remove(p3);
                                 MainActivity.instence.saveConfig();
                                 MainActivity.instence.adapter.notifyDataSetChanged();

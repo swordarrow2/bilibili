@@ -13,6 +13,7 @@ import android.widget.ListView;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.GuaJiService;
 import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.javaBean.*;
 
 public class GuaJiFragment extends Fragment {
 
@@ -31,7 +32,7 @@ public class GuaJiFragment extends Fragment {
             @Override
             public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
                 Intent intentOne = new Intent(getActivity(), GuaJiService.class);
-				intentOne.putExtra("name",(String)p1.getItemAtPosition(p3));
+				intentOne.putExtra("name",((LoginInfoPeople)p1.getItemAtPosition(p3)).personInfo.data.name);
                 intentOne.putExtra("cookie", MainActivity.instence.loginInfo.loginInfoPeople.get(p3).cookie);
 				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString());
                 getActivity().startService(intentOne);

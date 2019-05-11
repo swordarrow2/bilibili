@@ -97,10 +97,8 @@ public class InfoActivity extends Activity {
 
                                     @Override
                                     public void run() {
-                                        MainActivity.instence.loginInfoPeopleHashMap.clear();
                                         MainActivity.instence.arrayList.clear();
-                                        for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
-                                            MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name, loginInfoPeople);
+                                        for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {;
                                             MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
                                         }
                                         MainActivity.instence.adapter.notifyDataSetChanged();

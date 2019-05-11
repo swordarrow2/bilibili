@@ -27,8 +27,8 @@ public class CustomDanmakuAdapter extends BaseAdapter {
         return groupReplies.size();
 	  }
 	  
-	  public ArrayList<Boolean> getWillSend(){
-		return willSend;
+	  public boolean getChecked(int position){
+		return willSend.get(position);
 	  }
 
     public Object getItem(int position) {

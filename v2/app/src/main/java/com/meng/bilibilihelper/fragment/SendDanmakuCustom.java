@@ -36,10 +36,9 @@ public class SendDanmakuCustom extends Fragment {
 						@Override
 						public void run() {
 							CustomDanmakuAdapter cda=(CustomDanmakuAdapter) listview.getAdapter();
-							ArrayList<Boolean> ab=cda.getWillSend();
-
-							for (int i=0;i < ab.size();++i) {
-								if (ab.get(i)) {
+						
+							for (int i=0;i < cda.getCount();++i) {
+								if (cda.getChecked(i)) {
 									try {
 										MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople)cda.getItem(i)).cookie, MainActivity.instence.naiFragment.getLiveId());
 									  } catch (IOException e) {

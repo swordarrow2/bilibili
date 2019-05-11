@@ -82,9 +82,9 @@ public class InfoActivity extends Activity {
                             l1.addView(new MengTextview(context, "等级", info.data.level));
                             l1.addView(new MengTextview(context, "经验", info.data.level_exp.current_exp + "/" + info.data.level_exp.next_exp));
                             l1.addView(new MengTextview(context, "注册时间", info.data.jointime));
-                            l1.addView(new MengTextview(context, "节操", info.data.jointime));
-                            l1.addView(new MengTextview(context, "未读消息", info.data.jointime));
-                            l1.addView(new MengTextview(context, "未读消息(2)", info.data.jointime));
+                            l1.addView(new MengTextview(context, "节操", info.data.moral));
+                            l1.addView(new MengTextview(context, "绑定邮箱", info.data.email_status));
+                            l1.addView(new MengTextview(context, "绑定手机", info.data.tel_status));
                             l1.addView(new MengTextview(context, "生日", info.data.birthday));
                             l1.addView(new MengTextview(context, "硬币", info.data.coins));
                             l1.addView(new MengTextview(context, "vip类型", info.data.vip.type));

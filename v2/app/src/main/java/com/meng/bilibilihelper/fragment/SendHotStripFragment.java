@@ -40,7 +40,7 @@ public class SendHotStripFragment extends Fragment {
         listview = (ListView) view.findViewById(R.id.send_danmaku_customListView);
         btnSend = (Button) view.findViewById(R.id.send_danmaku_customButton);
         etUID = (EditText) view.findViewById(R.id.send_danmaku_customEditText);
-
+		etUID.setHint("输入用户ID");
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));
         btnSend.setOnClickListener(new View.OnClickListener() {
 

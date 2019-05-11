@@ -31,6 +31,7 @@ public class ManagerFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), InfoActivity.class);
                 intent.putExtra("bid", String.valueOf(((LoginInfoPeople) parent.getItemAtPosition(position)).personInfo.data.mid));
                 intent.putExtra("pos", position);
+				intent.putExtra("cookie", String.valueOf(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie));
                 startActivity(intent);
             }
         });

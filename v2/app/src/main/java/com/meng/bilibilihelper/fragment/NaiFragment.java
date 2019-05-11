@@ -14,13 +14,12 @@ import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.liveCaptcha.ReturnData;
+import com.meng.bilibilihelper.javaBean.SendDanmakuReturnedData;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
-import com.meng.bilibilihelper.javaBean.persionInfo.*;
 
 public class NaiFragment extends Fragment {
 
@@ -108,7 +107,7 @@ public class NaiFragment extends Fragment {
 			MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
 			MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
 	  }else if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
-		for(PlanePlayer pp:MainActivity.instence.mainFrgment.planePlayerList.planePlayers){
+		for(PlanePlayerList.PlanePlayer pp:MainActivity.instence.mainFrgment.planePlayerList.planePlayers){
 			if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))){
 			  lid=pp.bliveRoom+"";
 			}
@@ -195,7 +194,7 @@ public class NaiFragment extends Fragment {
         reader.close();
         connection.disconnect();
         try {
-            final ReturnData returnData = new Gson().fromJson(ss, ReturnData.class);
+            final SendDanmakuReturnedData returnData = new Gson().fromJson(ss, SendDanmakuReturnedData.class);
             switch (returnData.code) {
                 case 0:
                     if (!returnData.message.equals("")) {

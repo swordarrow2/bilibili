@@ -4,4 +4,5 @@
     <string name="close">关闭</string>
     <string name="user_id">用户ID</string>
     <string name="liveid">直播间ID</string>
+    <string name="send">发送</string>
 </resources>

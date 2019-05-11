@@ -13,9 +13,12 @@ import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.adapters.MainListAdapter;
 import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.ExceptionCatcher;
+import com.meng.bilibilihelper.libAndHelper.GithubUpdateManager;
+import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
 import com.meng.bilibilihelper.materialDesign.*;
 import java.io.*;
 import java.util.*;
@@ -28,7 +31,7 @@ import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.materialDesign.ActionBarDrawerToggle;
 
 
-public class MainActivity extends Activity {	
+public class MainActivity extends Activity {
 
     public static MainActivity instence;
     private DrawerLayout mDrawerLayout;
@@ -42,12 +45,13 @@ public class MainActivity extends Activity {
     public ManagerFragment managerFragment;
     public LoginCoinFragment loginCoinFragment;
 	public GuaJiFragment guaJiFragment;
-	public SettingsFragment stf;
+	public SettingsFragment settingsFragment;
 	public PersonInfoFragment personInfoFragment;
-	public SendDanmakuCustom sdc;
+	public SendDanmakuFragment sendDanmakuFragment;
+	public SendHotStripFragment sendHotStripFragment;
 
-    public FragmentManager manager;
-    public RelativeLayout rt;
+    public FragmentManager fragmentManager;
+    public RelativeLayout relativeLayout;
     public TextView rightText;
 
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
@@ -55,7 +59,7 @@ public class MainActivity extends Activity {
     public HashMap<String, LoginInfoPeople> loginInfoPeopleHashMap = new HashMap<>();
     public LoginInfo loginInfo;
 
-    public ArrayAdapter<String> adapter;
+    public MainListAdapter adapter;
     public ArrayList<String> arrayList;
 
     public String jsonPath;
@@ -110,7 +114,7 @@ public class MainActivity extends Activity {
                 arrayList.add(loginInfoPeople.personInfo.data.name);
 			  }
 		  }
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
+        adapter = new MainListAdapter(this,  loginInfo.loginInfoPeople);
 		if (SharedPreferenceHelper.getBoolean("opendraw", true)) {
 			mDrawerLayout.openDrawer(mDrawerList);
 		  } else {
@@ -192,8 +196,8 @@ public class MainActivity extends Activity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-															"首页(大概)","信息", "添加账号", "管理账号", 
-															"签到(测试)", "奶", "挂机", "sdc",
+															"首页(大概)","信息", "添加账号", "管理账号",
+															"签到(测试)", "奶", "挂机", "发送弹幕","发送辣条",
 															"签到-直播间","设置", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -209,14 +213,17 @@ public class MainActivity extends Activity {
 					  case "管理账号":
                         initManagerFragment(true);
                         break;
-					  case "sdc":
-                        initpSdcFragment(true);
-                        break;
+                      case "发送弹幕":
+                        initSendDanmakuFragment(true);
+                          break;
+                      case "发送辣条":
+                          initHotStripFragment(true);
+                          break;
 					  case "奶":
                         initNaiFragment(true);
                         break;
 					  case "信息":
-                        initpiFragment(true);
+                        initPersionInfoFragment(true);
                         break;
 					  case "挂机":
                         initGuajiFragment(true);
@@ -225,7 +232,7 @@ public class MainActivity extends Activity {
                         initSignFragment(true);
                         break;
 					  case "设置":
-                        initStFragment(true);
+                        initSettingsFragment(true);
                         break;
 					  case "签到(测试)":
                         initLoginCoinFragment(true);
@@ -245,27 +252,28 @@ public class MainActivity extends Activity {
 	  }
 
     private void findViews() {
-        rt = (RelativeLayout) findViewById(R.id.right_drawer);
+        relativeLayout = (RelativeLayout) findViewById(R.id.right_drawer);
         rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
 	  }
 
     private void initFragment() {
-        manager = getFragmentManager();
+        fragmentManager = getFragmentManager();
         initSignFragment(false);
         initManagerFragment(false);
         initLoginCoinFragment(false);
 		initGuajiFragment(false);
-		initStFragment(false);
-		initpiFragment(false);
-		initpSdcFragment(false);
+		initSettingsFragment(false);
+		initPersionInfoFragment(false);
+		initSendDanmakuFragment(false);
 		initNaiFragment(false);
+		initHotStripFragment(false);
         initMainFragment(true);
 	  }
 
     public void initMainFragment(boolean showNow) {
-        FragmentTransaction transactionWelcome = manager.beginTransaction();
+        FragmentTransaction transactionWelcome = fragmentManager.beginTransaction();
         if (mainFrgment == null) {
             mainFrgment = new MainFrgment();
             transactionWelcome.add(R.id.main_activityLinearLayout, mainFrgment);
@@ -278,7 +286,7 @@ public class MainActivity extends Activity {
 	  }
 
     private void initNaiFragment(boolean showNow) {
-        FragmentTransaction transactionsettings = manager.beginTransaction();
+        FragmentTransaction transactionsettings = fragmentManager.beginTransaction();
         if (naiFragment == null) {
             naiFragment = new NaiFragment();
             transactionsettings.add(R.id.main_activityLinearLayout, naiFragment);
@@ -291,7 +299,7 @@ public class MainActivity extends Activity {
 	  }
 
     private void initSignFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (signFragment == null) {
             signFragment = new SignFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, signFragment);
@@ -304,7 +312,7 @@ public class MainActivity extends Activity {
 	  }
 
     private void initManagerFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (managerFragment == null) {
             managerFragment = new ManagerFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, managerFragment);
@@ -317,7 +325,7 @@ public class MainActivity extends Activity {
 	  }
 
     private void initLoginCoinFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (loginCoinFragment == null) {
             loginCoinFragment = new LoginCoinFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, loginCoinFragment);
@@ -330,7 +338,7 @@ public class MainActivity extends Activity {
 	  }
 
 	private void initGuajiFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (guaJiFragment == null) {
             guaJiFragment = new GuaJiFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, guaJiFragment);
@@ -341,21 +349,21 @@ public class MainActivity extends Activity {
 		  }
         transactionBusR.commit();
 	  }
-	private void initStFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
-        if (stf == null) {
-            stf = new SettingsFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, stf);
+	private void initSettingsFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (settingsFragment == null) {
+            settingsFragment = new SettingsFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, settingsFragment);
 		  }
         hideFragment(transactionBusR);
         if (showNow) {
-            transactionBusR.show(stf);
+            transactionBusR.show(settingsFragment);
 		  }
         transactionBusR.commit();
 	  }
 
-	private void initpiFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
+	private void initPersionInfoFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (personInfoFragment == null) {
             personInfoFragment = new PersonInfoFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, personInfoFragment);
@@ -366,18 +374,30 @@ public class MainActivity extends Activity {
 		  }
         transactionBusR.commit();
 	  }
-	private void initpSdcFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = manager.beginTransaction();
-        if (sdc == null) {
-            sdc = new SendDanmakuCustom();
-            transactionBusR.add(R.id.main_activityLinearLayout, sdc);
-		  }
+    private void initSendDanmakuFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (sendDanmakuFragment == null) {
+            sendDanmakuFragment = new SendDanmakuFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, sendDanmakuFragment);
+        }
         hideFragment(transactionBusR);
         if (showNow) {
-            transactionBusR.show(sdc);
-		  }
+            transactionBusR.show(sendDanmakuFragment);
+        }
         transactionBusR.commit();
-	  }
+    }
+    private void initHotStripFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (sendHotStripFragment == null) {
+            sendHotStripFragment = new SendHotStripFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, sendHotStripFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(sendHotStripFragment);
+        }
+        transactionBusR.commit();
+    }
 
 
     public void hideFragment(FragmentTransaction transaction) {
@@ -388,9 +408,10 @@ public class MainActivity extends Activity {
 			managerFragment,
 			loginCoinFragment,
 			guaJiFragment,
-			stf,
+                settingsFragment,
 			personInfoFragment,
-			sdc
+                sendDanmakuFragment,
+                sendHotStripFragment
 		  };
         for (Fragment f : fs) {
             if (f != null) {

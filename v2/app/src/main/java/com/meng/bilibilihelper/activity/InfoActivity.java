@@ -7,144 +7,139 @@ import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
+
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.relation.*;
-import com.meng.bilibilihelper.javaBean.spaceToLive.*;
-import com.meng.bilibilihelper.javaBean.upstat.*;
-import com.meng.bilibilihelper.javaBean.user.*;
+import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
+import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
+import com.meng.bilibilihelper.libAndHelper.HeadType;
+import com.meng.bilibilihelper.libAndHelper.MengTextview;
+
 import java.io.*;
-import java.net.*;
 
-public class InfoActivity extends Activity{
+public class InfoActivity extends Activity {
 
-	public ProgressBar progressBar;
-	public static String mainDic = "";
+    public ProgressBar progressBar;
+    public static String mainDic = "";
 
-	private LinearLayout l1;
-	private Context c;
+    private LinearLayout l1;
+    private Context context;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		final Intent intent=getIntent();
-		if(intent.getStringExtra("bid")==null){
-			finish();
-		  }	
-		mainDic=Environment.getExternalStorageDirectory()+"/Pictures/grzx/";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        final Intent intent = getIntent();
+        if (intent.getStringExtra("bid") == null) {
+            finish();
+        }
+        if (intent.getStringExtra("cookie") == null) {
+            finish();
+        }
+        mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
-		setContentView(R.layout.info_list);
-		c=this;
-		progressBar=(ProgressBar) findViewById(R.id.info_listProgressBar1);	
-		l1=(LinearLayout)findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
-		final ImageView im=new ImageView(this);
-		im.setOnClickListener(new OnClickListener(){
+        setContentView(R.layout.info_list);
+        context = this;
+        progressBar = (ProgressBar) findViewById(R.id.info_listProgressBar1);
+        l1 = (LinearLayout) findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
+        final ImageView im = new ImageView(this);
+        im.setOnClickListener(new OnClickListener() {
 
-			  @Override
-			  public void onClick(View p1){
-				  File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");	
-				  imf.delete();		
-				  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this,im,intent.getStringExtra("bid"),HeadType.BilibiliUser));
-				}
-			});
+            @Override
+            public void onClick(View p1) {
+                File imf = new File(mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
+                imf.delete();
+                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), HeadType.BilibiliUser));
+            }
+        });
 
-		File imf=new File(mainDic+"bilibili/"+intent.getStringExtra("bid")+".jpg");
-		if(imf.exists()){
-			im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
-		  }else{
-			  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this,im,intent.getStringExtra("bid"),HeadType.BilibiliUser));
-		  }
-		l1.addView(im);
+        File imf = new File(mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
+        if (imf.exists()) {
+            im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
+        } else {
+            MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), HeadType.BilibiliUser));
+        }
+        l1.addView(im);
+        getBilibiliUserInfo(intent.getStringExtra("bid"), MainActivity.instence.loginInfo.loginInfoPeople.get(intent.getIntExtra("pos", 0)).cookie);
+    }
 
-		getBilibiliUserInfo(intent.getStringExtra("bid"));
-	  }
+    private void getBilibiliUserInfo(final String uid, final String cookie) {
+        new Thread(new Runnable() {
 
-	private String readHttpString(String urlstr) throws MalformedURLException, IOException{
-		URL url = new URL(urlstr);
-		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-		String line;
-		StringBuilder stringBuilder = new StringBuilder();
-		while((line=reader.readLine())!=null){
-			stringBuilder.append(line);
-		  }
-		return stringBuilder.toString();
-	  }
+            @Override
+            public void run() {
+                Gson gson = new Gson();
+                try {
+                    final BilibiliMyInfo info = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                            l1.addView(new MengTextview(context, "ID", info.data.mid));
+                            l1.addView(new MengTextview(context, "用户名", info.data.name));
+                            l1.addView(new MengTextview(context, "性别", info.data.sex));
+                            l1.addView(new MengTextview(context, "签名", info.data.sign));
+                            l1.addView(new MengTextview(context, "等级", info.data.level));
+                            l1.addView(new MengTextview(context, "经验", info.data.level_exp.current_exp + "/" + info.data.level_exp.next_exp));
+                            l1.addView(new MengTextview(context, "注册时间", info.data.jointime));
+                            l1.addView(new MengTextview(context, "节操", info.data.jointime));
+                            l1.addView(new MengTextview(context, "未读消息", info.data.jointime));
+                            l1.addView(new MengTextview(context, "未读消息(2)", info.data.jointime));
+                            l1.addView(new MengTextview(context, "生日", info.data.birthday));
+                            l1.addView(new MengTextview(context, "硬币", info.data.coins));
+                            l1.addView(new MengTextview(context, "vip类型", info.data.vip.type));
+                            l1.addView(new MengTextview(context, "vip状态", info.data.vip.status));
+                            int ii = InfoActivity.this.getIntent().getIntExtra("pos", 0);
+                            if (!MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name.equals(info.data.name)) {
+                                MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name = info.data.name;
 
-	private void getBilibiliUserInfo(final String uid){
-		new Thread(new Runnable(){
+                                runOnUiThread(new Runnable() {
 
-			  @Override
-			  public void run(){
-				  Gson gson=new Gson();
-				  try{				  
-					  final BilibiliPersonInfo person = gson.fromJson(readHttpString("https://api.bilibili.com/x/space/acc/info?mid="+uid+"&jsonp=jsonp"),BilibiliPersonInfo.class);
-					  runOnUiThread(new Runnable(){
-							@Override
-							public void run(){
-								progressBar.setVisibility(View.GONE);
-								l1.addView(new MengTextview(c,"ID",person.data.mid));
-								l1.addView(new MengTextview(c,"用户名",person.data.name));
-								l1.addView(new MengTextview(c,"性别",person.data.sex));
-								l1.addView(new MengTextview(c,"签名",person.data.sign));
-								l1.addView(new MengTextview(c,"等级",person.data.level));
-								l1.addView(new MengTextview(c,"生日",person.data.birthday));
-								l1.addView(new MengTextview(c,"硬币",person.data.coins));
-								l1.addView(new MengTextview(c,"vip类型",person.data.vip.type));
-								l1.addView(new MengTextview(c,"vip状态",person.data.vip.status));
-
-								int ii=InfoActivity.this.getIntent().getIntExtra("pos",0);
-								if(!MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name.equals(person.data.name)){
-									MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name=person.data.name;
-
-									runOnUiThread(new Runnable() {
-
-										  @Override
-										  public void run(){
-											  MainActivity.instence.loginInfoPeopleHashMap.clear();
-											  MainActivity.instence.arrayList.clear();
-											  for(LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople){
-												  MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name,loginInfoPeople);
-												  MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
-												}											
-											  MainActivity.instence.adapter.notifyDataSetChanged();
-											  MainActivity.instence.saveConfig();
-											}
-										});
-								  } 		
-							  }
-						  });				
-					  final SpaceToLiveJavaBean sjb = gson.fromJson(readHttpString("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+uid),SpaceToLiveJavaBean.class);
-					  runOnUiThread(new Runnable(){
-							@Override
-							public void run(){
-								l1.addView(new MengTextview(c,"直播URL",sjb.data.url));
-								l1.addView(new MengTextview(c,"标题",sjb.data.title));
-								l1.addView(new MengTextview(c,"状态",sjb.data.liveStatus==1?"正在直播":"未直播"));
-								l1.addView(new MengTextview(c,"房间号",sjb.data.roomid));
-							  }
-						  });			
-					  final Relation r=gson.fromJson(readHttpString("https://api.bilibili.com/x/relation/stat?vmid="+uid+"&jsonp=jsonp"),Relation.class);
-					  runOnUiThread(new Runnable(){
-							@Override
-							public void run(){
-								l1.addView(new MengTextview(c,"粉丝",r.data.follower));
-								l1.addView(new MengTextview(c,"关注",r.data.following));
-							  }
-						  });			
-					  final Upstat u=gson.fromJson(readHttpString("https://api.bilibili.com/x/space/upstat?mid="+uid+"&jsonp=jsonp"),Upstat.class);
-					  runOnUiThread(new Runnable(){
-							@Override
-							public void run(){
-								l1.addView(new MengTextview(c,"播放量",u.data.archive.view));
-								l1.addView(new MengTextview(c,"阅读量",u.data.article.view));
-							  }
-						  });			
-					}catch(Exception e){
-					  e.printStackTrace();
-					}
-				}
-			}).start();
-	  }
-  }
+                                    @Override
+                                    public void run() {
+                                        MainActivity.instence.loginInfoPeopleHashMap.clear();
+                                        MainActivity.instence.arrayList.clear();
+                                        for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
+                                            MainActivity.instence.loginInfoPeopleHashMap.put(loginInfoPeople.personInfo.data.name, loginInfoPeople);
+                                            MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
+                                        }
+                                        MainActivity.instence.adapter.notifyDataSetChanged();
+                                        MainActivity.instence.saveConfig();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    final UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UserSpaceToLive.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            l1.addView(new MengTextview(context, "直播URL", sjb.data.url));
+                            l1.addView(new MengTextview(context, "标题", sjb.data.title));
+                            l1.addView(new MengTextview(context, "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
+                            l1.addView(new MengTextview(context, "房间号", sjb.data.roomid));
+                        }
+                    });
+                    final BilibiliUserRelation r = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp"), BilibiliUserRelation.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            l1.addView(new MengTextview(context, "粉丝", r.data.follower));
+                            l1.addView(new MengTextview(context, "关注", r.data.following));
+                        }
+                    });
+                    final BilibiliUpStatus u = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp"), BilibiliUpStatus.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            l1.addView(new MengTextview(context, "播放量", u.data.archive.view));
+                            l1.addView(new MengTextview(context, "阅读量", u.data.article.view));
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+}

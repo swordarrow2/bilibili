@@ -8,9 +8,6 @@ import android.widget.AdapterView.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.MainActivity;
 
-import java.io.*;
-import java.net.*;
-
 public class LoginCoinFragment extends Fragment{
 
     @Override

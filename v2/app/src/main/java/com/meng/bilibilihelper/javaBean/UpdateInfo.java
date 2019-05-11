@@ -2,13 +2,11 @@ package com.meng.bilibilihelper.javaBean;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
 
 public class UpdateInfo {
 
     public boolean error = false;
-    private int[] newVersion;
     private int[] nowVersion;
     private String newVersionLink;
 
@@ -31,7 +29,7 @@ public class UpdateInfo {
         try {
             this.newVersionLink = newVersionLink;
             String[] newVersionStr = newVersionLink.substring(newVersionLink.lastIndexOf("/") + 1).split("\\.");
-            newVersion = new int[]{Integer.parseInt(newVersionStr[0]), Integer.parseInt(newVersionStr[1]), Integer.parseInt(newVersionStr[2])};
+            int[] newVersion = new int[]{Integer.parseInt(newVersionStr[0]), Integer.parseInt(newVersionStr[1]), Integer.parseInt(newVersionStr[2])};
             newFunction = newVersion[0] > nowVersion[0];
             optimize = newVersion[1] > nowVersion[1];
             bugFix = newVersion[2] > nowVersion[2];

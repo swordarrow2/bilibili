@@ -1,11 +1,8 @@
 package com.meng.bilibilihelper.fragment;
 
-import android.content.*;
 import android.os.*;
 import android.preference.*;
 import com.meng.bilibilihelper.*;
-import com.meng.bilibilihelper.activity.*;
-import java.io.*;
 
 public class SettingsFragment extends PreferenceFragment{
 

@@ -9,13 +9,10 @@ import android.view.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.liveCaptcha.*;
-import com.meng.bilibilihelper.javaBean.liveTimeStamp.*;
+import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
 
 import java.text.*;
 import java.util.*;
-
-import android.widget.*;
 
 public class GuaJiService extends Service {
 
@@ -28,8 +25,8 @@ public class GuaJiService extends Service {
     }
 
     int m = 0;
-    public static ArrayList<GuajiJavaBean> guajijavabean = new ArrayList<>();
-    private HashSet<GuajiJavaBean> hashSet = new HashSet<>();
+    public static ArrayList<LiveGuajiJavaBean> guajijavabean = new ArrayList<>();
+    private HashSet<LiveGuajiJavaBean> hashSet = new HashSet<>();
 
     @Override
     public void onCreate() {
@@ -41,7 +38,7 @@ public class GuaJiService extends Service {
             @Override
             public void run() {
                 while (true) {
-                    for (GuajiJavaBean g : guajijavabean) {
+                    for (LiveGuajiJavaBean g : guajijavabean) {
                         try {
                             sendHeartBeat(g.isFirstHeartBeat, g.cookie);
                         } catch (Exception e) {
@@ -61,7 +58,7 @@ public class GuaJiService extends Service {
             @Override
             public void run() {
                 while (true) {
-                    for (GuajiJavaBean g : guajijavabean) {
+                    for (LiveGuajiJavaBean g : guajijavabean) {
                         if (g.isNeedRefresh) {
                             try {
                                 if (g.finish) {
@@ -119,8 +116,8 @@ public class GuaJiService extends Service {
             @Override
             public void run() {
                 MainActivity.instence.showToast("任务开始");
-                GuajiJavaBean gua = new GuajiJavaBean(intent.getStringExtra("name"), intent.getStringExtra("refer"), intent.getStringExtra("cookie"));
-                for (GuajiJavaBean g : guajijavabean) {
+                LiveGuajiJavaBean gua = new LiveGuajiJavaBean(intent.getStringExtra("name"), intent.getStringExtra("refer"), intent.getStringExtra("cookie"));
+                for (LiveGuajiJavaBean g : guajijavabean) {
                     if (g.cookie.equals(gua.cookie)) {
                         MainActivity.instence.showToast("任务已添加");
                         return;
@@ -147,7 +144,7 @@ public class GuaJiService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendStartNotification(GuajiJavaBean g) {
+    private void sendStartNotification(LiveGuajiJavaBean g) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle("该账号正在运行:" + g.name)//设置通知栏标题
@@ -162,7 +159,7 @@ public class GuaJiService extends Service {
     }
 
 
-    private void sendEndNotification(GuajiJavaBean g) {
+    private void sendEndNotification(LiveGuajiJavaBean g) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle("该账号已挂机完毕:" + g.name)//设置通知栏标题
@@ -180,7 +177,7 @@ public class GuaJiService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         StringBuilder sb = new StringBuilder("");
-        for (GuajiJavaBean gu : guajijavabean) {
+        for (LiveGuajiJavaBean gu : guajijavabean) {
             if (gu.finish) continue;
             sb.append(gu.name).append(" ");
         }
@@ -202,7 +199,7 @@ public class GuaJiService extends Service {
         }
     }
 
-    private void sendNotification(GuajiJavaBean g) {
+    private void sendNotification(LiveGuajiJavaBean g) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(this);
         Intent notificationIntent = new Intent(this, CaptchaDialogActivity.class);
@@ -245,13 +242,13 @@ public class GuaJiService extends Service {
 			/*      return new Gson().fromJson(
 			 MainActivity.instence.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis()),
-			 GetAward.class);*/
+			 LiveGetAward.class);*/
             MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis(), cookie);
         } else {
 			/*    return new Gson().fromJson(
 			 MainActivity.instence.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/Feed/heartBeat"),
-			 GetAward.class);*/
+			 LiveGetAward.class);*/
             MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat", cookie);
         }
     }
@@ -269,7 +266,7 @@ public class GuaJiService extends Service {
         dialogBuilder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-				  /*  GetAward award = getGetAward(liveTimeStamp.data.time_start, liveTimeStamp.data.time_end, 0);
+				  /*  LiveGetAward award = getGetAward(liveTimeStamp.data.time_start, liveTimeStamp.data.time_end, 0);
 				   if (award.code != 0) {
 				   MainActivity.instence.showToast(award.message);
 				   } else {

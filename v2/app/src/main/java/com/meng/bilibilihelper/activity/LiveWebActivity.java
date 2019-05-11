@@ -4,9 +4,6 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.webkit.*;
-import com.google.gson.*;
-import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.user.*;
 
 public class LiveWebActivity extends Activity{
     @Override

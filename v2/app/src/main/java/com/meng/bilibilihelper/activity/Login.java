@@ -5,7 +5,6 @@ import android.os.*;
 import android.webkit.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.user.*;
 
 public class Login extends Activity{
 
@@ -45,10 +44,10 @@ public class Login extends Activity{
 							log.cookie=cookieStr;
 
 							String myInfoJson = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp",cookieStr);
-							BilibiliPersonInfo bilibiliPersonInfo = new Gson().fromJson(myInfoJson,BilibiliPersonInfo.class);
+							BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(myInfoJson,BilibiliUserInfo.class);
 							String json2 = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid="+bilibiliPersonInfo.data.mid+"&jsonp=jsonp");
 
-							log.personInfo=new Gson().fromJson(json2,BilibiliPersonInfo.class);
+							log.personInfo=new Gson().fromJson(json2,BilibiliUserInfo.class);
 
 							MainActivity.instence.loginInfo.loginInfoPeople.add(log);
 							MainActivity.instence.saveConfig();

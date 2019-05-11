@@ -10,16 +10,14 @@ import android.widget.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.adapters.PersonInfoAdapter;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.persionInfo.*;
-import com.meng.bilibilihelper.javaBean.spaceToLive.*;
-import com.meng.bilibilihelper.javaBean.user.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.meng.bilibilihelper.javaBean.liveAddress.*;
+import com.meng.bilibilihelper.libAndHelper.MengTextview;
 
 public class MainFrgment extends Fragment {
 
@@ -50,7 +48,7 @@ public class MainFrgment extends Fragment {
 		PersonInfoAdapter personInfoAdapter=new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.planePlayers);
 		MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
 		ArrayList<String> list = new ArrayList<>();
-		for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
+		for (PlanePlayerList.PlanePlayer planePlayer : planePlayerList.planePlayers) {
 		  if(planePlayer.bliveRoom==0)continue;
 			list.add(planePlayer.name);
 			list.add(String.valueOf(planePlayer.bliveRoom));
@@ -72,8 +70,9 @@ public class MainFrgment extends Fragment {
 							PersonInfoAdapter personInfoAdapter=new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.planePlayers);
 							MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
                             ArrayList<String> list = new ArrayList<>();
-                            for (PlanePlayer planePlayer : planePlayerList.planePlayers) {
-								if(planePlayer.bliveRoom==0)continue;
+                            for (PlanePlayerList.PlanePlayer planePlayer : planePlayerList.planePlayers) {
+                                if(planePlayer.bliveRoom==0)continue;
+                                if(planePlayer.bid==0)continue;
                                 list.add(planePlayer.name);
                                 list.add(String.valueOf(planePlayer.bliveRoom));
                             }
@@ -156,7 +155,7 @@ public class MainFrgment extends Fragment {
         public void afterTextChanged(final Editable s) {
             final Gson gson = new Gson();
             if (planePlayerList != null) {
-                for (final PlanePlayer planePlayer : planePlayerList.planePlayers) {
+                for (final PlanePlayerList.PlanePlayer planePlayer : planePlayerList.planePlayers) {
                     if (s.toString().equals(planePlayer.name)) {
                         autoCompleteTextView.setText(String.valueOf(planePlayer.bid));
                         break;
@@ -172,8 +171,8 @@ public class MainFrgment extends Fragment {
 							return;
 						  }
 						if (radioButtonUID.isChecked()) {
-							final BilibiliPersonInfo person = gson.fromJson(readStringFromNetwork("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliPersonInfo.class);
-							final SpaceToLiveJavaBean sjb = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), SpaceToLiveJavaBean.class);
+							final BilibiliUserInfo person = gson.fromJson(readStringFromNetwork("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliUserInfo.class);
+							final UserSpaceToLive sjb = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), UserSpaceToLive.class);
 							final LiveAddress la = gson.fromJson(readStringFromNetwork("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + sjb.data.roomid + "&quality=4&platform=web"), LiveAddress.class);
 							getActivity().runOnUiThread(new Runnable() {
 								  @Override

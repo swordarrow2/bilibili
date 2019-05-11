@@ -4,7 +4,6 @@ public class LiveGetAward {
     public int code = 0;
     public String msg = "";
     public String message = "";
-    public Data data = new Data();
 
     public class Data {
         public String silver = "";

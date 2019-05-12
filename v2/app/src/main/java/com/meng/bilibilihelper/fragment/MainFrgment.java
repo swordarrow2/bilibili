@@ -24,6 +24,7 @@ public class MainFrgment extends Fragment {
     public LinearLayout l1;
     public RadioButton radioButtonUID;
     public RadioButton radioButtonLiveID;
+    public ArrayAdapter<String> arrayAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,9 +50,9 @@ public class MainFrgment extends Fragment {
 		for (PersonInfo planePlayer : planePlayerList.personInfo) {
 			if (planePlayer.bliveRoom == 0)continue;
 			list.add(planePlayer.name);
-			list.add(String.valueOf(planePlayer.bliveRoom));
 		  }
-		autoCompleteTextView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
+		  arrayAdapter=new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list);
+		autoCompleteTextView.setAdapter(arrayAdapter);
 
         new Thread(new Runnable() {
 			  @Override

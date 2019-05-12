@@ -115,6 +115,22 @@ public class NaiFragment extends Fragment {
 	  }
 	  return lid;
 	}
+
+    public String getUId(){
+        String lid="";
+        if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
+            lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?
+                    MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
+                    MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+        }else if(MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()){
+            for(PersonInfo pp:MainActivity.instence.mainFrgment.planePlayerList.personInfo){
+                if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bliveRoom))){
+                    lid=pp.bid+"";
+                }
+            }
+        }
+        return lid;
+    }
 	
     public String readFileToString() throws IOException, UnsupportedEncodingException {
         Long filelength = customSentenseFile.length();

@@ -196,7 +196,7 @@ public class MainActivity extends Activity {
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
 															"首页(大概)","信息", "添加账号", "管理账号",
-															"签到(测试)", "奶", "挂机","礼物" ,"发送弹幕","发送辣条",
+															"签到(测试)", "奶", "挂机","发送礼物" ,"发送弹幕","发送辣条",
 															"签到-直播间","设置", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -221,7 +221,7 @@ public class MainActivity extends Activity {
                       case "奶":
                           initNaiFragment(true);
                           break;
-                      case "礼物":
+                      case "发送礼物":
                           initGiftFragment(true);
                           break;
 					  case "信息":

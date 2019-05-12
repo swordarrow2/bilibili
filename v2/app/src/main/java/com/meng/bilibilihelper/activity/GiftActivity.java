@@ -129,7 +129,7 @@ public class GiftActivity extends Activity {
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
         connection.setRequestProperty("cookie", cookie);
-        content = "ruid=" + uid +
+        content = "uid=" + uid +
                 "&gift_id=" + liveBagDataList.gift_id +
                 "&ruid=" + ruid +
                 "&gift_num=" + num +
@@ -159,7 +159,7 @@ public class GiftActivity extends Activity {
             s.append(line);
         }
         String ss = s.toString();
-        MainActivity.instence.showToast(ss);
+        MainActivity.instence.showToast(ss+"uid"+uid+"ruid"+ruid+"gift_id"+liveBagDataList.gift_id+"bag_id"+liveBagDataList.bag_id);
         reader.close();
         connection.disconnect();
     }

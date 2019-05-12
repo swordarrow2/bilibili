@@ -12,8 +12,7 @@
             android:id="@+id/autoCompleteTextview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:completionThreshold="1"
-            android:hint="2409909" />
+            android:completionThreshold="1" />
 
         <RadioGroup
             android:layout_width="match_parent"

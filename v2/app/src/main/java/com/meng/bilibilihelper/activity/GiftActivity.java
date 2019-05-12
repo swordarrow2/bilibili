@@ -1,9 +1,13 @@
 package com.meng.bilibilihelper.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,6 +30,8 @@ public class GiftActivity extends Activity {
     private BilibiliMyInfo info;
     private UserSpaceToLive userSpaceToLive;
     private String uid;
+    private LiveBag liveBag;
+    private GiftAdapter giftAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +54,15 @@ public class GiftActivity extends Activity {
                 String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
                 info = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
                 userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UserSpaceToLive.class);
-                LiveBag liveBag = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie), LiveBag.class);
-                final GiftAdapter giftAdapter = new GiftAdapter(GiftActivity.this, liveBag.data.list);
+                liveBag = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie), LiveBag.class);
+                giftAdapter = new GiftAdapter(GiftActivity.this, liveBag.data.list);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (liveBag.data.list.size() == 0) {
+                            Toast.makeText(getApplicationContext(), "包裹中什么也没有", Toast.LENGTH_SHORT).show();
+                            GiftActivity.this.finish();
+                        }
                         listView.setAdapter(giftAdapter);
                     }
                 });
@@ -62,22 +72,38 @@ public class GiftActivity extends Activity {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int p, long id) {
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-                            sendHotStrip(info.data.mid, uid, userSpaceToLive.data.roomid, cookie, (LiveBagDataList) parent.getItemAtPosition(p));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
+                final EditText editText = new EditText(getApplicationContext());
+                editText.setHint("要赠送的数量");
+                new AlertDialog.Builder(getApplicationContext())
+                        .setView(editText)
+                        .setTitle("编辑")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface p11, int p2) {
+                                if (liveBag.data.list.get(p).gift_num > 0) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
+                                                sendHotStrip(info.data.mid, uid, userSpaceToLive.data.roomid, editText.getText().toString(), cookie, (LiveBagDataList) parent.getItemAtPosition(p));
+                                                liveBag.data.list.get(p).gift_num -= Integer.parseInt(editText.getText().toString());
+                                                giftAdapter.notifyDataSetChanged();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }).start();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "物品数量为0", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).setNegativeButton("取消", null).show();
             }
         });
     }
 
-    public void sendHotStrip(long uid, String ruid, int roomID, String cookie, LiveBagDataList liveBagDataList) throws IOException {
+    public void sendHotStrip(long uid, String ruid, int roomID, String cookie, String num, LiveBagDataList liveBagDataList) throws IOException {
         URL postUrl = new URL("http://api.live.bilibili.com/gift/v2/gift/send");
         String content = "";//要发出的数据
         // 打开连接
@@ -102,7 +128,7 @@ public class GiftActivity extends Activity {
         content = "uid=" + uid +
                 "&gift_id=" + liveBagDataList.gift_id +
                 "&ruid=" + ruid +
-                "&gift_num=1" +
+                "&gift_num=" + num +
                 "&bag_id=" + liveBagDataList.bag_id +
                 "&platform=pc" +
                 "&biz_code=live" +
@@ -129,6 +155,12 @@ public class GiftActivity extends Activity {
             s.append(line);
         }
         final String ss = s.toString();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(GiftActivity.this, ss, Toast.LENGTH_SHORT).show();
+            }
+        });
         reader.close();
         connection.disconnect();
     }

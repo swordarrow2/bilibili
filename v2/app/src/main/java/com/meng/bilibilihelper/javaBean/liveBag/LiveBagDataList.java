@@ -1,5 +1,7 @@
 package com.meng.bilibilihelper.javaBean.liveBag;
 
+import java.util.ArrayList;
+
 public class LiveBagDataList {
     public int bag_id = 0;
     public int gift_id = 0;
@@ -8,7 +10,7 @@ public class LiveBagDataList {
     public int gift_type = 0;
     public long expire_at = 0;
     public String corner_mark = "";
-    public Count_map count_map = new Count_map();
+    public ArrayList<Count_map> count_map = new ArrayList<>();
     public int type = 0;
     public int card_image = 0;
     public String card_gif = "";

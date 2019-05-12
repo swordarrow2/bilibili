@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
 		  }
         if (loginInfo != null) {
-            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {;
+            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
                 arrayList.add(loginInfoPeople.personInfo.data.name);
 			  }
 		  }

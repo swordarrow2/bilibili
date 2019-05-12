@@ -21,7 +21,7 @@ public class DataBaseHelper {
     private static SQLiteOpenHelper sqLiteOpenHelper;
 
     public static void init(Context context) {
-        sqLiteOpenHelper = new SQLiteOpenHelper(context, Environment.getExternalStorageDirectory() + "/" + "bilibiliHelper.db", null, 1) {
+        sqLiteOpenHelper = new SQLiteOpenHelper(context, Environment.getExternalStorageDirectory() + "/sjf/bilibiliHelper.db", null, 1) {
             @Override
             public void onCreate(SQLiteDatabase db) {
                 db.execSQL(sql);

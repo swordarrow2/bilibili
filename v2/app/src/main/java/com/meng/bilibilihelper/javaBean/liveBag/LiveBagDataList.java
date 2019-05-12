@@ -12,7 +12,7 @@ public class LiveBagDataList {
     public String corner_mark = "";
     public ArrayList<Count_map> count_map = new ArrayList<>();
     public int type = 0;
-    public int card_image = 0;
+    public String card_image = "";
     public String card_gif = "";
     public int card_id = 0;
     public int card_record_id = 0;

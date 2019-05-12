@@ -62,7 +62,7 @@ public class DataBaseHelper {
     //查询数据，返回一个Cursor
     public static Cursor query() {
         SQLiteDatabase db = sqLiteOpenHelper.getReadableDatabase();
-        return db.rawQuery("select * from picBase64", null);
+        return db.rawQuery("select * from "+TABLE_NAME, null);
     }
 
     //根据主键删除某条记录

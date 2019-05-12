@@ -4,25 +4,23 @@ import android.app.*;
 import android.graphics.*;
 import android.view.*;
 import android.widget.*;
-
-import com.meng.bilibilihelper.javaBean.PlanePlayerList;
-import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
-import com.meng.bilibilihelper.libAndHelper.HeadType;
-import com.meng.bilibilihelper.R;
+import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.javaBean.a.*;
+import com.meng.bilibilihelper.libAndHelper.*;
 import java.io.*;
 import java.util.*;
 
 public class PersonInfoAdapter extends BaseAdapter {
     private Activity context;
-    private ArrayList<PlanePlayerList.PlanePlayer> infos;
+    private ArrayList<PersonInfo> infos;
 
-    public PersonInfoAdapter(Activity context, ArrayList<PlanePlayerList.PlanePlayer> infos) {
+    public PersonInfoAdapter(Activity context, ArrayList<PersonInfo> infos) {
         this.context = context;
         this.infos = infos;
 	  }
 
-	  
+
     public int getCount() {
         return infos.size();
 	  }
@@ -51,7 +49,7 @@ public class PersonInfoAdapter extends BaseAdapter {
 		  } else {
             holder = (ViewHolder) convertView.getTag();
 		  }
-        final PlanePlayerList.PlanePlayer personInfo = infos.get(position);
+        final PersonInfo personInfo = infos.get(position);
         holder.textViewName.setText(personInfo.name);
         holder.textViewQQNumber.setText(String.valueOf(personInfo.qq));
         holder.textViewBilibiliUid.setText(String.valueOf(personInfo.bid));
@@ -65,13 +63,13 @@ public class PersonInfoAdapter extends BaseAdapter {
                 holder.imageViewQQHead.setImageBitmap(BitmapFactory.decodeFile(qqImageFile.getAbsolutePath()));
 			  } else {
                 if (MainActivity.onWifi) {
-					  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), HeadType.QQUser));
+					MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), HeadType.QQUser));
 				  } else {
                     holder.imageViewQQHead.setImageResource(R.drawable.stat_sys_download_anim0);
                     holder.imageViewQQHead.setOnClickListener(new View.OnClickListener() {
 						  @Override
 						  public void onClick(View v) {
-								MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), HeadType.QQUser));
+							  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), HeadType.QQUser));
 							}
 						});
 				  }
@@ -84,19 +82,19 @@ public class PersonInfoAdapter extends BaseAdapter {
                 holder.imageViewBilibiiliHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
 			  } else {
                 if (MainActivity.onWifi) {
-					  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), HeadType.BilibiliUser));
+					MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), HeadType.BilibiliUser));
 				  } else {
                     holder.imageViewBilibiiliHead.setImageResource(R.drawable.stat_sys_download_anim0);
                     holder.imageViewBilibiiliHead.setOnClickListener(new View.OnClickListener() {
 						  @Override
 						  public void onClick(View v) {
-								MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), HeadType.BilibiliUser));
+							  MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), HeadType.BilibiliUser));
 							}
 						});
 				  }
 			  }
 		  }
-     
+
         return convertView;
 	  }
 

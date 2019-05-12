@@ -20,6 +20,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
+import com.meng.bilibilihelper.javaBean.a.*;
 
 public class NaiFragment extends Fragment {
 
@@ -106,7 +107,7 @@ public class NaiFragment extends Fragment {
 			MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
 			MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
 	  }else if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
-		for(PlanePlayerList.PlanePlayer pp:MainActivity.instence.mainFrgment.planePlayerList.planePlayers){
+		for(PersonInfo pp:MainActivity.instence.mainFrgment.planePlayerList.personInfo){
 			if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))){
 			  lid=pp.bliveRoom+"";
 			}

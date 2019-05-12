@@ -14,7 +14,7 @@ public class BilibiliMyInfo {
         public String sign = "";
         public int rank = 0;
         public int level = 0;
-        public int jointime = 0;
+        public long jointime = 0;
         public int moral = 0;
         public int silence = 0;
         public int email_status = 0;

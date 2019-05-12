@@ -129,13 +129,8 @@ public class SendHotStripFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        final String ss = s.toString();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getActivity(), ss, Toast.LENGTH_SHORT).show();
-            }
-        });
+        String ss = s.toString();
+        MainActivity.instence.showToast(ss);
         reader.close();
         connection.disconnect();
 

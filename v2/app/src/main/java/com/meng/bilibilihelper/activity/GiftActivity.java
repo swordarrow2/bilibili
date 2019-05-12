@@ -72,9 +72,9 @@ public class GiftActivity extends Activity {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int p, long id) {
 
-                final EditText editText = new EditText(getApplicationContext());
+                final EditText editText = new EditText(GiftActivity.this);
                 editText.setHint("要赠送的数量");
-                new AlertDialog.Builder(getApplicationContext())
+                new AlertDialog.Builder(GiftActivity.this)
                         .setView(editText)
                         .setTitle("编辑")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -88,14 +88,19 @@ public class GiftActivity extends Activity {
                                                 String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
                                                 sendHotStrip(info.data.mid, uid, userSpaceToLive.data.roomid, editText.getText().toString(), cookie, (LiveBagDataList) parent.getItemAtPosition(p));
                                                 liveBag.data.list.get(p).gift_num -= Integer.parseInt(editText.getText().toString());
-                                                giftAdapter.notifyDataSetChanged();
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        giftAdapter.notifyDataSetChanged();
+                                                    }
+                                                });
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
                                         }
                                     }).start();
                                 } else {
-                                    Toast.makeText(getApplicationContext(), "物品数量为0", Toast.LENGTH_SHORT).show();
+                                    MainActivity.instence.showToast("物品数量为0");
                                 }
                             }
                         }).setNegativeButton("取消", null).show();
@@ -154,13 +159,8 @@ public class GiftActivity extends Activity {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        final String ss = s.toString();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(GiftActivity.this, ss, Toast.LENGTH_SHORT).show();
-            }
-        });
+        String ss = s.toString();
+        MainActivity.instence.showToast(ss);
         reader.close();
         connection.disconnect();
     }

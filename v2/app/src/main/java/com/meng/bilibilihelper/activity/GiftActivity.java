@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,9 +26,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class GiftActivity extends Activity {
-    private BilibiliMyInfo info;
+    private BilibiliMyInfo myInfo;
     private UserSpaceToLive userSpaceToLive;
-    private String uid;
+    private String ruid;
     private LiveBag liveBag;
     private GiftAdapter giftAdapter;
 
@@ -40,8 +39,8 @@ public class GiftActivity extends Activity {
         if (position == -1) {
             finish();
         }
-        uid = MainActivity.instence.naiFragment.getUId();
-        if (uid.equals("")) {
+        ruid = MainActivity.instence.naiFragment.getUId();
+        if (ruid.equals("")) {
             Toast.makeText(getApplicationContext(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -52,15 +51,15 @@ public class GiftActivity extends Activity {
             public void run() {
                 Gson gson = new Gson();
                 String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-                info = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
-                userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UserSpaceToLive.class);
+                myInfo = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
+                userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + ruid), UserSpaceToLive.class);
                 liveBag = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie), LiveBag.class);
                 giftAdapter = new GiftAdapter(GiftActivity.this, liveBag.data.list);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (liveBag.data.list.size() == 0) {
-                            Toast.makeText(getApplicationContext(), "包裹中什么也没有", Toast.LENGTH_SHORT).show();
+                            MainActivity.instence.showToast("包裹中什么也没有");
                             GiftActivity.this.finish();
                         }
                         listView.setAdapter(giftAdapter);
@@ -86,7 +85,7 @@ public class GiftActivity extends Activity {
                                         public void run() {
                                             try {
                                                 String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-                                                sendHotStrip(info.data.mid, uid, userSpaceToLive.data.roomid, editText.getText().toString(), cookie, (LiveBagDataList) parent.getItemAtPosition(p));
+                                                sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, editText.getText().toString(), (LiveBagDataList) parent.getItemAtPosition(p));
                                                 liveBag.data.list.get(p).gift_num -= Integer.parseInt(editText.getText().toString());
                                                 runOnUiThread(new Runnable() {
                                                     @Override
@@ -109,7 +108,7 @@ public class GiftActivity extends Activity {
     }
 
     public void sendHotStrip(long uid, String ruid, int roomID, String cookie, String num, LiveBagDataList liveBagDataList) throws IOException {
-        URL postUrl = new URL("http://api.live.bilibili.com/gift/v2/gift/send");
+        URL postUrl = new URL("https://api.live.bilibili.com/gift/v2/live/bag_send");
         String content = "";//要发出的数据
         // 打开连接
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
@@ -130,7 +129,7 @@ public class GiftActivity extends Activity {
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
         connection.setRequestProperty("cookie", cookie);
-        content = "uid=" + uid +
+        content = "ruid=" + uid +
                 "&gift_id=" + liveBagDataList.gift_id +
                 "&ruid=" + ruid +
                 "&gift_num=" + num +

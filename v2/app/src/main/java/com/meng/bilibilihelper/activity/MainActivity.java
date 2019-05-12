@@ -223,7 +223,7 @@ public class MainActivity extends Activity {
                         initNaiFragment(true);
                         break;
                     case "发送礼物":
-                        new AlertDialog.Builder(getApplicationContext())
+                        new AlertDialog.Builder(MainActivity.this)
                                 .setTitle("选择礼物类型")
                                 .setPositiveButton("瓜子买辣条", new DialogInterface.OnClickListener() {
                                     @Override

@@ -26,7 +26,7 @@ public class GuaJiService extends Service {
 
     int m = 0;
     public static ArrayList<LiveGuajiJavaBean> guajijavabean = new ArrayList<>();
-    private HashSet<LiveGuajiJavaBean> hashSet = new HashSet<>();
+    public static boolean using = false;
 
     @Override
     public void onCreate() {
@@ -38,6 +38,7 @@ public class GuaJiService extends Service {
             @Override
             public void run() {
                 while (true) {
+                    using = true;
                     for (LiveGuajiJavaBean g : guajijavabean) {
                         try {
                             sendHeartBeat(g.isFirstHeartBeat, g.cookie);
@@ -46,6 +47,7 @@ public class GuaJiService extends Service {
                         }
                         g.isFirstHeartBeat = false;
                     }
+                    using = false;
                     try {
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {
@@ -58,6 +60,7 @@ public class GuaJiService extends Service {
             @Override
             public void run() {
                 while (true) {
+                    using = true;
                     for (LiveGuajiJavaBean g : guajijavabean) {
                         if (g.isNeedRefresh) {
                             try {
@@ -97,6 +100,7 @@ public class GuaJiService extends Service {
                             }
                         }
                     }
+                    using = false;
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -126,12 +130,14 @@ public class GuaJiService extends Service {
                 gua.liveTimeStamp = getLiveTimeStamp(gua.referer, gua.cookie);
                 gua.liveCaptcha = getLiveCaptcha(gua.referer, gua.cookie);
                 gua.id = m++;
-                try {
-                    guajijavabean.add(gua);
-                } catch (Exception e) {
-                    MainActivity.instence.showToast("出现了一个玄学错误");
-                    return;
+                while (using) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                guajijavabean.add(gua);
                 if (SharedPreferenceHelper.getBoolean("notifi", false)) {
                     sendRunningNotifi();
                 } else {
@@ -251,37 +257,6 @@ public class GuaJiService extends Service {
 			 LiveGetAward.class);*/
             MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat", cookie);
         }
-    }
-
-
-    public boolean showDialog(final LiveTimeStamp liveTimeStamp, LiveCaptcha liveCaptcha) {
-        boolean succeess = false;
-
-        //Bitmap bitmap = getCaptcha(liveCaptcha.data.img);
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getApplicationContext());
-        dialogBuilder.setTitle("提示");
-        dialogBuilder.setMessage("xxxxxxxxxxxxx");
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-				  /*  LiveGetAward award = getGetAward(liveTimeStamp.data.time_start, liveTimeStamp.data.time_end, 0);
-				   if (award.code != 0) {
-				   MainActivity.instence.showToast(award.message);
-				   } else {
-				   MainActivity.instence.showToast("成功");
-				   }*/
-            }
-        });
-        AlertDialog alertDialog = dialogBuilder.create();
-        if (Build.VERSION.SDK_INT >= 26) { //安卓8.0
-            alertDialog.getWindow().setType(2037);
-        } else {
-            alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_TOAST);
-        }
-        alertDialog.show();
-        return succeess;
     }
 
     public static String timeStampToDate(long tsp, String... format) {

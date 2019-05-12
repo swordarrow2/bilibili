@@ -13,24 +13,29 @@ import android.widget.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.DataBaseHelper;
 import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
 
 import java.io.*;
 
 public class CaptchaDialogActivity extends Activity {
-    public EditText etResule;
-    ImageView imPicture;
+    private EditText etResult;
+    private ImageView imPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha);
-        etResule = (EditText) findViewById(R.id.autoCompleteTextview);
+        etResult = (EditText) findViewById(R.id.autoCompleteTextview);
         imPicture = (ImageView) findViewById(R.id.captchaImageView);
         final LiveGuajiJavaBean guaji = new Gson().fromJson(getIntent().getStringExtra("data"), LiveGuajiJavaBean.class);
         Button btn = (Button) findViewById(R.id.naiAll);
-        String s = guaji.liveCaptcha.data.img;
-        imPicture.setImageBitmap(getCaptcha(s.substring(s.indexOf(",") + 1)));
+        final String picBase64 = guaji.liveCaptcha.data.img;
+        final String result= DataBaseHelper.searchResult(picBase64);
+        if(result!=null){
+            etResult.setText(result);
+        }
+        imPicture.setImageBitmap(getCaptcha(picBase64.substring(picBase64.indexOf(",") + 1)));
         btn.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -40,9 +45,10 @@ public class CaptchaDialogActivity extends Activity {
 
                     @Override
                     public void run() {
+                        DataBaseHelper.insertData(picBase64,result);
                         LiveGetAward ge = getGetAward(guaji.liveTimeStamp.data.time_start,
                                 guaji.liveTimeStamp.data.time_end,
-                                etResule.getText().toString(),
+                                etResult.getText().toString(),
                                 guaji.cookie,
                                 guaji.referer);
                         MainActivity.instence.showToast(new Gson().toJson(ge));
@@ -65,7 +71,7 @@ public class CaptchaDialogActivity extends Activity {
                                 finish();
                                 break;
                             case -901:    //过期
-                            case -902:  //错误
+                            case -902:    //错误
                                 showToast(ge.message);
                                 final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer, guaji.cookie);
                                 runOnUiThread(new Runnable() {

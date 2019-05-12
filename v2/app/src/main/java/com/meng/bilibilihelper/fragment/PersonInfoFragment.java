@@ -6,7 +6,7 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
-import com.meng.bilibilihelper.javaBean.a.*;
+import com.meng.bilibilihelper.javaBean.personInfo.*;
 import java.util.concurrent.*;
 
 public class PersonInfoFragment extends Fragment {

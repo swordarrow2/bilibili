@@ -11,7 +11,7 @@ import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.a.*;
+import com.meng.bilibilihelper.javaBean.personInfo.*;
 import com.meng.bilibilihelper.libAndHelper.*;
 import java.io.*;
 import java.net.*;

@@ -20,7 +20,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
-import com.meng.bilibilihelper.javaBean.a.*;
+import com.meng.bilibilihelper.javaBean.personInfo.*;
 
 public class NaiFragment extends Fragment {
 

@@ -16,6 +16,7 @@ import com.google.gson.*;
 import com.meng.bilibilihelper.adapters.MainListAdapter;
 import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.DataBaseHelper;
 import com.meng.bilibilihelper.libAndHelper.ExceptionCatcher;
 import com.meng.bilibilihelper.libAndHelper.GithubUpdateManager;
 import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
@@ -71,8 +72,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instence = this;
-		ExceptionCatcher.getInstance().init(this);
-		SharedPreferenceHelper.init(this, "settings");
+		ExceptionCatcher.getInstance().init(getApplicationContext());
+		SharedPreferenceHelper.init(getApplicationContext(), "settings");
+        DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -82,8 +84,8 @@ public class MainActivity extends Activity {
 				  .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
 					  @Override
 					  public void onClick(DialogInterface dialog, int which) {
-						  requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, 321);
-						}
+                          requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
+                      }
 					}).setCancelable(false).show();
 			  }
 		  }

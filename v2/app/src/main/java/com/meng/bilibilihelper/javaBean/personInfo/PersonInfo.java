@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.javaBean.a;
+package com.meng.bilibilihelper.javaBean.personInfo;
 
 public class PersonInfo {
 	public String name = "";

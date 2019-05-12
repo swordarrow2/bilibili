@@ -45,7 +45,6 @@ public class CaptchaDialogActivity extends Activity {
 
                     @Override
                     public void run() {
-                        DataBaseHelper.insertData(picBase64,result);
                         LiveGetAward ge = getGetAward(guaji.liveTimeStamp.data.time_start,
                                 guaji.liveTimeStamp.data.time_end,
                                 etResult.getText().toString(),
@@ -56,6 +55,7 @@ public class CaptchaDialogActivity extends Activity {
                         switch (ge.code) {
                             case 0:
                                 showToast(guaji.name + "成功");
+                                DataBaseHelper.insertData(picBase64,etResult.getText().toString());
                                 GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh = true;
                                 if (SharedPreferenceHelper.getBoolean("notifi", false)) {
                                     manager.cancel(guaji.id);

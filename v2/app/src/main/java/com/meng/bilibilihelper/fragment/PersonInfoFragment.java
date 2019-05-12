@@ -22,7 +22,7 @@ public class PersonInfoFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		threadPool=Executors.newFixedThreadPool(3);
-		listview=(ListView)view.findViewById(R.id.list);
+		listview=(ListView)view.findViewById(R.id.normal_listview);
 		listview.setOnItemClickListener(new OnItemClickListener(){
 
 			  @Override

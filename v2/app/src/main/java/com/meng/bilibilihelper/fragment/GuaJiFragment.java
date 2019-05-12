@@ -25,8 +25,8 @@ public class GuaJiFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ListView l = (ListView) view.findViewById(R.id.list);
-        l.setAdapter(MainActivity.instence.adapter);
+        ListView l = (ListView) view.findViewById(R.id.normal_listview);
+        l.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
         l.setOnItemClickListener(new OnItemClickListener() {
 
             @Override

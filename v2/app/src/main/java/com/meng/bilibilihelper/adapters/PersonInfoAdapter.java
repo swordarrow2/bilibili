@@ -41,10 +41,10 @@ public class PersonInfoAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.imageViewQQHead = (ImageView) convertView.findViewById(R.id.imageView_qqHead);
             holder.imageViewBilibiiliHead = (ImageView) convertView.findViewById(R.id.imageView_bilibiliHead);
-            holder.textViewName = (TextView) convertView.findViewById(R.id.textView_name);
-            holder.textViewQQNumber = (TextView) convertView.findViewById(R.id.textView_qqnum);
-            holder.textViewBilibiliUid = (TextView) convertView.findViewById(R.id.textView_bilibiliUid);
-            holder.textViewBilibiliLiveId = (TextView) convertView.findViewById(R.id.textView_bilibiliLiveId);
+            holder.textViewName = (TextView) convertView.findViewById(R.id.gitft_list_item_gift_name);
+            holder.textViewQQNumber = (TextView) convertView.findViewById(R.id.gitft_list_item_gift_count);
+            holder.textViewBilibiliUid = (TextView) convertView.findViewById(R.id.gitft_list_item_gift_expire);
+            holder.textViewBilibiliLiveId = (TextView) convertView.findViewById(R.id.gitft_list_item_mark);
             convertView.setTag(holder);
 		  } else {
             holder = (ViewHolder) convertView.getTag();

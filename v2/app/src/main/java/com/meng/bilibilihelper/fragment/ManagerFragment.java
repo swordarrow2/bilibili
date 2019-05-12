@@ -23,8 +23,8 @@ public class ManagerFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ListView list = (ListView) view.findViewById(R.id.list);
-        list.setAdapter(MainActivity.instence.adapter);
+        ListView list = (ListView) view.findViewById(R.id.normal_listview);
+        list.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
@@ -48,7 +48,7 @@ public class ManagerFragment extends Fragment {
                                 MainActivity.instence.loginInfo.loginInfoPeople.remove(p3);
                                 MainActivity.instence.arrayList.remove(p3);
                                 MainActivity.instence.saveConfig();
-                                MainActivity.instence.adapter.notifyDataSetChanged();
+                                MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
                             }
                         }).setNegativeButton("取消", null).show();
 

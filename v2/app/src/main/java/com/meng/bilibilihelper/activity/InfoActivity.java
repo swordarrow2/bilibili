@@ -97,7 +97,7 @@ public class InfoActivity extends Activity {
 											  for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {;
 												  MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
 												}
-											  MainActivity.instence.adapter.notifyDataSetChanged();
+											  MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
 											  MainActivity.instence.saveConfig();
 											}
 										});

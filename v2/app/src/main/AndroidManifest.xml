@@ -36,6 +36,7 @@
             android:name=".activity.InfoActivity"
             android:label="详细信息" />
         <activity android:name=".activity.LiveWebActivity" />
+        <activity android:name=".activity.GiftActivity" />
 
         <service android:name=".GuaJiService" />
     </application>

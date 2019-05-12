@@ -7,8 +7,6 @@ import android.content.pm.*;
 import android.content.res.*;
 import android.net.*;
 import android.os.*;
-import android.support.v4.app.*;
-import android.support.v4.content.*;
 import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
@@ -50,6 +48,7 @@ public class MainActivity extends Activity {
 	public PersonInfoFragment personInfoFragment;
 	public SendDanmakuFragment sendDanmakuFragment;
 	public SendHotStripFragment sendHotStripFragment;
+	public GiftFragment giftFragment;
 
     public FragmentManager fragmentManager;
     public RelativeLayout relativeLayout;
@@ -59,7 +58,7 @@ public class MainActivity extends Activity {
     public Gson gson = new Gson();
     public LoginInfo loginInfo;
 
-    public MainListAdapter adapter;
+    public MainListAdapter loginInfoPeopleAdapter;
     public ArrayList<String> arrayList;
 
     public String jsonPath;
@@ -114,7 +113,7 @@ public class MainActivity extends Activity {
                 arrayList.add(loginInfoPeople.personInfo.data.name);
 			  }
 		  }
-        adapter = new MainListAdapter(this,  loginInfo.loginInfoPeople);
+        loginInfoPeopleAdapter = new MainListAdapter(this,  loginInfo.loginInfoPeople);
 		if (SharedPreferenceHelper.getBoolean("opendraw", true)) {
 			mDrawerLayout.openDrawer(mDrawerList);
 		  } else {
@@ -197,7 +196,7 @@ public class MainActivity extends Activity {
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
 															"首页(大概)","信息", "添加账号", "管理账号",
-															"签到(测试)", "奶", "挂机", "发送弹幕","发送辣条",
+															"签到(测试)", "奶", "挂机","礼物" ,"发送弹幕","发送辣条",
 															"签到-直播间","设置", "退出"
 														  }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -219,9 +218,12 @@ public class MainActivity extends Activity {
                       case "发送辣条":
                           initHotStripFragment(true);
                           break;
-					  case "奶":
-                        initNaiFragment(true);
-                        break;
+                      case "奶":
+                          initNaiFragment(true);
+                          break;
+                      case "礼物":
+                          initGiftFragment(true);
+                          break;
 					  case "信息":
                         initPersionInfoFragment(true);
                         break;
@@ -269,6 +271,7 @@ public class MainActivity extends Activity {
 		initSendDanmakuFragment(false);
 		initNaiFragment(false);
 		initHotStripFragment(false);
+		initGiftFragment(false);
         initMainFragment(true);
 	  }
 
@@ -398,6 +401,18 @@ public class MainActivity extends Activity {
         }
         transactionBusR.commit();
     }
+    private void initGiftFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (giftFragment == null) {
+            giftFragment = new GiftFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, giftFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(giftFragment);
+        }
+        transactionBusR.commit();
+    }
 
 
     public void hideFragment(FragmentTransaction transaction) {
@@ -408,6 +423,7 @@ public class MainActivity extends Activity {
 			managerFragment,
 			loginCoinFragment,
 			guaJiFragment,
+                giftFragment,
                 settingsFragment,
 			personInfoFragment,
                 sendDanmakuFragment,

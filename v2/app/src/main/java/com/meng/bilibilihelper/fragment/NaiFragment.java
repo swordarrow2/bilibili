@@ -66,8 +66,8 @@ public class NaiFragment extends Fragment {
             customSentence = new Gson().fromJson(s, CustomSentence.class);
         }
 
-        ListView mainListview = (ListView) view.findViewById(R.id.list);
-        mainListview.setAdapter(MainActivity.instence.adapter);
+        ListView mainListview = (ListView) view.findViewById(R.id.normal_listview);
+        mainListview.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
         mainListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {

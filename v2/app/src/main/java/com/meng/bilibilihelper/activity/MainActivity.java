@@ -58,6 +58,8 @@ public class MainActivity extends Activity {
     public GiftFragment giftFragment;
     public ReplayVidoeFragment replayVidoeFragment;
     public FollowFragment followFragment;
+    public GiveCoinFragment giveCoinFragment;
+    public ZanFragment zanFragment;
 
     public FragmentManager fragmentManager;
     public RelativeLayout relativeLayout;
@@ -206,7 +208,7 @@ public class MainActivity extends Activity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
                 "首页(大概)", "信息", "添加账号", "管理账号",
                 "奶", "挂机", "发送弹幕", "发送礼物",
-                "签到", "j", "f", "设置", "退出"
+                "签到", "发送视频评论", "赞视频", "视频投币（2个）", "关注其他用户", "设置", "退出"
         }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -223,6 +225,12 @@ public class MainActivity extends Activity {
                         break;
                     case "发送弹幕":
                         initSendDanmakuFragment(true);
+                        break;
+                    case "视频投币（2个）":
+                        initCoinFragment(true);
+                        break;
+                    case "赞视频":
+                        initZanFragment(true);
                         break;
                     case "奶":
                         initNaiFragment(true);
@@ -248,10 +256,10 @@ public class MainActivity extends Activity {
                     case "挂机":
                         initGuajiFragment(true);
                         break;
-                    case "j":
+                    case "发送视频评论":
                         initReplyVideoFragment(true);
                         break;
-                    case "f":
+                    case "关注其他用户":
                         initFollowFragment(true);
                         break;
                     case "签到":
@@ -453,6 +461,32 @@ public class MainActivity extends Activity {
         transactionBusR.commit();
     }
 
+    private void initCoinFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (giveCoinFragment == null) {
+            giveCoinFragment = new GiveCoinFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, giveCoinFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(giveCoinFragment);
+        }
+        transactionBusR.commit();
+    }
+
+    private void initZanFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (zanFragment == null) {
+            zanFragment = new ZanFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, zanFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(zanFragment);
+        }
+        transactionBusR.commit();
+    }
+
     public void hideFragment(FragmentTransaction transaction) {
         Fragment fs[] = {
                 mainFrgment,
@@ -466,7 +500,9 @@ public class MainActivity extends Activity {
                 sendDanmakuFragment,
                 sendHotStripFragment,
                 replayVidoeFragment,
-                followFragment
+                followFragment,
+                giveCoinFragment,
+                zanFragment
         };
         for (Fragment f : fs) {
             if (f != null) {

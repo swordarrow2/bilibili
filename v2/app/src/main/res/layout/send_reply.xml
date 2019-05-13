@@ -14,11 +14,13 @@
             android:orientation="vertical">
 
             <EditText
+                android:hint="AID"
                 android:id="@+id/send_reply_editText_av"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
 
             <EditText
+                android:hint="content"
                 android:id="@+id/send_reply_editText_content"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />

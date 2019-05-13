@@ -20,6 +20,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
+
 import com.meng.bilibilihelper.javaBean.personInfo.*;
 
 public class NaiFragment extends Fragment {
@@ -83,7 +84,7 @@ public class NaiFragment extends Fragment {
                             public void run() {
                                 try {
                                     String room = getLiveId();
-                                    sendDanmakuData((String) p1.getItemAtPosition(p3), ((LoginInfoPeople)parent.getItemAtPosition(position)).cookie, room);
+                                    sendDanmakuData((String) p1.getItemAtPosition(p3), ((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, room);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -100,38 +101,34 @@ public class NaiFragment extends Fragment {
         });
     }
 
-	public String getLiveId(){
-	  String lid="";
-	  if(MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()){
-		   lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?
-			MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
-			MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
-	  }else if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
-		for(PersonInfo pp:MainActivity.instence.mainFrgment.planePlayerList.personInfo){
-			if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))){
-			  lid=pp.bliveRoom+"";
-			}
-		}
-	  }
-	  return lid;
-	}
-
-    public String getUId(){
-        String lid="";
-        if(MainActivity.instence.mainFrgment.radioButtonUID.isChecked()){
-            lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals("") ?
-                    MainActivity.instence.mainFrgment.autoCompleteTextView.getHint().toString() :
-                    MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
-        }else if(MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()){
-            for(PersonInfo pp:MainActivity.instence.mainFrgment.planePlayerList.personInfo){
-                if(MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bliveRoom))){
-                    lid=pp.bid+"";
+    public String getLiveId() {
+        String lid = "";
+        if (MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()) {
+            lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+        } else if (MainActivity.instence.mainFrgment.radioButtonUID.isChecked()) {
+            for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
+                if (MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))) {
+                    lid = pp.bliveRoom + "";
                 }
             }
         }
         return lid;
     }
-	
+
+    public String getUId() {
+        String lid = "";
+        if (MainActivity.instence.mainFrgment.radioButtonUID.isChecked()) {
+            lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+        } else if (MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()) {
+            for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
+                if (MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bliveRoom))) {
+                    lid = pp.bid + "";
+                }
+            }
+        }
+        return lid;
+    }
+
     public String readFileToString() throws IOException, UnsupportedEncodingException {
         Long filelength = customSentenseFile.length();
         byte[] filecontent = new byte[filelength.intValue()];

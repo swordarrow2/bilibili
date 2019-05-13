@@ -37,8 +37,8 @@ public class SendHotStripFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        listview = (ListView) view.findViewById(R.id.send_reply_listView);
-        btnSend = (Button) view.findViewById(R.id.send_reply_button);
+        listview = (ListView) view.findViewById(R.id.send_danmaku_listView);
+        btnSend = (Button) view.findViewById(R.id.send_danmaku_button);
         etUID = (EditText) view.findViewById(R.id.send_danmaku_editText);
         etUID.setVisibility(View.GONE);
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));

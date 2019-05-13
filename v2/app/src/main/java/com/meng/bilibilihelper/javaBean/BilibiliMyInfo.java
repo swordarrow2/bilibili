@@ -63,7 +63,7 @@ public class BilibiliMyInfo {
     public class Vip {
         public int type = 0;
         public int status = 0;
-        public int due_date = 0;
+        public long due_date = 0;
         public int vip_pay_type = 0;
         public int theme_type = 0;
     }

@@ -15,12 +15,12 @@
 			android:layout_height="wrap_content">
 
 			<EditText
-				android:id="@+id/send_danmaku_customEditText"
+				android:id="@+id/send_danmaku_editText"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"/>
 
 			<Button
-				android:id="@+id/send_danmaku_customButton"
+				android:id="@+id/send_danmaku_button"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:text="@string/send"/>
@@ -29,7 +29,7 @@
 
 		<ListView
 			android:choiceMode="multipleChoice"
-			android:id="@+id/send_danmaku_customListView"
+			android:id="@+id/send_danmaku_listView"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"/>
 

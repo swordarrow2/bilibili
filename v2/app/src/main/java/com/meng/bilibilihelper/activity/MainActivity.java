@@ -57,6 +57,7 @@ public class MainActivity extends Activity {
     public SendHotStripFragment sendHotStripFragment;
     public GiftFragment giftFragment;
     public ReplayVidoeFragment replayVidoeFragment;
+    public FollowFragment followFragment;
 
     public FragmentManager fragmentManager;
     public RelativeLayout relativeLayout;
@@ -205,7 +206,7 @@ public class MainActivity extends Activity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
                 "首页(大概)", "信息", "添加账号", "管理账号",
                 "奶", "挂机", "发送弹幕", "发送礼物",
-                "签到","j", "设置", "退出"
+                "签到", "j", "f", "设置", "退出"
         }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -250,6 +251,9 @@ public class MainActivity extends Activity {
                     case "j":
                         initReplyVideoFragment(true);
                         break;
+                    case "f":
+                        initFollowFragment(true);
+                        break;
                     case "签到":
                         initSignFragment(true);
                         break;
@@ -289,6 +293,7 @@ public class MainActivity extends Activity {
         initHotStripFragment(false);
         initGiftFragment(false);
         initReplyVideoFragment(false);
+        initFollowFragment(false);
         initMainFragment(true);
     }
 
@@ -435,6 +440,18 @@ public class MainActivity extends Activity {
         transactionBusR.commit();
     }
 
+    private void initFollowFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (followFragment == null) {
+            followFragment = new FollowFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, followFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(followFragment);
+        }
+        transactionBusR.commit();
+    }
 
     public void hideFragment(FragmentTransaction transaction) {
         Fragment fs[] = {
@@ -448,7 +465,8 @@ public class MainActivity extends Activity {
                 personInfoFragment,
                 sendDanmakuFragment,
                 sendHotStripFragment,
-                replayVidoeFragment
+                replayVidoeFragment,
+                followFragment
         };
         for (Fragment f : fs) {
             if (f != null) {
@@ -561,7 +579,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void sendDataPost(String url,String referer,String origin, String cookie,HashMap<String,String> data) throws IOException {
+    public void sendDataPost(String url, String referer, String origin, String cookie, HashMap<String, String> data) throws IOException {
         URL postUrl = new URL("http://api.live.bilibili.com/gift/v2/gift/send");
         StringBuilder content = new StringBuilder();//要发出的数据
         // 打开连接
@@ -583,7 +601,7 @@ public class MainActivity extends Activity {
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
         connection.setRequestProperty("cookie", cookie);
-        for (String key:data.keySet()){
+        for (String key : data.keySet()) {
             content.append(key).append("=").append(data.get(key)).append("&");
         }
         content = new StringBuilder(content.substring(0, content.lastIndexOf("&") - 1));
@@ -614,7 +632,8 @@ public class MainActivity extends Activity {
             return "Issue while encoding" + e.getMessage();
         }
     }
-    public String getCsrf(String cookie){
+
+    public String getCsrf(String cookie) {
         return MainActivity.instence.cookieToMap(cookie).get("bili_jct");
     }
 

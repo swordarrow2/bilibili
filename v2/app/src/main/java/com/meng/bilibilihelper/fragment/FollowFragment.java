@@ -8,14 +8,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
-import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
-import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
+import com.meng.bilibilihelper.javaBean.LoginInfo;
+import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -23,11 +21,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
-public class SendHotStripFragment extends Fragment {
-    ListView listview;
-    Button btnSend;
-    EditText etUID;
+public class FollowFragment extends Fragment {
+    public ListView listview;
+    public Button btn;
+    public EditText et;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,12 +36,12 @@ public class SendHotStripFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        listview = (ListView) view.findViewById(R.id.send_reply_listView);
-        btnSend = (Button) view.findViewById(R.id.send_reply_button);
-        etUID = (EditText) view.findViewById(R.id.send_danmaku_editText);
-        etUID.setVisibility(View.GONE);
+        listview = (ListView) view.findViewById(R.id.send_danmaku_listView);
+        btn = (Button) view.findViewById(R.id.send_danmaku_button);
+        et = (EditText) view.findViewById(R.id.send_danmaku_editText);
+
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View p1) {
@@ -50,23 +49,14 @@ public class SendHotStripFragment extends Fragment {
 
                     @Override
                     public void run() {
-                        final String uid = MainActivity.instence.naiFragment.getUId();
-                        if (uid.equals("")) {
-                            Toast.makeText(getActivity(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
                         ListWithImageSwitchAdapter cda = (ListWithImageSwitchAdapter) listview.getAdapter();
+
                         for (int i = 0; i < cda.getCount(); ++i) {
                             if (cda.getChecked(i)) {
                                 try {
-                                    Gson gson = new Gson();
-                                    String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(i).cookie;
-                                    BilibiliMyInfo info = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
-                                    UserSpaceToLive userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UserSpaceToLive.class);
-                                    sendHotStrip(info.data.mid, uid, userSpaceToLive.data.roomid, cookie);
-                                    Thread.sleep(50);
-                                } catch (Exception e) {
-
+                                    sendReplyData(true, ((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
+                                } catch (IOException e) {
+                                    MainActivity.instence.showToast(e.toString());
                                 }
                             }
                         }
@@ -76,9 +66,22 @@ public class SendHotStripFragment extends Fragment {
         });
     }
 
-    public void sendHotStrip(long uid, String ruid, int roomID, String cookie) throws IOException {
-        URL postUrl = new URL("http://api.live.bilibili.com/gift/v2/gift/send");
-        String content = "";//要发出的数据
+    public void sendReplyData(boolean clickFollow, String cookie, String UID) throws IOException {
+        String content = "";
+        URL postUrl = null;
+        if (clickFollow) {
+            postUrl = new URL("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true");
+            content = "fids=" + UID +
+                    "&tagids=0" +
+                    "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+        } else {
+            postUrl = new URL("https://api.bilibili.com/x/relation/modify?cross_domain=true");
+            content = "fid=" + UID +
+                    "&act=2" +
+                    "&re_src=122" +
+                    "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+        }
+
         // 打开连接
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
         // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
@@ -88,32 +91,17 @@ public class SendHotStripFragment extends Fragment {
         //	 Post请求不能使用缓存
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
+        connection.setRequestProperty("Host", "api.bilibili.com");
         connection.setRequestProperty("Connection", "keep-alive");
         connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
+        connection.setRequestProperty("Origin", "https://www.bilibili.com");
         connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomID);
+        connection.setRequestProperty("Referer", "https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369);
         connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
         connection.setRequestProperty("cookie", cookie);
-        content = "uid=" + uid +
-                "&gift_id=1" +
-                "&ruid=" + ruid +
-                "&gift_num=1" +
-                "&coin_type=silver" +
-                "&bag_id=0" +
-                "&platform=pc" +
-                "&biz_code=live" +
-                "&biz_id=" + roomID +
-                "&rnd=" + (System.currentTimeMillis() / 1000) +
-                "&storm_beat_id=0" +
-                "&metadata=" +
-                "&price=0" +
-                "&csrf_token=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct") +
-                "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct") +
-                "&visit_id=";
+
         connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
         // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
         // 要注意的是connection.getOutputStream会隐含的进行 connect
@@ -128,10 +116,11 @@ public class SendHotStripFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        String ss = s.toString();
+        final String ss = s.toString();
         MainActivity.instence.showToast(ss);
         reader.close();
         connection.disconnect();
 
     }
+
 }

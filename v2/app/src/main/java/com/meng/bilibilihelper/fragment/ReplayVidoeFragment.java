@@ -1,10 +1,6 @@
 package com.meng.bilibilihelper.fragment;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.google.gson.Gson;
 import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.activity.LiveWebActivity;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
-import com.meng.bilibilihelper.javaBean.SendDanmakuReturnedData;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -31,21 +24,23 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class ReplayVidoeFragment extends Fragment {
-    ListView listview;
-    Button btn;
-    EditText et;
+    public ListView listview;
+    public Button btn;
+    public EditText etAv;
+    public EditText etContent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.send_danmaku_custom, container, false);
+        return inflater.inflate(R.layout.send_reply, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        listview = (ListView) view.findViewById(R.id.send_danmaku_customListView);
-        btn = (Button) view.findViewById(R.id.send_danmaku_customButton);
-        et = (EditText) view.findViewById(R.id.send_danmaku_customEditText);
+        listview = (ListView) view.findViewById(R.id.send_reply_listView);
+        btn = (Button) view.findViewById(R.id.send_reply_button);
+        etAv = (EditText) view.findViewById(R.id.send_reply_editText_av);
+        etAv = (EditText) view.findViewById(R.id.send_reply_editText_content);
 
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));
         btn.setOnClickListener(new View.OnClickListener() {
@@ -61,9 +56,9 @@ public class ReplayVidoeFragment extends Fragment {
                         for (int i = 0; i < cda.getCount(); ++i) {
                             if (cda.getChecked(i)) {
                                 try {
-                                    sendReplyData("发发发",((LoginInfoPeople)cda.getItem(i)).cookie,String.valueOf(39594559));
+                                    sendReplyData(etContent.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(etAv.getText().toString())));
                                 } catch (IOException e) {
-                                    e.printStackTrace();
+                                    MainActivity.instence.showToast(e.toString());
                                 }
                             }
                         }
@@ -114,6 +109,7 @@ public class ReplayVidoeFragment extends Fragment {
             s.append(line);
         }
         final String ss = s.toString();
+        MainActivity.instence.showToast(ss);
         reader.close();
         connection.disconnect();
 

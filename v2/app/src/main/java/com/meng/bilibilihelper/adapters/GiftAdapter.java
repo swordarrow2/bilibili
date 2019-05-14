@@ -6,18 +6,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.activity.MainActivity;
-import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
-import com.meng.bilibilihelper.javaBean.liveBag.LiveBag;
 import com.meng.bilibilihelper.javaBean.liveBag.LiveBagDataList;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class GiftAdapter extends BaseAdapter {
     private Activity activity;

@@ -15,7 +15,7 @@ import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.adapters.GiftAdapter;
 import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
 import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
-import com.meng.bilibilihelper.javaBean.liveBag.LiveBag;
+import com.meng.bilibilihelper.javaBean.LiveBag;
 import com.meng.bilibilihelper.javaBean.liveBag.LiveBagDataList;
 
 import java.io.BufferedReader;

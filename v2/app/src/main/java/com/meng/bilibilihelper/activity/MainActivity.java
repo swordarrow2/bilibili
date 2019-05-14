@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     public FollowFragment followFragment;
     public GiveCoinFragment giveCoinFragment;
     public ZanFragment zanFragment;
+    public ChoujiangFragment choujiangFragment;
 
     public FragmentManager fragmentManager;
     public RelativeLayout relativeLayout;
@@ -207,7 +208,7 @@ public class MainActivity extends Activity {
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
                 "首页(大概)", "信息", "添加账号", "管理账号",
-                "奶", "挂机", "发送弹幕", "发送礼物",
+                "奶", "挂机", "发送弹幕", "发送礼物", "cj",
                 "签到", "发送视频评论", "赞视频", "视频投币（2个）", "关注其他用户", "设置", "退出"
         }));
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -228,6 +229,9 @@ public class MainActivity extends Activity {
                         break;
                     case "视频投币（2个）":
                         initCoinFragment(true);
+                        break;
+                    case "cj":
+                        initChouJiangFragment(true);
                         break;
                     case "赞视频":
                         initZanFragment(true);
@@ -293,15 +297,16 @@ public class MainActivity extends Activity {
         fragmentManager = getFragmentManager();
         initSignFragment(false);
         initManagerFragment(false);
-        initGuajiFragment(false);
-        initSettingsFragment(false);
-        initPersionInfoFragment(false);
-        initSendDanmakuFragment(false);
-        initNaiFragment(false);
-        initHotStripFragment(false);
-        initGiftFragment(false);
-        initReplyVideoFragment(false);
-        initFollowFragment(false);
+        //  initGuajiFragment(false);
+        //   initSettingsFragment(false);
+        //   initPersionInfoFragment(false);
+        //   initSendDanmakuFragment(false);
+        //    initNaiFragment(false);
+        //    initHotStripFragment(false);
+        //    initGiftFragment(false);
+        //    initReplyVideoFragment(false);
+        //    initFollowFragment(false);
+        //    initChouJiangFragment(false);
         initMainFragment(true);
     }
 
@@ -487,6 +492,19 @@ public class MainActivity extends Activity {
         transactionBusR.commit();
     }
 
+    private void initChouJiangFragment(boolean showNow) {
+        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
+        if (choujiangFragment == null) {
+            choujiangFragment = new ChoujiangFragment();
+            transactionBusR.add(R.id.main_activityLinearLayout, choujiangFragment);
+        }
+        hideFragment(transactionBusR);
+        if (showNow) {
+            transactionBusR.show(choujiangFragment);
+        }
+        transactionBusR.commit();
+    }
+
     public void hideFragment(FragmentTransaction transaction) {
         Fragment fs[] = {
                 mainFrgment,
@@ -502,6 +520,7 @@ public class MainActivity extends Activity {
                 replayVidoeFragment,
                 followFragment,
                 giveCoinFragment,
+                choujiangFragment,
                 zanFragment
         };
         for (Fragment f : fs) {

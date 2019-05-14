@@ -55,7 +55,8 @@ public class FollowFragment extends Fragment {
                                 try {
                                     sendFollowDataStep1(((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
                                     sendFollowDataStep2(((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
-                                } catch (IOException e) {
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
                                     MainActivity.instence.showToast(e.toString());
                                 }
                             }

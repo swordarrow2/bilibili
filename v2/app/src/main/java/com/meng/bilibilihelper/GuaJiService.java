@@ -92,7 +92,6 @@ public class GuaJiService extends Service {
 						  if (System.currentTimeMillis() / 1000 > g.liveTimeStamp.data.time_end) {
 							  if (g.isShowed || g.finish) continue;
 							  try {
-								  g.liveCaptcha = getLiveCaptcha(g.referer, g.cookie);
 								  sendNotification(g);
 								  g.isShowed = true;
 								} catch (Exception e) {
@@ -128,7 +127,6 @@ public class GuaJiService extends Service {
 						}
 					}
 				  gua.liveTimeStamp = getLiveTimeStamp(gua.referer, gua.cookie);
-				  gua.liveCaptcha = getLiveCaptcha(gua.referer, gua.cookie);
 				  gua.id = m++;
 				  while (using) {
 					  try {
@@ -233,15 +231,6 @@ public class GuaJiService extends Service {
 			cookie),
 		  LiveTimeStamp.class);
 	  }
-
-    public LiveCaptcha getLiveCaptcha(String refer, String cookie) {
-        return new Gson().fromJson(
-		  MainActivity.instence.getSourceCode(
-			"https://api.live.bilibili.com/lottery/v1/SilverBox/getCaptcha?ts=" + System.currentTimeMillis(),
-			cookie, refer),
-		  LiveCaptcha.class);
-	  }
-
 
     public void sendHeartBeat(boolean isFirst, String cookie) {
         if (isFirst) {

@@ -54,7 +54,8 @@ public class GiveCoinFragment extends Fragment {
                             if (cda.getChecked(i)) {
                                 try {
                                     sendCoin(((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
-                                } catch (IOException e) {
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
                                     MainActivity.instence.showToast(e.toString());
                                 }
                             }

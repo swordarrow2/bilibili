@@ -21,6 +21,7 @@ import java.io.*;
 public class CaptchaDialogActivity extends Activity {
     private EditText etResult;
     private ImageView imPicture;
+    private String picBase64 = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +31,26 @@ public class CaptchaDialogActivity extends Activity {
         imPicture = (ImageView) findViewById(R.id.captchaImageView);
         final LiveGuajiJavaBean guaji = new Gson().fromJson(getIntent().getStringExtra("data"), LiveGuajiJavaBean.class);
         Button btn = (Button) findViewById(R.id.naiAll);
-        final String picBase64 = guaji.liveCaptcha.data.img;
-        final String result= DataBaseHelper.searchResult(picBase64);
-        if(result!=null){
-            etResult.setText(result);
-        }
-        imPicture.setImageBitmap(getCaptcha(picBase64.substring(picBase64.indexOf(",") + 1)));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer, guaji.cookie);
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Bitmap b = getCaptcha(liveCaptcha.data.img.substring(liveCaptcha.data.img.indexOf(",") + 1));
+                        imPicture.setImageBitmap(b);
+                        picBase64 = liveCaptcha.data.img;
+                        final String result = DataBaseHelper.searchResult(picBase64);
+                        if (result != null) {
+                            etResult.setText(result);
+                        }
+                        imPicture.setImageBitmap(getCaptcha(picBase64.substring(picBase64.indexOf(",") + 1)));
+                    }
+                });
+            }
+        }).start();
         btn.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -55,7 +70,7 @@ public class CaptchaDialogActivity extends Activity {
                         switch (ge.code) {
                             case 0:
                                 showToast(guaji.name + "成功");
-                                DataBaseHelper.insertData(picBase64,etResult.getText().toString());
+                                DataBaseHelper.insertData(picBase64, etResult.getText().toString());
                                 GuaJiService.guajijavabean.get(guaji.id).isNeedRefresh = true;
                                 if (SharedPreferenceHelper.getBoolean("notifi", false)) {
                                     manager.cancel(guaji.id);

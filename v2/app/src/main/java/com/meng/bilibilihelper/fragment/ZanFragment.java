@@ -52,8 +52,9 @@ public class ZanFragment extends Fragment {
                         for (int i = 0; i < cda.getCount(); ++i) {
                             if (cda.getChecked(i)) {
                                 try {
-                                    sendCoin(((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
-                                } catch (IOException e) {
+                                    sendLike(((LoginInfoPeople) cda.getItem(i)).cookie, String.valueOf(Integer.parseInt(et.getText().toString())));
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
                                     MainActivity.instence.showToast(e.toString());
                                 }
                             }
@@ -64,7 +65,7 @@ public class ZanFragment extends Fragment {
         });
     }
 
-    public void sendCoin(String cookie, String AID) throws IOException {
+    public void sendLike(String cookie, String AID) throws IOException {
         String content = "";
         URL postUrl = null;
         postUrl = new URL("https://api.bilibili.com/x/web-interface/archive/like");

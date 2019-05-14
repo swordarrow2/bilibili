@@ -8,7 +8,6 @@ public class LiveGuajiJavaBean {
 	public boolean isShowed=false;
 	public String cookie="";
 	public LiveTimeStamp liveTimeStamp=new LiveTimeStamp();
-	public LiveCaptcha liveCaptcha = new LiveCaptcha();
 	public String referer="";
 	public boolean isFirstHeartBeat=true;
 

@@ -224,12 +224,12 @@ public class GuaJiService extends Service {
 		  }
 	  }
 
-    public LiveTimeStamp getLiveTimeStamp(String refer, String cookie) {
+    public LiveGuajiJavaBean.LiveTimeStamp getLiveTimeStamp(String refer, String cookie) {
         return new Gson().fromJson(
 		  MainActivity.instence.getSourceCode(
 			"https://api.live.bilibili.com/lottery/v1/SilverBox/getCurrentTask",
 			cookie),
-		  LiveTimeStamp.class);
+		  LiveGuajiJavaBean.LiveTimeStamp.class);
 	  }
 
     public void sendHeartBeat(boolean isFirst, String cookie) {

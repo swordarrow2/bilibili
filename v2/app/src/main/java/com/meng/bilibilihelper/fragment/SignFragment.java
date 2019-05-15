@@ -6,6 +6,9 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
@@ -71,9 +74,10 @@ public class SignFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        final String ss = s.toString();
         reader.close();
         connection.disconnect();
-        MainActivity.instence.showToast(ss);
+        JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
+        MainActivity.instence.showToast(obj.get("message").getAsString());
     }
 }

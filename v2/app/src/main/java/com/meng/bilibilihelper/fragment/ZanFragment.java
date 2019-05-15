@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
@@ -106,8 +108,9 @@ public class ZanFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        final String ss = s.toString();
-        MainActivity.instence.showToast(ss);
+        JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
+        MainActivity.instence.showToast(obj.get("message").getAsString());
         reader.close();
         connection.disconnect();
     }

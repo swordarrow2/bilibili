@@ -11,7 +11,6 @@ import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
@@ -43,7 +42,7 @@ public class MainActivity extends Activity {
     public SendDanmakuFragment sendDanmakuFragment;
     public SendHotStripFragment sendHotStripFragment;
     public GiftFragment giftFragment;
-    public ReplayVidoeFragment replayVidoeFragment;
+    public ReplyVidoeFragment replayVidoeFragment;
     public FollowFragment followFragment;
     public GiveCoinFragment giveCoinFragment;
     public ZanFragment zanFragment;
@@ -430,7 +429,7 @@ public class MainActivity extends Activity {
     private void initReplyVideoFragment(boolean showNow) {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (replayVidoeFragment == null) {
-            replayVidoeFragment = new ReplayVidoeFragment();
+            replayVidoeFragment = new ReplyVidoeFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, replayVidoeFragment);
         }
         hideFragment(transactionBusR);

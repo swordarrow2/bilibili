@@ -9,10 +9,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,8 +27,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ReplayVidoeFragment extends Fragment {
+public class ReplyVidoeFragment extends Fragment {
     public ListView listview;
     public Button btn;
     public EditText etAv;
@@ -69,6 +76,34 @@ public class ReplayVidoeFragment extends Fragment {
     }
 
     public void sendReplyData(String msg, String cookie, String AID) throws IOException {
+
+        Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
+        String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+        Map<String, String> map = new HashMap<>();
+        map.put("Host", "api.bilibili.com");
+        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        map.put("Connection", "keep-alive");
+        map.put("Origin", "https://www.bilibili.com");
+        connection.userAgent(MainActivity.instence.userAgent)
+                .headers(map)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/video/av" + AID)
+                .cookies(MainActivity.instence.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("oid=" + AID +
+                        "&type=1" +
+                        "&message=" + encode(msg) +
+                        "&jsonp=jsonp" +
+                        "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
+        Connection.Response response = connection.execute();
+        if (response.statusCode() != 200) {
+            MainActivity.instence.showToast(String.valueOf(response.statusCode()));
+        }
+        JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+        MainActivity.instence.showToast(obj.get("message").getAsString());
+        /*
         URL postUrl = new URL("https://api.bilibili.com/x/v2/reply/add");
         // 打开连接
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
@@ -80,9 +115,9 @@ public class ReplayVidoeFragment extends Fragment {
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
         connection.setRequestProperty("Host", "api.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://www.bilibili.com");
+        connection.setRequestProperty("Connection", "keep-alive");*/
+        //   connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
+      /*  connection.setRequestProperty("Origin", "https://www.bilibili.com");
         connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         connection.setRequestProperty("Referer", "https://www.bilibili.com/video/av" + AID);
@@ -109,10 +144,12 @@ public class ReplayVidoeFragment extends Fragment {
             s.append(line);
         }
         final String ss = s.toString();
-        MainActivity.instence.showToast(ss);
+        JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(ss).getAsJsonObject();
+        MainActivity.instence.showToast(obj.get("message").getAsString());
         reader.close();
         connection.disconnect();
-
+*/
     }
 
     public String encode(String url) {

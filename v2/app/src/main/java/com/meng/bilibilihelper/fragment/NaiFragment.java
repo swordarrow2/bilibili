@@ -204,12 +204,11 @@ public class NaiFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        String ss = s.toString();
         reader.close();
         connection.disconnect();
         try {
             JsonParser parser = new JsonParser();
-            JsonObject obj = parser.parse(ss).getAsJsonObject();
+            JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
             switch (obj.getAsJsonObject("code").getAsInt()) {
                 case 0:
                     if (!obj.getAsJsonObject("message").getAsString().equals("")) {
@@ -233,11 +232,11 @@ public class NaiFragment extends Fragment {
                     }
                     break;
                 default:
-                    MainActivity.instence.showToast(ss);
+                    MainActivity.instence.showToast(s.toString());
                     break;
             }
         } catch (Exception e) {
-            MainActivity.instence.showToast(ss);
+            MainActivity.instence.showToast(s.toString());
         }
     }
 

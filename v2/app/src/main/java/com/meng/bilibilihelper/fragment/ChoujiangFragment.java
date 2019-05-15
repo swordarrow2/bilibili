@@ -160,7 +160,9 @@ public class ChoujiangFragment extends Fragment {
             if (response.statusCode() != 200) {
                 MainActivity.instence.showToast(String.valueOf(response.statusCode()));
             }
-            MainActivity.instence.showToast(response.body());
+            JsonParser parser = new JsonParser();
+            JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+            MainActivity.instence.showToast(obj.get("message").getAsString());
         } catch (Exception e) {
             e.printStackTrace();
             MainActivity.instence.showToast(e.toString());

@@ -223,7 +223,6 @@ public class MainFrgment extends Fragment {
                                     l1.addView(new MengTextview(getActivity(), "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
                                 }
                             });
-
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

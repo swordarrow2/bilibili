@@ -17,18 +17,11 @@ import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 import com.meng.bilibilihelper.javaBean.Choujiang;
 import com.meng.bilibilihelper.javaBean.HourRank;
+import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +52,8 @@ public class ChoujiangFragment extends Fragment {
                         try {
                             HourRank chouJiangInfo = readRank();
                             for (HourRank.HourRankDataList c : chouJiangInfo.data.list) {
-                                Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, c.id);
+                                UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + c.uid), UserSpaceToLive.class);
+                                Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, sjb.data.roomid);
                                 Thread.sleep(500);
                                 for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
                                     join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);

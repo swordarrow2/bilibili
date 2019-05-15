@@ -77,9 +77,15 @@ public class ChoujiangFragment extends Fragment {
 
     public HourRank readRank() {
         try {
+            Map<String, String> map = new HashMap<>();
+            map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+            map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            map.put("Connection", "keep-alive");
+            map.put("Origin", "https://live.bilibili.com");
             Connection connection = Jsoup.connect("https://api.live.bilibili.com/rankdb/v1/Rank2018/getTop?type=master_last_hour&type_id=areaid_hour&area_id=0");
             connection.userAgent(MainActivity.instence.userAgent)
-                    .ignoreContentType(false)
+                    .headers(map)
+                    .ignoreContentType(true)
                     .method(Connection.Method.GET);
             Connection.Response response = connection.execute();
             if (response.statusCode() != 200) {
@@ -100,6 +106,8 @@ public class ChoujiangFragment extends Fragment {
             Connection connection = Jsoup.connect("https://api.live.bilibili.com/rankdb/v1/Rank2018/getTop?type=master_last_hour&type_id=areaid_hour&area_id=0");
             Map<String, String> map = new HashMap<>();
             map.put("Host", "api.live.bilibili.com");
+            map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+            map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             map.put("Connection", "keep-alive");
             map.put("Origin", "https://live.bilibili.com");
             connection.userAgent(MainActivity.instence.userAgent)
@@ -128,9 +136,10 @@ public class ChoujiangFragment extends Fragment {
             String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
             Map<String, String> map = new HashMap<>();
             map.put("Host", "api.live.bilibili.com");
+            map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+            map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             map.put("Connection", "keep-alive");
             map.put("Origin", "https://live.bilibili.com");
-            map.put("Referer", "https://live.bilibili.com/" + roomId + "?live_lottery_type=1&broadcast_type=0&from=28003&extra_jump_from=28003&visit_id=459wg8aatmu0");
             connection.userAgent(MainActivity.instence.userAgent)
                     .headers(map)
                     .ignoreContentType(true)

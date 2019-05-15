@@ -127,14 +127,13 @@ public class InfoActivity extends Activity {
                             l1.addView(new MengTextview(context, "关注", upData.get("following").getAsInt()));
                         }
                     });
-                    JsonObject upInfoObj = parser.parse(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp")).getAsJsonObject();
+                    JsonObject upInfoObj = parser.parse(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp")).getAsJsonObject();
                     final JsonObject upInfo = upInfoObj.get("data").getAsJsonObject();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             l1.addView(new MengTextview(context, "播放量", upInfo.get("archive").getAsJsonObject().get("view").getAsInt()));
                             l1.addView(new MengTextview(context, "阅读量", upInfo.get("article").getAsJsonObject().get("view").getAsInt()));
-                            ;
                         }
                     });
                 } catch (Exception e) {

@@ -34,14 +34,16 @@ public class CaptchaDialogActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer, guaji.cookie);
+                JsonParser parser = new JsonParser();
+                JsonObject obj = parser.parse(getLiveCaptcha(guaji.referer, guaji.cookie)).getAsJsonObject();
+                final String capImg = obj.get("data").getAsJsonObject().get("img").getAsString();
                 runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
-                        Bitmap b = getCaptcha(liveCaptcha.data.img.substring(liveCaptcha.data.img.indexOf(",") + 1));
+                        Bitmap b = getCaptcha(capImg.substring(capImg.indexOf(",") + 1));
                         imPicture.setImageBitmap(b);
-                        picBase64 = liveCaptcha.data.img;
+                        picBase64 = capImg;
                         final String result = DataBaseHelper.searchResult(picBase64);
                         if (result != null) {
                             etResult.setText(result);
@@ -89,12 +91,13 @@ public class CaptchaDialogActivity extends Activity {
                             case -901:    //过期
                             case -902:    //错误
                                 showToast(obj.get("msg").getAsString());
-                                final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer, guaji.cookie);
+                                JsonObject obj2 = parser.parse(getLiveCaptcha(guaji.referer, guaji.cookie)).getAsJsonObject();
+                                final String capImg = obj2.get("data").getAsJsonObject().get("img").getAsString();
                                 runOnUiThread(new Runnable() {
 
                                     @Override
                                     public void run() {
-                                        Bitmap b = getCaptcha(liveCaptcha.data.img.substring(liveCaptcha.data.img.indexOf(",") + 1));
+                                        Bitmap b = getCaptcha(capImg.substring(capImg.indexOf(",") + 1));
                                         imPicture.setImageBitmap(b);
                                     }
                                 });
@@ -126,12 +129,10 @@ public class CaptchaDialogActivity extends Activity {
         return BitmapFactory.decodeByteArray(result, 0, result.length);
     }
 
-    public LiveCaptcha getLiveCaptcha(String refer, String cookie) {
-        return new Gson().fromJson(
-                MainActivity.instence.getSourceCode(
-                        "https://api.live.bilibili.com/lottery/v1/SilverBox/getCaptcha?ts=" + System.currentTimeMillis(),
-                        cookie, refer),
-                LiveCaptcha.class);
+    public String getLiveCaptcha(String refer, String cookie) {
+        return MainActivity.instence.getSourceCode(
+                "https://api.live.bilibili.com/lottery/v1/SilverBox/getCaptcha?ts=" + System.currentTimeMillis(),
+                cookie, refer);
     }
 
     public String getGetAward(long time_start, long time_end, String captcha, String cookie, String refer) {

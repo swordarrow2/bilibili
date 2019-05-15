@@ -17,5 +17,4 @@ public class UserSpaceToLive {
         public int roomid = 0;
         public int broadcast_type = 0;
     }
-
 }

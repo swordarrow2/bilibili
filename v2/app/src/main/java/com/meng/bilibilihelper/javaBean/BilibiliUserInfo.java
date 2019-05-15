@@ -1,7 +1,5 @@
 package com.meng.bilibilihelper.javaBean;
 
-import java.util.ArrayList;
-
 public class BilibiliUserInfo {
     public int code = 0;
     public String message = "";

@@ -1,23 +1,18 @@
 package com.meng.bilibilihelper.adapters;
 
-import android.app.Activity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
-
-import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.javaBean.liveBag.LiveBagDataList;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import android.app.*;
+import android.view.*;
+import android.widget.*;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.javaBean.*;
+import java.text.*;
+import java.util.*;
 
 public class GiftAdapter extends BaseAdapter {
     private Activity activity;
-    public ArrayList<LiveBagDataList> infos;
+    public ArrayList<LiveBag.LiveBagDataList> infos;
 
-    public GiftAdapter(Activity context, ArrayList<LiveBagDataList> infos) {
+    public GiftAdapter(Activity context, ArrayList<LiveBag.LiveBagDataList> infos) {
         this.activity = context;
         this.infos = infos;
     }
@@ -48,7 +43,7 @@ public class GiftAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        LiveBagDataList liveBagDataList = infos.get(position);
+		LiveBag.LiveBagDataList liveBagDataList = infos.get(position);
         holder.tvGiftName.setText(liveBagDataList.gift_name);
         holder.tvGiftCount.setText("数量:"+liveBagDataList.gift_num);
         holder.tvExpire.setText("过期时间:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(liveBagDataList.expire_at * 1000)));

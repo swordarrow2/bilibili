@@ -10,32 +10,19 @@ import android.os.*;
 import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
-
 import com.google.gson.*;
-import com.meng.bilibilihelper.adapters.MainListAdapter;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.liveBag.LiveBagDataList;
-import com.meng.bilibilihelper.libAndHelper.DataBaseHelper;
-import com.meng.bilibilihelper.libAndHelper.ExceptionCatcher;
-import com.meng.bilibilihelper.libAndHelper.GithubUpdateManager;
-import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
+import com.meng.bilibilihelper.libAndHelper.*;
 import com.meng.bilibilihelper.materialDesign.*;
-
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.*;
-
 import org.jsoup.*;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-
 import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.materialDesign.ActionBarDrawerToggle;
 
 
 public class MainActivity extends Activity {
@@ -299,9 +286,9 @@ public class MainActivity extends Activity {
         initManagerFragment(false);
         //  initGuajiFragment(false);
         //   initSettingsFragment(false);
-        //   initPersionInfoFragment(false);
+           initPersionInfoFragment(false);
         //   initSendDanmakuFragment(false);
-        //    initNaiFragment(false);
+            initNaiFragment(false);
         //    initHotStripFragment(false);
         //    initGiftFragment(false);
         //    initReplyVideoFragment(false);

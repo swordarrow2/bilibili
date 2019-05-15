@@ -56,17 +56,19 @@ public class ChoujiangFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            HourRank hourRank = readRank();
-                            for (HourRank.HourRankDataList c : hourRank.data.list) {
-                                UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + c.uid), UserSpaceToLive.class);
-                                Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, sjb.data.roomid);
+                            //       HourRank hourRank = readRank();
+                            //       for (HourRank.HourRankDataList c : hourRank.data.list) {
+                            //           UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + c.uid), UserSpaceToLive.class);
+                            //   Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, sjb.data.roomid);
+                            Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, Integer.parseInt(et.getText().toString()));
+                            Thread.sleep(500);
+                            //        if (choujiang.data.list == null) continue;
+                            if (choujiang.data.list == null) return;
+                            for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
+                                join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
                                 Thread.sleep(500);
-                                if (choujiang.data.list == null) continue;
-                                for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
-                                    join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
-                                    Thread.sleep(500);
-                                }
                             }
+                            //       }
                         } catch (Exception e) {
                             e.printStackTrace();
                             MainActivity.instence.showToast(e.toString());
@@ -150,19 +152,20 @@ public class ChoujiangFragment extends Fragment {
                     .ignoreContentType(true)
                     .referrer("https://live.bilibili.com/" + roomId)
                     .cookies(MainActivity.instence.cookieToMap(cookie))
-                    .method(Connection.Method.POST)
-                    .data("roomid=" + roomId +
-                            "&raffleId=" + raffleId +
-                            "&type=Gift" +
-                            "&csrf_token=" + csrf +
-                            "&csrf=" + csrf);
+                    .data("roomid", roomId)
+                    .data("raffleId", String.valueOf(raffleId))
+                    .data("type", "Gift")
+                    .data("csrf_token", csrf)
+                    .data("csrf", csrf)
+                    .method(Connection.Method.POST);
             Connection.Response response = connection.execute();
             if (response.statusCode() != 200) {
                 MainActivity.instence.showToast(String.valueOf(response.statusCode()));
             }
-            JsonParser parser = new JsonParser();
-            JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-            MainActivity.instence.showToast(obj.get("message").getAsString());
+   //         JsonParser parser = new JsonParser();
+   //         JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+    //        MainActivity.instence.showToast(obj.get("message").getAsString());
+            MainActivity.instence.showToast(response.body());
         } catch (Exception e) {
             e.printStackTrace();
             MainActivity.instence.showToast(e.toString());

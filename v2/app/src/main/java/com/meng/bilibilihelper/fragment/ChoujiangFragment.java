@@ -12,6 +12,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
@@ -23,7 +26,9 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ChoujiangFragment extends Fragment {
 
@@ -50,12 +55,12 @@ public class ChoujiangFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            HourRank chouJiangInfo = readRank();
-                            for (HourRank.HourRankDataList c : chouJiangInfo.data.list) {
+                            HourRank hourRank = readRank();
+                            for (HourRank.HourRankDataList c : hourRank.data.list) {
                                 UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + c.uid), UserSpaceToLive.class);
                                 Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, sjb.data.roomid);
                                 Thread.sleep(500);
-								if(choujiang.data.list==null)continue;
+                                if (choujiang.data.list == null) continue;
                                 for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
                                     join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
                                     Thread.sleep(500);
@@ -63,7 +68,7 @@ public class ChoujiangFragment extends Fragment {
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-							MainActivity.instence.showToast(e.toString());
+                            MainActivity.instence.showToast(e.toString());
                         }
                     }
                 }).start();
@@ -118,6 +123,18 @@ public class ChoujiangFragment extends Fragment {
                 return new Choujiang();
             }
             MainActivity.instence.showToast(response.body());
+            JsonParser parser = new JsonParser();
+            JsonObject obj = parser.parse(response.body()).getAsJsonObject();// 谷歌的GSON对象
+
+            Iterator it = obj.entrySet().iterator();
+            while (it.hasNext()) {// 遍历集合
+                Map.Entry entry = (Map.Entry) it.next();
+                if (entry.getKey().equals("msg")) { // 使用了正则表达式查找要进行的回复
+                    MainActivity.instence.showToast((String) entry.getValue());
+                }
+            }
+
+
             return new Gson().fromJson(response.body(), Choujiang.class);
         } catch (Exception e) {
             e.printStackTrace();

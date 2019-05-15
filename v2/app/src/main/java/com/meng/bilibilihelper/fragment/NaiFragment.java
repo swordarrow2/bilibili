@@ -209,16 +209,16 @@ public class NaiFragment extends Fragment {
         try {
             JsonParser parser = new JsonParser();
             JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
-            switch (obj.getAsJsonObject("code").getAsInt()) {
+            switch (obj.get("code").getAsInt()) {
                 case 0:
-                    if (!obj.getAsJsonObject("message").getAsString().equals("")) {
+                    if (!obj.get("message").getAsString().equals("")) {
                         MainActivity.instence.showToast(obj.getAsJsonObject("message").getAsString());
                     } else {
                         MainActivity.instence.showToast(roomId + "已奶");
                     }
                     break;
                 case 1990000:
-                    if (obj.getAsJsonObject("message").getAsString().equals("risk")) {
+                    if (obj.get("message").getAsString().equals("risk")) {
                         ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                         if (wifiNetworkInfo.isConnected()) {

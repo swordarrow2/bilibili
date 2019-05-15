@@ -193,9 +193,7 @@ public class GiftActivity extends Activity {
 				MainActivity.instence.showToast(((JsonPrimitive) entry.getValue()).getAsString());
 			}
 		}
-
-     //   MainActivity.instence.showToast(ss + "uid" + uid + "ruid" + ruid + "gift_id" + liveBagDataList.gift_id + "bag_id" + liveBagDataList.bag_id);
-        reader.close();
+      reader.close();
         connection.disconnect();
 	  }
   }

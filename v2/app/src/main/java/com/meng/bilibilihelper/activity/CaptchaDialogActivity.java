@@ -60,14 +60,15 @@ public class CaptchaDialogActivity extends Activity {
 
                     @Override
                     public void run() {
-                        LiveGetAward ge = getGetAward(guaji.liveTimeStamp.data.time_start,
+                        String ge = getGetAward(guaji.liveTimeStamp.data.time_start,
                                 guaji.liveTimeStamp.data.time_end,
                                 etResult.getText().toString(),
                                 guaji.cookie,
                                 guaji.referer);
-                        MainActivity.instence.showToast(new Gson().toJson(ge));
+                        JsonParser parser = new JsonParser();
+                        JsonObject obj = parser.parse(ge).getAsJsonObject();
                         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        switch (ge.code) {
+                        switch (obj.get("code").getAsInt()) {
                             case 0:
                                 showToast(guaji.name + "成功");
                                 DataBaseHelper.insertData(picBase64, etResult.getText().toString());
@@ -78,7 +79,7 @@ public class CaptchaDialogActivity extends Activity {
                                 finish();
                                 break;
                             case -500:  //时间未到
-                                showToast(ge.msg);
+                                showToast(obj.get("msg").getAsString());
                                 if (SharedPreferenceHelper.getBoolean("notifi", false)) {
                                     manager.cancel(guaji.id);
                                 }
@@ -87,7 +88,7 @@ public class CaptchaDialogActivity extends Activity {
                                 break;
                             case -901:    //过期
                             case -902:    //错误
-                                showToast(ge.message);
+                                showToast(obj.get("msg").getAsString());
                                 final LiveCaptcha liveCaptcha = getLiveCaptcha(guaji.referer, guaji.cookie);
                                 runOnUiThread(new Runnable() {
 
@@ -133,13 +134,12 @@ public class CaptchaDialogActivity extends Activity {
                 LiveCaptcha.class);
     }
 
-    public LiveGetAward getGetAward(long time_start, long time_end, String captcha, String cookie, String refer) {
-        return new Gson().fromJson(
+    public String getGetAward(long time_start, long time_end, String captcha, String cookie, String refer) {
+        return
                 MainActivity.instence.getSourceCode(
                         "https://api.live.bilibili.com/lottery/v1/SilverBox/getAward?time_start=" + time_start +
                                 "&end_time=" + time_end +
-                                "&captcha=" + captcha, cookie, refer),
-                LiveGetAward.class);
+                                "&captcha=" + captcha, cookie, refer);
     }
 
     public void showToast(final String msg) {

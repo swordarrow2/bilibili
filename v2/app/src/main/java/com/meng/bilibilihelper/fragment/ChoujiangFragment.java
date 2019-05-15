@@ -125,16 +125,8 @@ public class ChoujiangFragment extends Fragment {
             }
             MainActivity.instence.showToast(response.body());
             JsonParser parser = new JsonParser();
-            JsonObject obj = parser.parse(response.body()).getAsJsonObject();// 谷歌的GSON对象
-
-            Iterator it = obj.entrySet().iterator();
-            while (it.hasNext()) {// 遍历集合
-                Map.Entry entry = (Map.Entry) it.next();
-                if (entry.getKey().equals("msg")) { // 使用了正则表达式查找要进行的回复
-                    MainActivity.instence.showToast(((JsonPrimitive) entry.getValue()).getAsString());
-                }
-            }
-
+            JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+            MainActivity.instence.showToast(obj.get("msg").getAsString());
             return new Gson().fromJson(response.body(), Choujiang.class);
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,11 +14,12 @@ import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.javaBean.SendDanmakuReturnedData;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
 import com.meng.bilibilihelper.javaBean.personInfo.*;
@@ -203,21 +204,22 @@ public class NaiFragment extends Fragment {
         while ((line = reader.readLine()) != null) {
             s.append(line);
         }
-        final String ss = s.toString();
+        String ss = s.toString();
         reader.close();
         connection.disconnect();
         try {
-            final SendDanmakuReturnedData returnData = new Gson().fromJson(ss, SendDanmakuReturnedData.class);
-            switch (returnData.code) {
+            JsonParser parser = new JsonParser();
+            JsonObject obj = parser.parse(ss).getAsJsonObject();
+            switch (obj.getAsJsonObject("code").getAsInt()) {
                 case 0:
-                    if (!returnData.message.equals("")) {
-                        MainActivity.instence.showToast(returnData.message);
+                    if (!obj.getAsJsonObject("message").getAsString().equals("")) {
+                        MainActivity.instence.showToast(obj.getAsJsonObject("message").getAsString());
                     } else {
                         MainActivity.instence.showToast(roomId + "已奶");
                     }
                     break;
                 case 1990000:
-                    if (returnData.message.equals("risk")) {
+                    if (obj.getAsJsonObject("message").getAsString().equals("risk")) {
                         ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                         if (wifiNetworkInfo.isConnected()) {

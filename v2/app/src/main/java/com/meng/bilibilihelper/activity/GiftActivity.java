@@ -11,6 +11,7 @@ import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;
+import android.widget.AdapterView.*;
 
 public class GiftActivity extends Activity {
     private BilibiliMyInfo myInfo;
@@ -66,14 +67,20 @@ public class GiftActivity extends Activity {
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface p11, int p2) {
-							if (liveBag.data.list.get(p).gift_num > 0) {
 								new Thread(new Runnable() {
 									  @Override
 									  public void run() {
 										  try {
 											  String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-											  sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, editText.getText().toString(), (LiveBag.LiveBagDataList) parent.getItemAtPosition(p));
+											  sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, Integer.parseInt(editText.getText().toString()), (LiveBag.LiveBagDataList) parent.getItemAtPosition(p));
 											  liveBag.data.list.get(p).gift_num -= Integer.parseInt(editText.getText().toString());
+											  if(liveBag.data.list.get(p).gift_num==0){
+												liveBag.data.list.remove(p);
+												if(liveBag.data.list.size()==0){
+												  MainActivity.instence.showToast("已送出全部礼物🎁");
+												  finish();
+												}
+											  }
 											  runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -85,16 +92,42 @@ public class GiftActivity extends Activity {
                                             }
                                         }
                                     }).start();
-							  } else {
-								MainActivity.instence.showToast("物品数量为0");
-							  }
 						  }
 					  }).setNegativeButton("取消", null).show();
 				}
 			});
+		listView.setOnItemLongClickListener(new OnItemLongClickListener(){
+
+			  @Override
+			  public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {			  
+					  new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
+									sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, liveBag.data.list.get(p3).gift_num, (LiveBag.LiveBagDataList) p1.getItemAtPosition(p3));
+										liveBag.data.list.remove(p3);
+										if(liveBag.data.list.size()==0){
+											MainActivity.instence.showToast("已送出全部礼物🎁");
+											finish();
+										  }
+									runOnUiThread(new Runnable() {
+										  @Override
+										  public void run() {
+											  giftAdapter.notifyDataSetChanged();
+											}
+										});
+								  } catch (IOException e) {
+									e.printStackTrace();
+								  }
+							  }
+						  }).start();	
+				  return true;
+				}
+			});
 	  }
 
-    public void sendHotStrip(long uid, String ruid, int roomID, String cookie, String num, LiveBag.LiveBagDataList liveBagDataList) throws IOException {
+    public void sendHotStrip(long uid, String ruid, int roomID, String cookie, int num, LiveBag.LiveBagDataList liveBagDataList) throws IOException {
         URL postUrl = new URL("https://api.live.bilibili.com/gift/v2/live/bag_send");
         String content = "";//要发出的数据
         // 打开连接

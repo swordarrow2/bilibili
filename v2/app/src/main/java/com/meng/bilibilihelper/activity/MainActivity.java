@@ -620,14 +620,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    public String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "Issue while encoding" + e.getMessage();
-        }
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {

@@ -78,7 +78,6 @@ public class ReplyVidoeFragment extends Fragment {
     public void sendReplyData(String msg, String cookie, String AID) throws IOException {
 
         Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
-        String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
         Map<String, String> map = new HashMap<>();
         map.put("Host", "api.bilibili.com");
         map.put("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -93,7 +92,7 @@ public class ReplyVidoeFragment extends Fragment {
                 .method(Connection.Method.POST)
                 .data("oid", AID)
                 .data("type", "1")
-                .data("message", encode(msg))
+                .data("message", msg)
                 .data("jsonp", "jsonp")
                 .data("csrf", MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
         Connection.Response response = connection.execute();

@@ -18,11 +18,15 @@ import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
 import com.meng.bilibilihelper.javaBean.personInfo.*;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 
 public class NaiFragment extends Fragment {
 
@@ -160,55 +164,37 @@ public class NaiFragment extends Fragment {
     }
 
     public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
-        URL postUrl = new URL("http://api.live.bilibili.com/msg/send");
-        String content = "";//要发出的数据
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        content = "color=16777215" +
-                "&fontsize=25" +
-                "&mode=1" +
-                "&msg=" + encode(msg) +
-                "&rnd=" + (System.currentTimeMillis() / 1000) +
-                "&roomid=" + roomId +
-                "&bubble=0" +
-                "&csrf_token=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct") +
-                "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
+
+        Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
+        Map<String, String> map = new HashMap<>();
+        map.put("Host", "api.live.bilibili.com");
+        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        map.put("Connection", "keep-alive");
+        map.put("Origin", "https://live.bilibili.com");
+        String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+        connection.userAgent(MainActivity.instence.userAgent)
+                .headers(map)
+                .ignoreContentType(true)
+                .referrer("https://live.bilibili.com/" + roomId)
+                .cookies(MainActivity.instence.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("color", "16777215")
+                .data("fontsize", "25")
+                .data("msg", msg)
+                .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
+                .data("roomid", roomId)
+                .data("bubble", "0")
+                .data("csrf_token", csrf)
+                .data("csrf", csrf);
+        Connection.Response response = connection.execute();
+        if (response.statusCode() != 200) {
+            MainActivity.instence.showToast(String.valueOf(response.statusCode()));
         }
-        reader.close();
-        connection.disconnect();
+
         try {
             JsonParser parser = new JsonParser();
-            JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
+            JsonObject obj = parser.parse(response.body()).getAsJsonObject();
             switch (obj.get("code").getAsInt()) {
                 case 0:
                     if (!obj.get("message").getAsString().equals("")) {
@@ -232,20 +218,11 @@ public class NaiFragment extends Fragment {
                     }
                     break;
                 default:
-                    MainActivity.instence.showToast(s.toString());
+                    MainActivity.instence.showToast(response.body());
                     break;
             }
         } catch (Exception e) {
-            MainActivity.instence.showToast(s.toString());
+            MainActivity.instence.showToast(response.body());
         }
     }
-
-    public String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "Issue while encoding" + e.getMessage();
-        }
-    }
-
 }

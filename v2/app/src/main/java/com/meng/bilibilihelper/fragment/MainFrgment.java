@@ -136,11 +136,10 @@ public class MainFrgment extends Fragment {
 
                         @Override
                         public void run() {
-                            String room = autoCompleteTextView.getText().toString().equals("") ? autoCompleteTextView.getHint().toString() : autoCompleteTextView.getText().toString();
                             for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
                                 try {
                                     Thread.sleep(1000);
-                                    MainActivity.instence.signFragment.sendSignData(loginInfoPeople.cookie, room);
+                                    MainActivity.instence.signFragment.sendSignData(loginInfoPeople.cookie);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

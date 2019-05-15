@@ -16,12 +16,17 @@ import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class FollowFragment extends Fragment {
@@ -70,106 +75,57 @@ public class FollowFragment extends Fragment {
     }
 
     public void sendFollowDataStep1(String cookie, String UID) throws IOException {
-        String content = "";
-        URL postUrl = null;
-        postUrl = new URL("https://api.bilibili.com/x/relation/modify?cross_domain=true");
-        content = "fid=" + UID +
-                "&act=1" +
-                "&re_src=122" +
-                "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://www.bilibili.com");
-        connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
 
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
+        Connection connection = Jsoup.connect("https://api.bilibili.com/x/relation/modify?cross_domain=true");
+        Map<String, String> map = new HashMap<>();
+        map.put("Host", "api.bilibili.com");
+        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        map.put("Connection", "keep-alive");
+        map.put("Origin", "https://www.bilibili.com");
+        connection.userAgent(MainActivity.instence.userAgent)
+                .headers(map)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
+                .cookies(MainActivity.instence.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("fid", UID)
+                .data("act", "1")
+                .data("re_src", "122")
+                .data("csrf", MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
+        Connection.Response response = connection.execute();
+        if (response.statusCode() != 200) {
+            MainActivity.instence.showToast(String.valueOf(response.statusCode()));
         }
         JsonParser parser = new JsonParser();
-        JsonObject obj = parser.parse(s.toString()).getAsJsonObject();
+        JsonObject obj = parser.parse(response.body()).getAsJsonObject();
         MainActivity.instence.showToast(obj.get("message").getAsString());
-        reader.close();
-        connection.disconnect();
     }
 
     public void sendFollowDataStep2(String cookie, String UID) throws IOException {
-        String content = "";
-        URL postUrl = null;
-        //   if (clickFollow) {
-        postUrl = new URL("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true");
-        content = "fids=" + UID +
-                "&tagids=0" +
-                "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        //    } else {
-        //       postUrl = new URL("https://api.bilibili.com/x/relation/modify?cross_domain=true");
-        //       content = "fid=" + UID +
-        //               "&act=2" +
-        //               "&re_src=122" +
-        //               "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        //    }
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://www.bilibili.com");
-        connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
 
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
+        Connection connection = Jsoup.connect("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true");
+        Map<String, String> map = new HashMap<>();
+        map.put("Host", "api.bilibili.com");
+        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        map.put("Connection", "keep-alive");
+        map.put("Origin", "https://www.bilibili.com");
+        connection.userAgent(MainActivity.instence.userAgent)
+                .headers(map)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
+                .cookies(MainActivity.instence.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("fids", UID)
+                .data("tagids", "0")
+                .data("csrf", MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
+        Connection.Response response = connection.execute();
+        if (response.statusCode() != 200) {
+            MainActivity.instence.showToast(String.valueOf(response.statusCode()));
         }
-        final String ss = s.toString();
-        MainActivity.instence.showToast(ss);
-        reader.close();
-        connection.disconnect();
+        JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+        MainActivity.instence.showToast(obj.get("message").getAsString());
     }
 }

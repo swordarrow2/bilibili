@@ -11,6 +11,9 @@ import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;
+import java.util.Iterator;
+import java.util.Map;
+
 import android.widget.AdapterView.*;
 
 public class GiftActivity extends Activity {
@@ -99,7 +102,7 @@ public class GiftActivity extends Activity {
 		listView.setOnItemLongClickListener(new OnItemLongClickListener(){
 
 			  @Override
-			  public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {			  
+			  public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
 					  new Thread(new Runnable() {
 							@Override
 							public void run() {
@@ -121,7 +124,7 @@ public class GiftActivity extends Activity {
 									e.printStackTrace();
 								  }
 							  }
-						  }).start();	
+						  }).start();
 				  return true;
 				}
 			});
@@ -179,7 +182,19 @@ public class GiftActivity extends Activity {
             s.append(line);
 		  }
         String ss = s.toString();
-        MainActivity.instence.showToast(ss + "uid" + uid + "ruid" + ruid + "gift_id" + liveBagDataList.gift_id + "bag_id" + liveBagDataList.bag_id);
+
+		JsonParser parser = new JsonParser();
+		JsonObject obj = parser.parse(ss).getAsJsonObject();// 谷歌的GSON对象
+
+		Iterator it = obj.entrySet().iterator();
+		while (it.hasNext()) {// 遍历集合
+			Map.Entry entry = (Map.Entry) it.next();
+			if (entry.getKey().equals("msg")) { // 使用了正则表达式查找要进行的回复
+				MainActivity.instence.showToast(((JsonPrimitive) entry.getValue()).getAsString());
+			}
+		}
+
+     //   MainActivity.instence.showToast(ss + "uid" + uid + "ruid" + ruid + "gift_id" + liveBagDataList.gift_id + "bag_id" + liveBagDataList.bag_id);
         reader.close();
         connection.disconnect();
 	  }

@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
@@ -130,10 +131,9 @@ public class ChoujiangFragment extends Fragment {
             while (it.hasNext()) {// 遍历集合
                 Map.Entry entry = (Map.Entry) it.next();
                 if (entry.getKey().equals("msg")) { // 使用了正则表达式查找要进行的回复
-                    MainActivity.instence.showToast((String) entry.getValue());
+                    MainActivity.instence.showToast(((JsonPrimitive) entry.getValue()).getAsString());
                 }
             }
-
 
             return new Gson().fromJson(response.body(), Choujiang.class);
         } catch (Exception e) {

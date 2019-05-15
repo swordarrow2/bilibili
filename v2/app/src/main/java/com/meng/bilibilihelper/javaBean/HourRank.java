@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class HourRank {
     public int code = 0;
-    public HourRankData data = new HourRankData();
     public String message = "";
     public String msg = "";
+    public HourRankData data = new HourRankData();
 
     public class HourRankData {
         public RankInfo rank_info = new RankInfo();

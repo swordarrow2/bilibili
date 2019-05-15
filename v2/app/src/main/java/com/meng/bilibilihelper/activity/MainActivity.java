@@ -556,7 +556,7 @@ public class MainActivity extends Activity {
 
     public String getSourceCode(String url, String cookie, String refer) {
         Connection.Response response = null;
-        Connection connection = null;
+        Connection connection;
         try {
             connection = Jsoup.connect(url);
             if (cookie != null) {
@@ -621,62 +621,12 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void sendDataPost(String url, String referer, String origin, String cookie, HashMap<String, String> data) throws IOException {
-        URL postUrl = new URL("http://api.live.bilibili.com/gift/v2/gift/send");
-        StringBuilder content = new StringBuilder();//要发出的数据
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", origin);
-        connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", referer);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        for (String key : data.keySet()) {
-            content.append(key).append("=").append(data.get(key)).append("&");
-        }
-        content = new StringBuilder(content.substring(0, content.lastIndexOf("&") - 1));
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content.toString());
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
-        }
-        String ss = s.toString();
-        MainActivity.instence.showToast(ss);
-        reader.close();
-        connection.disconnect();
-    }
-
     public String encode(String url) {
         try {
             return URLEncoder.encode(url, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             return "Issue while encoding" + e.getMessage();
         }
-    }
-
-    public String getCsrf(String cookie) {
-        return MainActivity.instence.cookieToMap(cookie).get("bili_jct");
     }
 
     @Override

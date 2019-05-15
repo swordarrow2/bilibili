@@ -97,7 +97,7 @@ public class ChoujiangFragment extends Fragment {
 
     public Choujiang readInfo(String cookie, int roomId) {
         try {
-            Connection connection = Jsoup.connect("https://api.live.bilibili.com/rankdb/v1/Rank2018/getTop?type=master_last_hour&type_id=areaid_hour&area_id=0");
+            Connection connection = Jsoup.connect("https://api.live.bilibili.com/xlive/lottery-interface/v3/smalltv/Check?roomid=" + roomId);
             Map<String, String> map = new HashMap<>();
             map.put("Host", "api.live.bilibili.com");
             map.put("Accept", "application/json, text/javascript, */*; q=0.01");

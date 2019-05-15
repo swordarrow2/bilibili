@@ -55,6 +55,7 @@ public class ChoujiangFragment extends Fragment {
                                 UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + c.uid), UserSpaceToLive.class);
                                 Choujiang choujiang = readInfo(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, sjb.data.roomid);
                                 Thread.sleep(500);
+								if(choujiang.data.list==null)continue;
                                 for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
                                     join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
                                     Thread.sleep(500);
@@ -62,6 +63,7 @@ public class ChoujiangFragment extends Fragment {
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+							MainActivity.instence.showToast(e.toString());
                         }
                     }
                 }).start();

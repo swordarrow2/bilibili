@@ -91,11 +91,11 @@ public class ReplyVidoeFragment extends Fragment {
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(MainActivity.instence.cookieToMap(cookie))
                 .method(Connection.Method.POST)
-                .data("oid=" + AID +
-                        "&type=1" +
-                        "&message=" + encode(msg) +
-                        "&jsonp=jsonp" +
-                        "&csrf=" + MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
+                .data("oid", AID)
+                .data("type", "1")
+                .data("message", encode(msg))
+                .data("jsonp", "jsonp")
+                .data("csrf", MainActivity.instence.cookieToMap(cookie).get("bili_jct"));
         Connection.Response response = connection.execute();
         if (response.statusCode() != 200) {
             MainActivity.instence.showToast(String.valueOf(response.statusCode()));

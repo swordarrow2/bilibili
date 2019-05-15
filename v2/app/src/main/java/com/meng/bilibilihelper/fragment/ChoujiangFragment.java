@@ -71,7 +71,7 @@ public class ChoujiangFragment extends Fragment {
                             //        if (choujiang.data.list == null) continue;
                             if (choujiang.data.list == null) return;
                             for (Choujiang.ChouJiangDataList chouJiangDataList : choujiang.data.list) {
-                                join1(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
+                                join(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, et.getText().toString(), chouJiangDataList.raffleId);
                                 Thread.sleep(500);
                             }
                             //       }
@@ -142,7 +142,7 @@ public class ChoujiangFragment extends Fragment {
         }
         return new Choujiang();
     }
-
+/*
     public void join1(String cookie, String roomId, int raffleId) throws IOException {
         URL postUrl = new URL("https://api.live.bilibili.com/xlive/lottery-interface/v3/smalltv/Join");
         String content = "";//要发出的数据
@@ -156,9 +156,9 @@ public class ChoujiangFragment extends Fragment {
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(true);
         connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
+        connection.setRequestProperty("Connection", "keep-alive");*/
+     //   connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
+   /*     connection.setRequestProperty("Origin", "https://live.bilibili.com");
         connection.setRequestProperty("User-Agent", MainActivity.instence.userAgent);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomId + "?live_lottery_type=1&broadcast_type=0&from=28003&extra_jump_from=28003&visit_id=");
@@ -190,7 +190,7 @@ public class ChoujiangFragment extends Fragment {
         MainActivity.instence.showToast(ss);
     }
 
-
+*/
 
 
     public void join(String cookie, String roomId, int raffleId) {

@@ -5,34 +5,24 @@ import android.app.*;
 import android.content.*;
 import android.content.pm.*;
 import android.content.res.*;
+import android.graphics.*;
 import android.net.*;
 import android.os.*;
 import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
-
 import com.google.gson.*;
-import com.meng.bilibilihelper.activity.main.Login;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.main.*;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.fragment.*;
-import com.meng.bilibilihelper.fragment.live.ChoujiangFragment;
-import com.meng.bilibilihelper.fragment.live.GiftFragment;
-import com.meng.bilibilihelper.fragment.live.GuaJiFragment;
-import com.meng.bilibilihelper.fragment.live.NaiFragment;
-import com.meng.bilibilihelper.fragment.live.SendDanmakuFragment;
-import com.meng.bilibilihelper.fragment.live.SendHotStripFragment;
-import com.meng.bilibilihelper.fragment.live.SignFragment;
-import com.meng.bilibilihelper.fragment.main.FollowFragment;
-import com.meng.bilibilihelper.fragment.main.GiveCoinFragment;
-import com.meng.bilibilihelper.fragment.main.ReplyVideoFragment;
-import com.meng.bilibilihelper.fragment.main.ZanFragment;
+import com.meng.bilibilihelper.fragment.live.*;
+import com.meng.bilibilihelper.fragment.main.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.*;
 import com.meng.bilibilihelper.materialDesign.*;
-
 import java.io.*;
 import java.util.*;
-
 import org.jsoup.*;
 
 import com.meng.bilibilihelper.R;
@@ -102,6 +92,7 @@ public class MainActivity extends Activity {
                         }).setCancelable(false).show();
             }
         }
+		infoHeader = new MengInfoHeaderView(this);
         findViews();
         initFragment();
         setActionBar();
@@ -157,17 +148,24 @@ public class MainActivity extends Activity {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         onWifi = wifiNetworkInfo.isConnected();
-        final String mainUID = SharedPreferenceHelper.getValue("mainAccount", null);
-        if (mainUID != null) {
+        final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
+        if (!mainUID.equals("")) {
+			mDrawerList.addHeaderView(infoHeader);
+			File imf = new File(mainDic + "bilibili/" + mainUID + ".jpg");
+			if (imf.exists()) {
+				MainActivity.instence.infoHeader.setImage(BitmapFactory.decodeFile(imf.getAbsolutePath()));
+			  } else {
+				MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(this, infoHeader.getImageView(), mainUID, HeadType.BilibiliUser));
+			  }
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final BilibiliUserInfo info = new Gson().fromJson("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp", BilibiliUserInfo.class);
+                    final BilibiliUserInfo info = new Gson().fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            MainActivity.instence.infoHeader.setTitle(info.data.name);
-                            MainActivity.instence.infoHeader.setSummry(info.data.name);
+                            infoHeader.setTitle(info.data.name);
+                            infoHeader.setSummry("Lv."+info.data.level);
                         }
                     });
                 }
@@ -229,9 +227,7 @@ public class MainActivity extends Activity {
         }));
         rightList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
                 "信息", "添加账号", "管理账号", "发送视频评论", "赞视频", "视频投币（2个）", "关注其他用户", "设置", "退出"
-        }));
-        infoHeader = new MengInfoHeaderView(this);
-        mDrawerList.addHeaderView(infoHeader);
+        }));       
         mDrawerList.setOnItemClickListener(itemClickListener);
         rightList.setOnItemClickListener(itemClickListener);
     }
@@ -239,72 +235,74 @@ public class MainActivity extends Activity {
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (((TextView) view).getText().toString()) {
-                case "首页(大概)":
-                    initMainFragment(true);
-                    break;
-                case "添加账号":
-                    startActivity(new Intent(MainActivity.this, Login.class));
-                    break;
-                case "管理账号":
-                    initManagerFragment(true);
-                    break;
-                case "发送弹幕":
-                    initSendDanmakuFragment(true);
-                    break;
-                case "视频投币（2个）":
-                    initCoinFragment(true);
-                    break;
-                case "cj":
-                    initChouJiangFragment(true);
-                    break;
-                case "赞视频":
-                    initZanFragment(true);
-                    break;
-                case "奶":
-                    initNaiFragment(true);
-                    break;
-                case "发送礼物":
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("选择礼物类型")
-                            .setPositiveButton("瓜子买辣条", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface p11, int p2) {
-                                    initHotStripFragment(true);
-                                }
-                            }).setNegativeButton("包裹中的辣条", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            initGiftFragment(true);
-                        }
-                    }).show();
-                    break;
-                case "信息":
-                    initPersionInfoFragment(true);
-                    break;
-                case "挂机":
-                    initGuajiFragment(true);
-                    break;
-                case "发送视频评论":
-                    initReplyVideoFragment(true);
-                    break;
-                case "关注其他用户":
-                    initFollowFragment(true);
-                    break;
-                case "签到":
-                    initSignFragment(true);
-                    break;
-                case "设置":
-                    initSettingsFragment(true);
-                    break;
-                case "退出":
-                    if (SharedPreferenceHelper.getBoolean("exit", false)) {
-                        System.exit(0);
-                    } else {
-                        finish();
-                    }
-                    break;
-            }
+            if(view instanceof TextView){
+				switch (((TextView) view).getText().toString()) {
+					case "首页(大概)":
+					  initMainFragment(true);
+					  break;
+					case "添加账号":
+					  startActivity(new Intent(MainActivity.this, Login.class));
+					  break;
+					case "管理账号":
+					  initManagerFragment(true);
+					  break;
+					case "发送弹幕":
+					  initSendDanmakuFragment(true);
+					  break;
+					case "视频投币（2个）":
+					  initCoinFragment(true);
+					  break;
+					case "cj":
+					  initChouJiangFragment(true);
+					  break;
+					case "赞视频":
+					  initZanFragment(true);
+					  break;
+					case "奶":
+					  initNaiFragment(true);
+					  break;
+					case "发送礼物":
+					  new AlertDialog.Builder(MainActivity.this)
+						.setTitle("选择礼物类型")
+						.setPositiveButton("瓜子买辣条", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface p11, int p2) {
+								initHotStripFragment(true);
+							  }
+						  }).setNegativeButton("包裹中的辣条", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								initGiftFragment(true);
+							  }
+						  }).show();
+					  break;
+					case "信息":
+					  initPersionInfoFragment(true);
+					  break;
+					case "挂机":
+					  initGuajiFragment(true);
+					  break;
+					case "发送视频评论":
+					  initReplyVideoFragment(true);
+					  break;
+					case "关注其他用户":
+					  initFollowFragment(true);
+					  break;
+					case "签到":
+					  initSignFragment(true);
+					  break;
+					case "设置":
+					  initSettingsFragment(true);
+					  break;
+					case "退出":
+					  if (SharedPreferenceHelper.getBoolean("exit", false)) {
+						  System.exit(0);
+						} else {
+						  finish();
+						}
+					  break;
+				  }
+			}
             mDrawerToggle.syncState();
             mDrawerLayout.closeDrawer(mDrawerList);
         }

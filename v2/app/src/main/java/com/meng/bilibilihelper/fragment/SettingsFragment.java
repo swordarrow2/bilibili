@@ -44,17 +44,17 @@ public class SettingsFragment extends PreferenceFragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final BilibiliUserInfo info = new Gson().fromJson("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp", BilibiliUserInfo.class);
+                        final BilibiliUserInfo info = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 MainActivity.instence.infoHeader.setTitle(info.data.name);
-                                MainActivity.instence.infoHeader.setSummry(info.data.name);
+                                MainActivity.instence.infoHeader.setSummry("Lv."+info.data.level);
                             }
                         });
                     }
                 }).start();
-                return false;
+                return true;
             }
         });
 	/*	CheckBoxPreference cb=(CheckBoxPreference)findPreference("useLightTheme");

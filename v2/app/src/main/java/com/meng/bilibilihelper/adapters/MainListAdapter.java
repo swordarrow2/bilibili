@@ -55,7 +55,7 @@ public class MainListAdapter extends BaseAdapter {
         }
         final LoginInfoPeople loginInfoPeople = loginInfoPeopleArrayList.get(position);
         holder.tvName.setText(loginInfoPeople.personInfo.data.name);
-        File bilibiliImageFile = new File(MainActivity.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
+        File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
         if (bilibiliImageFile.exists()) {
             holder.ivHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {

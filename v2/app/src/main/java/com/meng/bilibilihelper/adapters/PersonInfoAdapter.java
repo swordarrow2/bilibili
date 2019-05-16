@@ -54,8 +54,8 @@ public class PersonInfoAdapter extends BaseAdapter {
         holder.textViewQQNumber.setText(String.valueOf(personInfo.qq));
         holder.textViewBilibiliUid.setText(String.valueOf(personInfo.bid));
         holder.textViewBilibiliLiveId.setText(String.valueOf(personInfo.bliveRoom));
-        File qqImageFile = new File(MainActivity.mainDic + "user/" + personInfo.qq + ".jpg");
-        File bilibiliImageFile = new File(MainActivity.mainDic + "bilibili/" + personInfo.bid + ".jpg");
+        File qqImageFile = new File(MainActivity.instence.mainDic + "user/" + personInfo.qq + ".jpg");
+        File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + personInfo.bid + ".jpg");
         if (personInfo.qq == 0) {
             holder.imageViewQQHead.setImageResource(R.drawable.stat_sys_download_anim0);
 		  } else {

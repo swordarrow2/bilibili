@@ -44,17 +44,6 @@
         android:background="#eeeeee"
         android:gravity="center_horizontal">
 
-        <ListView
-            android:id="@+id/right_list"
-            android:layout_width="@dimen/navdrawer_width"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="#eeeeee"
-            android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:drawSelectorOnTop="false" />
-
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
@@ -69,6 +58,17 @@
                 android:padding="5dp"
                 android:textIsSelectable="true" />
         </ScrollView>
+		
+		<ListView
+            android:id="@+id/right_list"
+            android:layout_width="@dimen/navdrawer_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#eeeeee"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:drawSelectorOnTop="false" />
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
 

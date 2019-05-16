@@ -1,32 +1,23 @@
 package com.meng.bilibilihelper.fragment.live;
 
 import android.app.*;
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
-import com.meng.bilibilihelper.activity.live.LiveWebActivity;
-import com.meng.bilibilihelper.fragment.BaseFrgment;
+import com.meng.bilibilihelper.activity.live.*;
+import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import com.meng.bilibilihelper.javaBean.personInfo.*;
-
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
+import com.meng.bilibilihelper.libAndHelper.*;
+import java.io.*;
+import java.util.*;
+import org.jsoup.*;
 
 public class NaiFragment extends BaseFrgment {
 
@@ -124,6 +115,9 @@ public class NaiFragment extends BaseFrgment {
         String lid = "";
         if (MainActivity.instence.mainFrgment.radioButtonUID.isChecked()) {
             lid = MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString();
+			if(lid==null||lid.equals("")){
+				lid=SharedPreferenceHelper.getValue("mainAccount", "");
+			  }
         } else if (MainActivity.instence.mainFrgment.radioButtonLiveID.isChecked()) {
             for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
                 if (MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bliveRoom))) {

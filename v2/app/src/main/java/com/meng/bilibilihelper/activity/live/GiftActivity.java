@@ -20,7 +20,7 @@ import android.widget.AdapterView.*;
 public class GiftActivity extends Activity {
     private BilibiliMyInfo myInfo;
     private UserSpaceToLive userSpaceToLive;
-    private String ruid;
+    private String uid;
     private LiveBag liveBag;
     private GiftAdapter giftAdapter;
 
@@ -31,8 +31,8 @@ public class GiftActivity extends Activity {
         if (position == -1) {
             finish();
         }
-        ruid = MainActivity.instence.naiFragment.getUId();
-        if (ruid.equals("")) {
+        uid = MainActivity.instence.naiFragment.getUId();
+        if (uid.equals("")) {
             Toast.makeText(getApplicationContext(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -44,7 +44,7 @@ public class GiftActivity extends Activity {
                 Gson gson = new Gson();
                 String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
                 myInfo = gson.fromJson(MainActivity.instence.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), BilibiliMyInfo.class);
-                userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + ruid), UserSpaceToLive.class);
+                userSpaceToLive = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UserSpaceToLive.class);
                 liveBag = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie), LiveBag.class);
                 giftAdapter = new GiftAdapter(GiftActivity.this, liveBag.data.list);
                 runOnUiThread(new Runnable() {
@@ -76,7 +76,7 @@ public class GiftActivity extends Activity {
                                     public void run() {
                                         try {
                                             String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-                                            sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, Integer.parseInt(editText.getText().toString()), (LiveBag.LiveBagDataList) parent.getItemAtPosition(p));
+                                            sendHotStrip(myInfo.data.mid, uid, userSpaceToLive.data.roomid, cookie, Integer.parseInt(editText.getText().toString()), (LiveBag.LiveBagDataList) parent.getItemAtPosition(p));
                                             liveBag.data.list.get(p).gift_num -= Integer.parseInt(editText.getText().toString());
                                             if (liveBag.data.list.get(p).gift_num == 0) {
                                                 liveBag.data.list.remove(p);
@@ -109,7 +109,7 @@ public class GiftActivity extends Activity {
                     public void run() {
                         try {
                             String cookie = MainActivity.instence.loginInfo.loginInfoPeople.get(position).cookie;
-                            sendHotStrip(myInfo.data.mid, ruid, userSpaceToLive.data.roomid, cookie, liveBag.data.list.get(p3).gift_num, (LiveBag.LiveBagDataList) p1.getItemAtPosition(p3));
+                            sendHotStrip(myInfo.data.mid, uid, userSpaceToLive.data.roomid, cookie, liveBag.data.list.get(p3).gift_num, (LiveBag.LiveBagDataList) p1.getItemAtPosition(p3));
                             liveBag.data.list.remove(p3);
                             if (liveBag.data.list.size() == 0) {
                                 MainActivity.instence.showToast("已送出全部礼物🎁");

@@ -70,7 +70,7 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
         });
 
         holder.switchEnable.setChecked(checked.get(position));
-        File bilibiliImageFile = new File(MainActivity.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
+        File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
         if (bilibiliImageFile.exists()) {
             holder.ivHeader.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {

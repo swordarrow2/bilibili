@@ -122,7 +122,7 @@ public class MainFrgment extends Fragment {
                             for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
                                 try {
                                     Thread.sleep(1000);
-                                    String room = autoCompleteTextView.getText().toString().equals("") ? autoCompleteTextView.getHint().toString() : autoCompleteTextView.getText().toString();
+                                    String room = autoCompleteTextView.getText().toString().equals("") ? SharedPreferenceHelper.getValue("mainAccount", "") : autoCompleteTextView.getText().toString();
                                     MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.getRandomSentense(), loginInfoPeople.cookie, room);
                                 } catch (Exception e) {
                                     e.printStackTrace();

@@ -31,10 +31,11 @@ public class GiftActivity extends Activity {
         if (position == -1) {
             finish();
         }
-        uid = MainActivity.instence.naiFragment.getUId();
+        uid = MainActivity.instence.mainFrgment.mengEditText.getUId();
         if (uid.equals("")) {
             Toast.makeText(getApplicationContext(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
         setContentView(R.layout.list_fragment);
         final ListView listView = (ListView) findViewById(R.id.normal_listview);

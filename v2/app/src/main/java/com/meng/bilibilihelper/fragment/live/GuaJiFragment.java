@@ -34,7 +34,7 @@ public class GuaJiFragment extends BaseFrgment {
                 Intent intentOne = new Intent(getActivity(), GuaJiService.class);
 				intentOne.putExtra("name",((LoginInfoPeople)p1.getItemAtPosition(p3)).personInfo.data.name);
                 intentOne.putExtra("cookie", MainActivity.instence.loginInfo.loginInfoPeople.get(p3).cookie);
-				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.mainFrgment.autoCompleteTextView.getText().toString());
+				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.mainFrgment.mengEditText.getLiveId());
                 getActivity().startService(intentOne);
             }
         });

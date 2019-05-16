@@ -52,7 +52,7 @@ public class SendHotStripFragment extends BaseFrgment {
 
                     @Override
                     public void run() {
-                        final String uid = MainActivity.instence.naiFragment.getUId();
+                        final String uid = MainActivity.instence.mainFrgment.mengEditText.getUId();
                         if (uid.equals("")) {
                             Toast.makeText(getActivity(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
                             return;

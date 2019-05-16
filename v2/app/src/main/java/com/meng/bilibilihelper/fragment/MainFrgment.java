@@ -21,12 +21,10 @@ import java.util.*;
 
 public class MainFrgment extends Fragment {
 
-    public AutoCompleteTextView autoCompleteTextView;
     public ConfigJavaBean planePlayerList = null;
     public LinearLayout l1;
-    public RadioButton radioButtonUID;
-    public RadioButton radioButtonLiveID;
     public ArrayAdapter<String> arrayAdapter;
+    public MengEditText mengEditText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,12 +34,9 @@ public class MainFrgment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.autoCompleteTextview);
-        autoCompleteTextView.addTextChangedListener(textWatcher);
+        mengEditText = (MengEditText) view.findViewById(R.id.meng_edittext);
         Button btn = (Button) view.findViewById(R.id.naiAll);
         Button btn2 = (Button) view.findViewById(R.id.signAll);
-        radioButtonUID = (RadioButton) view.findViewById(R.id.rbBid);
-        radioButtonLiveID = (RadioButton) view.findViewById(R.id.rbLiveId);
         l1 = (LinearLayout) view.findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
         btn.setOnClickListener(onClickListener);
         btn2.setOnClickListener(onClickListener);
@@ -54,7 +49,7 @@ public class MainFrgment extends Fragment {
             list.add(planePlayer.name);
         }
         arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list);
-        autoCompleteTextView.setAdapter(arrayAdapter);
+        mengEditText.setAdapter(arrayAdapter);
 
         new Thread(new Runnable() {
             @Override
@@ -84,7 +79,7 @@ public class MainFrgment extends Fragment {
                                     list.add(planePlayer.name);
                                     list.add(String.valueOf(planePlayer.bliveRoom));
                                 }
-                                autoCompleteTextView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
+                                mengEditText.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
                             }
                         }
                     });
@@ -122,8 +117,7 @@ public class MainFrgment extends Fragment {
                             for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
                                 try {
                                     Thread.sleep(1000);
-                                    String room = autoCompleteTextView.getText().toString().equals("") ? SharedPreferenceHelper.getValue("mainAccount", "") : autoCompleteTextView.getText().toString();
-                                    MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.getRandomSentense(), loginInfoPeople.cookie, room);
+                                    MainActivity.instence.naiFragment.sendDanmakuData(MainActivity.instence.naiFragment.getRandomSentense(), loginInfoPeople.cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -151,83 +145,4 @@ public class MainFrgment extends Fragment {
         }
     };
 
-    TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(final Editable s) {
-            final Gson gson = new Gson();
-            if (planePlayerList != null) {
-                for (final PersonInfo planePlayer : planePlayerList.personInfo) {
-                    if (s.toString().equals(planePlayer.name)) {
-                        autoCompleteTextView.setText(String.valueOf(planePlayer.bid));
-                        break;
-                    }
-                }
-            }
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        if (s.toString().equals("0")) {
-                            return;
-                        }
-                        if (radioButtonUID.isChecked()) {
-                            final BilibiliUserInfo person = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliUserInfo.class);
-                            final UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), UserSpaceToLive.class);
-                            JsonParser parser = new JsonParser();
-                            JsonObject obj = parser.parse(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + sjb.data.roomid + "&quality=4&platform=web")).getAsJsonObject();
-                            final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    l1.removeAllViews();
-                                    l1.addView(new MengTextview(getActivity(), "屑站ID", person.data.mid));
-                                    l1.addView(new MengTextview(getActivity(), "用户名", person.data.name));
-                                    l1.addView(new MengTextview(getActivity(), "性别", person.data.sex));
-                                    l1.addView(new MengTextview(getActivity(), "签名", person.data.sign));
-                                    l1.addView(new MengTextview(getActivity(), "等级", person.data.level));
-                                    l1.addView(new MengTextview(getActivity(), "生日", person.data.birthday));
-                                    l1.addView(new MengTextview(getActivity(), "vip类型", person.data.vip.type));
-                                    l1.addView(new MengTextview(getActivity(), "vip状态", person.data.vip.status));
-                                    l1.addView(new MengTextview(getActivity(), "直播URL", sjb.data.url));
-                                    l1.addView(new MengTextview(getActivity(), "标题", sjb.data.title));
-                                    l1.addView(new MengTextview(getActivity(), "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
-                                }
-                            });
-                        } else if (radioButtonLiveID.isChecked()) {
-                            JsonParser parser = new JsonParser();
-                            JsonObject obj = parser.parse(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + s.toString() + "&quality=4&platform=web")).getAsJsonObject();
-                            final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    l1.removeAllViews();
-                                    l1.addView(new MengTextview(getActivity(), "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
-                                    l1.addView(new MengTextview(getActivity(), "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
-    };
 }

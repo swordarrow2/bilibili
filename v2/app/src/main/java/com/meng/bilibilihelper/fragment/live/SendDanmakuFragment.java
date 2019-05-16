@@ -45,7 +45,7 @@ public class SendDanmakuFragment extends BaseFrgment {
                         for (int i = 0; i < cda.getCount(); ++i) {
                             if (cda.getChecked(i)) {
                                 try {
-                                    MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.naiFragment.getLiveId());
+                                    MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
                                 } catch (Exception e) {
 
                                 }

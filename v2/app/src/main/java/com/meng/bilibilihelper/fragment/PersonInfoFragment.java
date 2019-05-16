@@ -31,8 +31,8 @@ public class PersonInfoFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
                 long l = ((PersonInfo) p1.getItemAtPosition(p3)).bid;
-                MainActivity.instence.mainFrgment.radioButtonUID.setChecked(true);
-                MainActivity.instence.mainFrgment.autoCompleteTextView.setText(String.valueOf(l));
+                MainActivity.instence.mainFrgment.mengEditText.checkUidButton();
+                MainActivity.instence.mainFrgment.mengEditText.setText(String.valueOf(l));
                 MainActivity.instence.initMainFragment(true);
             }
         });

@@ -30,21 +30,21 @@ import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 import com.meng.bilibilihelper.javaBean.personInfo.PersonInfo;
 
 public class MengEditText extends LinearLayout {
-    private MainActivity activity;
+    private Context activity;
 
     public AutoCompleteTextView autoCompleteTextView;
     public RadioButton radioButtonUID;
     public RadioButton radioButtonLiveID;
 
-    public MengEditText(MainActivity activity, String title, long summry) {
+    public MengEditText(Context activity, String title, long summry) {
         this(activity, title, String.valueOf(summry));
     }
 
-    public MengEditText(MainActivity activity, String title, float summry) {
+    public MengEditText(Context activity, String title, float summry) {
         this(activity, title, String.valueOf(summry));
     }
 
-    public MengEditText(MainActivity activity, String title, String summry) {
+    public MengEditText(Context activity, String title, String summry) {
         super(activity);
         this.activity = activity;
         LayoutInflater.from(activity).inflate(R.layout.meng_edittext, this);
@@ -55,10 +55,10 @@ public class MengEditText extends LinearLayout {
 
     }
 
-    public MengEditText(MainActivity activity, AttributeSet attributeSet) {
+    public MengEditText(Context activity, AttributeSet attributeSet) {
         super(activity, attributeSet);
         this.activity = activity;
-        LayoutInflater.from(activity).inflate(R.layout.meng_textview, this);
+        LayoutInflater.from(activity).inflate(R.layout.meng_edittext, this);
 
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextview);
         autoCompleteTextView.addTextChangedListener(textWatcher);
@@ -153,39 +153,39 @@ public class MengEditText extends LinearLayout {
                             JsonParser parser = new JsonParser();
                             JsonObject obj = parser.parse(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + sjb.data.roomid + "&quality=4&platform=web")).getAsJsonObject();
                             final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-                            activity.runOnUiThread(new Runnable() {
+                            ((MainActivity) activity).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    activity.mainFrgment.l1.removeAllViews();
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "屑站ID", person.data.mid));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "用户名", person.data.name));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "性别", person.data.sex));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "签名", person.data.sign));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "等级", person.data.level));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "生日", person.data.birthday));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "vip类型", person.data.vip.type));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "vip状态", person.data.vip.status));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "直播URL", sjb.data.url));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "标题", sjb.data.title));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.removeAllViews();
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "屑站ID", person.data.mid));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "用户名", person.data.name));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "性别", person.data.sex));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "签名", person.data.sign));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "等级", person.data.level));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "生日", person.data.birthday));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "vip类型", person.data.vip.type));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "vip状态", person.data.vip.status));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "直播URL", sjb.data.url));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "标题", sjb.data.title));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播"));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
                                 }
                             });
                         } else if (radioButtonLiveID.isChecked()) {
                             JsonParser parser = new JsonParser();
                             JsonObject obj = parser.parse(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + s.toString() + "&quality=4&platform=web")).getAsJsonObject();
                             final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-                            activity.runOnUiThread(new Runnable() {
+                            ((MainActivity) activity).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    activity.mainFrgment.l1.removeAllViews();
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
-                                    activity.mainFrgment.l1.addView(new MengTextview(activity, "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.removeAllViews();
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址1", ja.get(0).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址2", ja.get(1).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址3", ja.get(2).getAsJsonObject().get("url").getAsString()));
+                                    ((MainActivity) activity).mainFrgment.l1.addView(new MengTextview(activity, "视频地址4", ja.get(3).getAsJsonObject().get("url").getAsString()));
                                 }
                             });
                         }

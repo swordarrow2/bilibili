@@ -96,6 +96,7 @@ public class MainActivity extends Activity {
             }
         }
         infoHeaderLeft = new MengInfoHeaderView(this);
+        infoHeaderRight = new MengInfoHeaderView(this);
         findViews();
         initFragment();
         setActionBar();

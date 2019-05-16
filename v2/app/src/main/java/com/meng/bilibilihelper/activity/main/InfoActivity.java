@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.activity;
+package com.meng.bilibilihelper.activity.main;
 
 import android.app.*;
 import android.content.*;
@@ -10,6 +10,7 @@ import android.widget.*;
 
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.*;
 
@@ -90,7 +91,6 @@ public class InfoActivity extends Activity {
                                 MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name = info.data.name;
                                 MainActivity.instence.arrayList.clear();
                                 for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
-                                    ;
                                     MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
                                 }
                                 MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();

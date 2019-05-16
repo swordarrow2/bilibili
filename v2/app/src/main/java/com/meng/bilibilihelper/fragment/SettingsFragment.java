@@ -1,25 +1,21 @@
 package com.meng.bilibilihelper.fragment;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
 import android.preference.*;
-import android.view.View;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.*;
-import com.meng.bilibilihelper.activity.InfoActivity;
 import com.meng.bilibilihelper.activity.MainActivity;
-import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
 import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
-import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
-import com.meng.bilibilihelper.javaBean.personInfo.PersonInfo;
 import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
 import com.meng.bilibilihelper.libAndHelper.HeadType;
-import com.meng.bilibilihelper.libAndHelper.MengTextview;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class SettingsFragment extends PreferenceFragment {
 
@@ -37,19 +33,29 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, final Object newValue) {
                 File imf = new File(MainActivity.instence.mainDic + "bilibili/" + newValue + ".jpg");
                 if (imf.exists()) {
-                    MainActivity.instence.infoHeader.setImage(BitmapFactory.decodeFile(imf.getAbsolutePath()));
+                    Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
+                    MainActivity.instence.infoHeaderLeft.setImage(b);
+                    MainActivity.instence.infoHeaderRight.setImage(b);
                 } else {
-                    MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instence.infoHeader.getImageView(), (String) newValue, HeadType.BilibiliUser));
+                    MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instence.infoHeaderLeft.getImageView(), (String) newValue, HeadType.BilibiliUser));
+                    MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instence.infoHeaderRight.getImageView(), (String) newValue, HeadType.BilibiliUser));
                 }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         final BilibiliUserInfo info = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
+                        String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + info.data.mid);
+                        JsonParser parser = new JsonParser();
+                        JsonObject obj = parser.parse(json).getAsJsonObject();
+                        final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                MainActivity.instence.infoHeader.setTitle(info.data.name);
-                                MainActivity.instence.infoHeader.setSummry("Lv."+info.data.level);
+                                JsonArray ja = obj2.get("current").getAsJsonArray();
+                                MainActivity.instence.infoHeaderLeft.setTitle(String.valueOf(obj2.get("level").getAsInt()));
+                                MainActivity.instence.infoHeaderLeft.setSummry(obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
+                                MainActivity.instence.infoHeaderRight.setTitle(info.data.name);
+                                MainActivity.instence.infoHeaderRight.setSummry("Lv." + info.data.level);
                             }
                         });
                     }

@@ -8,7 +8,7 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 
 import com.meng.bilibilihelper.*;
-import com.meng.bilibilihelper.activity.InfoActivity;
+import com.meng.bilibilihelper.activity.main.InfoActivity;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.activity.main.Login;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;

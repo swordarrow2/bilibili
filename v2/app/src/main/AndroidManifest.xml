@@ -31,7 +31,7 @@
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material.Dialog" />
         <activity
-            android:name=".activity.InfoActivity"
+            android:name=".activity.main.InfoActivity"
             android:label="详细信息"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material.Dialog" />

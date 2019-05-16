@@ -99,6 +99,7 @@ public class MengEditText extends LinearLayout {
             if (autoCompleteTextView.getText().toString().equals("")) {
                 return SharedPreferenceHelper.getValue("mainAccount", "");
             }
+            return autoCompleteTextView.getText().toString();
         } else if (radioButtonLiveID.isChecked()) {
             String lid = autoCompleteTextView.getText().toString();
             if (lid.equals("")) {

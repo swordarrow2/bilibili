@@ -54,8 +54,8 @@ public class SettingsFragment extends PreferenceFragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                JsonArray ja = obj2.get("current").getAsJsonArray();
-                                MainActivity.instence.infoHeaderLeft.setTitle(String.valueOf(obj2.get("level").getAsInt()));
+                                JsonArray ja = obj2.get("next").getAsJsonArray();
+                                MainActivity.instence.infoHeaderLeft.setTitle("Lv."+obj2.get("level").getAsInt());
                                 MainActivity.instence.infoHeaderLeft.setSummry(obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
                                 MainActivity.instence.infoHeaderRight.setTitle(info.data.name);
                                 MainActivity.instence.infoHeaderRight.setSummry("Lv." + info.data.level);

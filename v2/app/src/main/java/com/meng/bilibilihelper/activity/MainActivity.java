@@ -177,8 +177,8 @@ public class MainActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            JsonArray ja = obj2.get("current").getAsJsonArray();
-                            infoHeaderLeft.setTitle(String.valueOf(obj2.get("level").getAsInt()));
+                            JsonArray ja = obj2.get("next").getAsJsonArray();
+                            infoHeaderLeft.setTitle("Lv."+obj2.get("level").getAsInt());
                             infoHeaderLeft.setSummry(obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
                             infoHeaderRight.setTitle(info.data.name);
                             infoHeaderRight.setSummry("Lv." + info.data.level);

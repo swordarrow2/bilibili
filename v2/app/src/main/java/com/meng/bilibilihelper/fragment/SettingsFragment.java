@@ -32,6 +32,8 @@ public class SettingsFragment extends PreferenceFragment {
         editTextPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, final Object newValue) {
+                MainActivity.instence.mDrawerList.addHeaderView(MainActivity.instence.infoHeaderLeft);
+                MainActivity.instence.rightList.addHeaderView(MainActivity.instence.infoHeaderRight);
                 File imf = new File(MainActivity.instence.mainDic + "bilibili/" + newValue + ".jpg");
                 if (imf.exists()) {
                     Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
@@ -55,10 +57,10 @@ public class SettingsFragment extends PreferenceFragment {
                             @Override
                             public void run() {
                                 JsonArray ja = obj2.get("next").getAsJsonArray();
-                                MainActivity.instence.infoHeaderLeft.setTitle("Lv."+obj2.get("level").getAsInt());
+                                MainActivity.instence.infoHeaderLeft.setTitle("主播 Lv." + obj2.get("level").getAsInt());
                                 MainActivity.instence.infoHeaderLeft.setSummry(obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
                                 MainActivity.instence.infoHeaderRight.setTitle(info.data.name);
-                                MainActivity.instence.infoHeaderRight.setSummry("Lv." + info.data.level);
+                                MainActivity.instence.infoHeaderRight.setSummry("主站 Lv." + info.data.level);
                             }
                         });
                     }

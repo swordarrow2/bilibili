@@ -24,9 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Login" />
+        <activity android:name=".activity.main.Login" />
         <activity
-            android:name=".activity.CaptchaDialogActivity"
+            android:name=".activity.live.CaptchaDialogActivity"
             android:label="验证码"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material.Dialog" />
@@ -36,10 +36,10 @@
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material.Dialog" />
         <activity
-            android:name=".activity.LiveWebActivity"
+            android:name=".activity.live.LiveWebActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.GiftActivity"
+            android:name=".activity.live.GiftActivity"
             android:launchMode="singleTop" />
 
         <service android:name=".GuaJiService" />

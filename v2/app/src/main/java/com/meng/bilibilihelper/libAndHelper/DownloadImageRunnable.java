@@ -2,17 +2,19 @@ package com.meng.bilibilihelper.libAndHelper;
 
 import android.graphics.*;
 import android.widget.*;
+
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
 
 import java.io.*;
 import java.net.*;
+
 import android.app.*;
 
 public class DownloadImageRunnable implements Runnable {
 
-	private ImageView imageView;
+    private ImageView imageView;
     private HeadType headType;
     private String id = "";
     private File imageFile;
@@ -23,37 +25,38 @@ public class DownloadImageRunnable implements Runnable {
         this.imageView = imageView;
         this.headType = headType;
         this.id = id;
-	  }
+    }
 
     @Override
     public void run() {
         switch (headType) {
             case QQGroup:
-			  imageFile = new File(MainActivity.mainDic + "group/" + id + ".jpg");
-			  if (imageFile.exists()) {
-				  return;
+                imageFile = new File(MainActivity.instence.mainDic + "group/" + id + ".jpg");
+                if (imageFile.exists()) {
+                    return;
                 }
-			  downloadFile("http://p.qlogo.cn/gh/" + id + "/" + id + "/100/");
-			  break;
+                downloadFile("http://p.qlogo.cn/gh/" + id + "/" + id + "/100/");
+                break;
             case QQUser:
-			  imageFile = new File(MainActivity.mainDic + "user/" + id + ".jpg");
-			  if (imageFile.exists()) {
-				  return;
+                imageFile = new File(MainActivity.instence.mainDic + "user/" + id + ".jpg");
+                if (imageFile.exists()) {
+                    return;
                 }
-			  downloadFile("http://q2.qlogo.cn/headimg_dl?bs=" + id + "&dst_uin=" + id + "&dst_uin=" + id + "&;dst_uin=" + id + "&spec=100&url_enc=0&referer=bu_interface&term_type=PC");
-			  break;
+                downloadFile("http://q2.qlogo.cn/headimg_dl?bs=" + id + "&dst_uin=" + id + "&dst_uin=" + id + "&;dst_uin=" + id + "&spec=100&url_enc=0&referer=bu_interface&term_type=PC");
+                break;
             case BilibiliUser:
-			  imageFile = new File(MainActivity.mainDic + "bilibili/" + id + ".jpg");
-			  if (imageFile.exists()) {
-				  return;
+                imageFile = new File(MainActivity.instence.mainDic + "bilibili/" + id + ".jpg");
+                if (imageFile.exists()) {
+                    return;
                 }
-			  downloadFile(getBilibiliHeadUrl(id));
-			  break;
-		  }
-		try {
-			Thread.sleep(1000);
-		  } catch (InterruptedException e) {}
-	  }
+                downloadFile(getBilibiliHeadUrl(id));
+                break;
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+    }
 
     private String getBilibiliHeadUrl(String uid) {
         try {
@@ -64,14 +67,14 @@ public class DownloadImageRunnable implements Runnable {
             StringBuilder stringBuilder = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
-			  }
+            }
             BilibiliUserInfo bilibiliPersonInfoJavaBean = new Gson().fromJson(stringBuilder.toString(), BilibiliUserInfo.class);
             return bilibiliPersonInfoJavaBean.data.face;
-		  } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
-		  }
-	  }
+        }
+    }
 
     private void downloadFile(String url) {
         try {
@@ -85,19 +88,19 @@ public class DownloadImageRunnable implements Runnable {
             int len = 0;
             while ((len = is.read(buf)) > 0) {
                 fos.write(buf, 0, len);
-			  }
+            }
             is.close();
             connection.disconnect();
             activity.runOnUiThread(new Runnable() {
 
-				  @Override
-				  public void run() {
-					  imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
-					}
-				});
-		  } catch (IOException e) {
+                @Override
+                public void run() {
+                    imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
+                }
+            });
+        } catch (IOException e) {
             e.printStackTrace();
-		  }
-	  }
-  }
+        }
+    }
+}
 

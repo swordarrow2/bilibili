@@ -1,6 +1,5 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,10 +9,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.activity.GiftActivity;
+import com.meng.bilibilihelper.activity.live.GiftActivity;
 import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 
-public class GiftFragment extends Fragment {
+public class GiftFragment extends BaseFrgment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

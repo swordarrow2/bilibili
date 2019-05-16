@@ -4,10 +4,10 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.util.*;
-import android.view.*;
 
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.activity.live.CaptchaDialogActivity;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
 

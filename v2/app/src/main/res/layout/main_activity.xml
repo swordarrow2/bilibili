@@ -14,13 +14,6 @@
             android:layout_gravity="top"
             android:gravity="bottom">
 
-            <ImageView
-                android:layout_width="36dip"
-                android:layout_height="36dip"
-                android:paddingLeft="10dip"
-                android:src="@drawable/ic_launcher"
-                android:visibility="gone" />
-
         </RelativeLayout>
 
         <FrameLayout
@@ -33,11 +26,11 @@
     <!-- The navigation drawer -->
 
     <ListView
-		android:background="#eeeeee"
         android:id="@+id/navdrawer"
         android:layout_width="@dimen/navdrawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="#eeeeee"
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
@@ -50,6 +43,17 @@
         android:layout_gravity="end"
         android:background="#eeeeee"
         android:gravity="center_horizontal">
+
+        <ListView
+            android:id="@+id/right_list"
+            android:layout_width="@dimen/navdrawer_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#eeeeee"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:drawSelectorOnTop="false" />
 
         <ScrollView
             android:layout_width="fill_parent"

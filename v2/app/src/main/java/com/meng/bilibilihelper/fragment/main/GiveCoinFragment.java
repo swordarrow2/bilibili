@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.main;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 
 import org.jsoup.Connection;
@@ -29,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class GiveCoinFragment extends Fragment {
+public class GiveCoinFragment extends BaseFrgment {
     public ListView listview;
     public Button btn;
     public EditText et;
@@ -75,14 +76,8 @@ public class GiveCoinFragment extends Fragment {
     public void sendCoin(String cookie, String AID) throws IOException {
 
         Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
-        Map<String, String> map = new HashMap<>();
-        map.put("Host", "api.bilibili.com");
-        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
-        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        map.put("Connection", "keep-alive");
-        map.put("Origin", "https://www.bilibili.com");
-        connection.userAgent(MainActivity.instence.userAgent)
-                .headers(map)
+         connection.userAgent(MainActivity.instence.userAgent)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(MainActivity.instence.cookieToMap(cookie))

@@ -1,6 +1,5 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,22 +15,18 @@ import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
 import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SendHotStripFragment extends Fragment {
+public class SendHotStripFragment extends BaseFrgment {
     ListView listview;
     Button btnSend;
     EditText etUID;
@@ -87,15 +82,9 @@ public class SendHotStripFragment extends Fragment {
 
 
         Connection connection = Jsoup.connect("http://api.live.bilibili.com/gift/v2/gift/send");
-        Map<String, String> map = new HashMap<>();
-        map.put("Host", "api.live.bilibili.com");
-        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
-        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        map.put("Connection", "keep-alive");
-        map.put("Origin", "https://live.bilibili.com");
         String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
         connection.userAgent(MainActivity.instence.userAgent)
-                .headers(map)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://live.bilibili.com/" + roomID)
                 .cookies(MainActivity.instence.cookieToMap(cookie))

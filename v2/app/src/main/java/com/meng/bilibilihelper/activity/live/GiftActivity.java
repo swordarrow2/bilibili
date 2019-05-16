@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.activity;
+package com.meng.bilibilihelper.activity.live;
 
 import android.app.*;
 import android.content.*;
@@ -8,13 +8,12 @@ import android.widget.*;
 
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.javaBean.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.Iterator;
-import java.util.Map;
 
 import android.widget.AdapterView.*;
 

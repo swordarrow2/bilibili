@@ -1,9 +1,11 @@
-package com.meng.bilibilihelper.activity;
+package com.meng.bilibilihelper.activity.live;
 
 import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.webkit.*;
+
+import com.meng.bilibilihelper.activity.MainActivity;
 
 public class LiveWebActivity extends Activity{
     @Override

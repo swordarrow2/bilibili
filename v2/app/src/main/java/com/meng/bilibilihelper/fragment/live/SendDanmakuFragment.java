@@ -1,6 +1,5 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
-import android.app.*;
 import android.os.*;
 import android.view.*;
 
@@ -13,11 +12,10 @@ import com.meng.bilibilihelper.activity.*;
 import android.view.View.*;
 
 import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.*;
 
-import java.io.*;
-
-public class SendDanmakuFragment extends Fragment {
+public class SendDanmakuFragment extends BaseFrgment {
     public ListView listview;
     public Button btn;
     public EditText et;

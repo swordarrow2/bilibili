@@ -1,18 +1,62 @@
 package com.meng.bilibilihelper.fragment;
 
+import android.graphics.BitmapFactory;
 import android.os.*;
 import android.preference.*;
+import android.view.View;
+
+import com.google.gson.Gson;
 import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.InfoActivity;
+import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.javaBean.BilibiliMyInfo;
+import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
+import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
+import com.meng.bilibilihelper.javaBean.personInfo.PersonInfo;
+import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
+import com.meng.bilibilihelper.libAndHelper.HeadType;
+import com.meng.bilibilihelper.libAndHelper.MengTextview;
 
-public class SettingsFragment extends PreferenceFragment{
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-	Preference clean;
+public class SettingsFragment extends PreferenceFragment {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		getPreferenceManager().setSharedPreferencesName("settings");
-		addPreferencesFromResource(R.xml.preference);
+    Preference clean;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getPreferenceManager().setSharedPreferencesName("settings");
+        addPreferencesFromResource(R.xml.preference);
+
+        EditTextPreference editTextPreference = (EditTextPreference) findPreference("mainAccount");
+        editTextPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, final Object newValue) {
+                File imf = new File(MainActivity.instence.mainDic + "bilibili/" + newValue + ".jpg");
+                if (imf.exists()) {
+                    MainActivity.instence.infoHeader.setImage(BitmapFactory.decodeFile(imf.getAbsolutePath()));
+                } else {
+                    MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instence.infoHeader.getImageView(), (String) newValue, HeadType.BilibiliUser));
+                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final BilibiliUserInfo info = new Gson().fromJson("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp", BilibiliUserInfo.class);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainActivity.instence.infoHeader.setTitle(info.data.name);
+                                MainActivity.instence.infoHeader.setSummry(info.data.name);
+                            }
+                        });
+                    }
+                }).start();
+                return false;
+            }
+        });
 	/*	CheckBoxPreference cb=(CheckBoxPreference)findPreference("useLightTheme");
 		cb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
 			  @Override
@@ -47,6 +91,6 @@ public class SettingsFragment extends PreferenceFragment{
 			  }
 
 		  }*/
-	  }
-  }
+    }
+}
 	

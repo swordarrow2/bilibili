@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.activity;
+package com.meng.bilibilihelper.activity.live;
 
 import Decoder.*;
 
@@ -12,6 +12,7 @@ import android.widget.*;
 
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.DataBaseHelper;
 import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;

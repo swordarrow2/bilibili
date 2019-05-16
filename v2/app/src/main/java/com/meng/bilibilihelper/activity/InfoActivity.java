@@ -20,7 +20,6 @@ import java.util.*;
 public class InfoActivity extends Activity {
 
     public ProgressBar progressBar;
-    public static String mainDic = "";
 
     private LinearLayout l1;
     private Context context;
@@ -35,7 +34,6 @@ public class InfoActivity extends Activity {
         if (intent.getStringExtra("cookie") == null) {
             finish();
         }
-        mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
         setContentView(R.layout.info_list);
         context = this;
@@ -46,13 +44,13 @@ public class InfoActivity extends Activity {
 
             @Override
             public void onClick(View p1) {
-                File imf = new File(mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
+                File imf = new File(MainActivity.instence.mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
                 imf.delete();
                 MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), HeadType.BilibiliUser));
             }
         });
 
-        File imf = new File(mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
+        File imf = new File(MainActivity.instence.mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
         if (imf.exists()) {
             im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
         } else {
@@ -90,20 +88,13 @@ public class InfoActivity extends Activity {
                             int ii = InfoActivity.this.getIntent().getIntExtra("pos", 0);
                             if (!MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name.equals(info.data.name)) {
                                 MainActivity.instence.loginInfo.loginInfoPeople.get(ii).personInfo.data.name = info.data.name;
-
-                                runOnUiThread(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        MainActivity.instence.arrayList.clear();
-                                        for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
-                                            ;
-                                            MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
-                                        }
-                                        MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
-                                        MainActivity.instence.saveConfig();
-                                    }
-                                });
+                                MainActivity.instence.arrayList.clear();
+                                for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
+                                    ;
+                                    MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
+                                }
+                                MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
+                                MainActivity.instence.saveConfig();
                             }
                         }
                     });

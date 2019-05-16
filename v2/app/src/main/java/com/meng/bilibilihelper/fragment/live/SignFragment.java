@@ -1,28 +1,26 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
-import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.*;
-import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class SignFragment extends Fragment {
+public class SignFragment extends BaseFrgment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,14 +54,8 @@ public class SignFragment extends Fragment {
 
     public void sendSignData(String cookie) throws IOException {
         Connection connection = Jsoup.connect("https://api.live.bilibili.com/sign/doSign");
-        Map<String, String> map = new HashMap<>();
-        map.put("Host", "api.live.bilibili.com");
-        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
-        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        map.put("Connection", "keep-alive");
-        map.put("Origin", "https://live.bilibili.com");
         connection.userAgent(MainActivity.instence.userAgent)
-                .headers(map)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://live.bilibili.com/" + new Random().nextInt() % 9721949)
                 .cookies(MainActivity.instence.cookieToMap(cookie))

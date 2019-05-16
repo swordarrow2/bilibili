@@ -1,6 +1,5 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,32 +11,22 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
 import com.meng.bilibilihelper.javaBean.Choujiang;
 import com.meng.bilibilihelper.javaBean.HourRank;
-import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-public class ChoujiangFragment extends Fragment {
+public class ChoujiangFragment extends BaseFrgment {
 
     public ListView listview;
     public Button btn;
@@ -114,14 +103,8 @@ public class ChoujiangFragment extends Fragment {
     public Choujiang readInfo(String cookie, int roomId) {
         try {
             Connection connection = Jsoup.connect("https://api.live.bilibili.com/xlive/lottery-interface/v3/smalltv/Check?roomid=" + roomId);
-            Map<String, String> map = new HashMap<>();
-            map.put("Host", "api.live.bilibili.com");
-            map.put("Accept", "application/json, text/javascript, */*; q=0.01");
-            map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            map.put("Connection", "keep-alive");
-            map.put("Origin", "https://live.bilibili.com");
             connection.userAgent(MainActivity.instence.userAgent)
-                    .headers(map)
+                    .headers(liveHead)
                     .ignoreContentType(true)
                     .referrer("https://live.bilibili.com/" + roomId)
                     .cookies(MainActivity.instence.cookieToMap(cookie))

@@ -1,9 +1,10 @@
-package com.meng.bilibilihelper.activity;
+package com.meng.bilibilihelper.activity.main;
 
 import android.app.*;
 import android.os.*;
 import android.webkit.*;
 import com.google.gson.*;
+import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.*;
 
 public class Login extends Activity{

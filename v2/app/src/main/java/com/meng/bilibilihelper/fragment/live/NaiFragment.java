@@ -1,4 +1,4 @@
-package com.meng.bilibilihelper.fragment;
+package com.meng.bilibilihelper.fragment.live;
 
 import android.app.*;
 import android.content.Context;
@@ -13,13 +13,13 @@ import android.widget.AdapterView.*;
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.activity.live.LiveWebActivity;
+import com.meng.bilibilihelper.fragment.BaseFrgment;
 import com.meng.bilibilihelper.javaBean.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -28,7 +28,7 @@ import com.meng.bilibilihelper.javaBean.personInfo.*;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
-public class NaiFragment extends Fragment {
+public class NaiFragment extends BaseFrgment {
 
     public CustomSentence customSentence;
     File customSentenseFile;
@@ -166,15 +166,9 @@ public class NaiFragment extends Fragment {
     public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
 
         Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
-        Map<String, String> map = new HashMap<>();
-        map.put("Host", "api.live.bilibili.com");
-        map.put("Accept", "application/json, text/javascript, */*; q=0.01");
-        map.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        map.put("Connection", "keep-alive");
-        map.put("Origin", "https://live.bilibili.com");
         String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
         connection.userAgent(MainActivity.instence.userAgent)
-                .headers(map)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://live.bilibili.com/" + roomId)
                 .cookies(MainActivity.instence.cookieToMap(cookie))

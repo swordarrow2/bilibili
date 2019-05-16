@@ -168,8 +168,9 @@ public class MainActivity extends Activity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final BilibiliUserInfo info = new Gson().fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
-                    String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + info.data.mid);
+                    final BilibiliUserInfo info = gson.fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
+                    UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+                    String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
                     JsonParser parser = new JsonParser();
                     JsonObject obj = parser.parse(json).getAsJsonObject();
                     final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();

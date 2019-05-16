@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.MainActivity;
 import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
+import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
 import com.meng.bilibilihelper.libAndHelper.HeadType;
 
@@ -43,8 +44,10 @@ public class SettingsFragment extends PreferenceFragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final BilibiliUserInfo info = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
-                        String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + info.data.mid);
+                        Gson gson = new Gson();
+                        final BilibiliUserInfo info = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
+                        UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+                        String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
                         JsonParser parser = new JsonParser();
                         JsonObject obj = parser.parse(json).getAsJsonObject();
                         final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();

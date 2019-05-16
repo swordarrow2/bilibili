@@ -12,7 +12,6 @@ import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.main.*;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.fragment.*;

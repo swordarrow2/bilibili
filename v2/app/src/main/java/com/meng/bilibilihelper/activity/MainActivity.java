@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     public static MainActivity instence;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    private RelativeLayout rightDrawer;
     private ListView rightList;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerArrowDrawable drawerArrow;
@@ -160,7 +161,7 @@ public class MainActivity extends Activity {
             if (imf.exists()) {
                 Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
                 MainActivity.instence.infoHeaderLeft.setImage(b);
-                MainActivity.instence.infoHeaderLeft.setImage(b);
+                MainActivity.instence.infoHeaderRight.setImage(b);
             } else {
                 MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(this, infoHeaderLeft.getImageView(), mainUID, HeadType.BilibiliUser));
                 MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(this, infoHeaderRight.getImageView(), mainUID, HeadType.BilibiliUser));
@@ -321,7 +322,7 @@ public class MainActivity extends Activity {
             }
             mDrawerToggle.syncState();
             mDrawerLayout.closeDrawer(mDrawerList);
-            mDrawerLayout.closeDrawer(rightList);
+            mDrawerLayout.closeDrawer(rightDrawer);
         }
     };
 
@@ -330,6 +331,7 @@ public class MainActivity extends Activity {
         rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
+        rightDrawer=(RelativeLayout)findViewById(R.id.right_drawer);
         rightList = (ListView) findViewById(R.id.right_list);
     }
 

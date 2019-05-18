@@ -34,13 +34,16 @@ public class MengLiveControl extends LinearLayout {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UserSpaceToLive.class);
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btn.setText(sjb.data.liveStatus == 0 ? "开始直播" : "关闭直播");
-                    }
-                });
+                final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
+                if (!mainUID.equals("")) {
+                    final UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UserSpaceToLive.class);
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            btn.setText(sjb.data.liveStatus == 0 ? "开始直播" : "关闭直播");
+                        }
+                    });
+                }
             }
         }).start();
         btn.setOnClickListener(new OnClickListener() {

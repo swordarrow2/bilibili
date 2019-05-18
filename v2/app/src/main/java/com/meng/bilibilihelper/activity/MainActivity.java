@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     public RelativeLayout relativeLayout;
     public TextView rightText;
     public MengInfoHeaderView infoHeaderLeft;
+    public MengLiveControl mengLiveControl;
     public MengInfoHeaderView infoHeaderRight;
 
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
@@ -98,6 +99,7 @@ public class MainActivity extends Activity {
         }
         infoHeaderLeft = new MengInfoHeaderView(this);
         infoHeaderRight = new MengInfoHeaderView(this);
+        mengLiveControl = new MengLiveControl(this);
         findViews();
         initFragment();
         setActionBar();
@@ -155,6 +157,7 @@ public class MainActivity extends Activity {
         onWifi = wifiNetworkInfo.isConnected();
         final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
         if (!mainUID.equals("")) {
+            mDrawerList.addHeaderView(mengLiveControl);
             mDrawerList.addHeaderView(infoHeaderLeft);
             rightList.addHeaderView(infoHeaderRight);
             File imf = new File(mainDic + "bilibili/" + mainUID + ".jpg");

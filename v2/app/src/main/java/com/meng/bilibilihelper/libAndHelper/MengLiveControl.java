@@ -53,38 +53,32 @@ public class MengLiveControl extends LinearLayout {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
+                            String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
                             if (!mainUID.equals("")) {
-                                new Thread(new Runnable() {
+                                String cookie = MainActivity.instence.getCookie(Long.parseLong(mainUID));
+                                UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UserSpaceToLive.class);
+                                String streamJson = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
+                                JsonParser parser = new JsonParser();
+                                JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();
+                                MainActivity.instence.showToast(rtmp.get("message").getAsString());
+                                try {
+                                    start(sjb.data.roomid, cookie);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                final MengTextview m1 = new MengTextview(context, "rtmp地址", rtmp.get("addr").getAsString());
+                                final MengTextview m2 = new MengTextview(context, "直播码", rtmp.get("code").getAsString());
+                                ((Activity) context).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        String cookie = MainActivity.instence.getCookie(Long.parseLong(mainUID));
-                                        UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UserSpaceToLive.class);
-                                        String streamJson = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
-                                        JsonParser parser = new JsonParser();
-                                        JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();
-                                        MainActivity.instence.showToast(rtmp.get("message").getAsString());
-                                        try {
-                                            start(sjb.data.roomid, cookie);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                        final MengTextview m1 = new MengTextview(context, "rtmp地址", rtmp.get("addr").getAsString());
-                                        final MengTextview m2 = new MengTextview(context, "直播码", rtmp.get("code").getAsString());
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ll.addView(m1);
-                                                ll.addView(m2);
-                                                btn.setText("关闭直播");
-                                            }
-                                        });
+                                        ll.addView(m1);
+                                        ll.addView(m2);
+                                        btn.setText("关闭直播");
                                     }
-                                }).start();
+                                });
                             }
                         }
-
-                    });
+                    }).start();
                 } else {
                     new Thread(new Runnable() {
                         @Override

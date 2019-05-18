@@ -157,8 +157,8 @@ public class MainActivity extends Activity {
         onWifi = wifiNetworkInfo.isConnected();
         final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
         if (!mainUID.equals("")) {
-            mDrawerList.addHeaderView(mengLiveControl);
             mDrawerList.addHeaderView(infoHeaderLeft);
+            mDrawerList.addHeaderView(mengLiveControl);
             rightList.addHeaderView(infoHeaderRight);
             File imf = new File(mainDic + "bilibili/" + mainUID + ".jpg");
             if (imf.exists()) {

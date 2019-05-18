@@ -60,7 +60,6 @@ public class MengLiveControl extends LinearLayout {
                                 String streamJson = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
                                 JsonParser parser = new JsonParser();
                                 JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();
-                                MainActivity.instence.showToast(rtmp.get("message").getAsString());
                                 try {
                                     start(sjb.data.roomid, cookie);
                                 } catch (IOException e) {

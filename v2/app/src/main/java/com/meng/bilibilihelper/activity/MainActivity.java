@@ -646,6 +646,15 @@ public class MainActivity extends Activity {
         return map;
     }
 
+    public String getCookie(long bid) {
+        for (LoginInfoPeople l : loginInfo.loginInfoPeople) {
+            if (bid == l.personInfo.data.mid) {
+                return l.cookie;
+            }
+        }
+        return null;
+    }
+
     public String readFileToString() throws IOException, UnsupportedEncodingException {
         File file = new File(jsonPath);
         if (!file.exists()) {

@@ -30,7 +30,7 @@ import org.jsoup.*;
 import com.meng.bilibilihelper.R;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
     public static MainActivity instence;
     private DrawerLayout mDrawerLayout;
@@ -102,7 +102,7 @@ public class MainActivity extends Activity {
         mengLiveControl = new MengLiveControl(this);
         findViews();
         initFragment();
-        setActionBar();
+     //   setActionBar();
         setListener();
         jsonPath = getApplicationContext().getFilesDir() + "/info.json";
         File f = new File(jsonPath);

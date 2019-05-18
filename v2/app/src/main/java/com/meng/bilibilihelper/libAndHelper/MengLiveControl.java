@@ -25,7 +25,9 @@ public class MengLiveControl extends LinearLayout {
 
     private Button btn;
     private LinearLayout ll;
-
+	private MengTextview m1;
+	private MengTextview m2;
+	
     public MengLiveControl(final Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
@@ -65,8 +67,8 @@ public class MengLiveControl extends LinearLayout {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                                final MengTextview m1 = new MengTextview(context, "rtmp地址", rtmp.get("addr").getAsString());
-                                final MengTextview m2 = new MengTextview(context, "直播码", rtmp.get("code").getAsString());
+                                 m1 = new MengTextview(context, "", rtmp.get("addr").getAsString());
+                               m2 = new MengTextview(context, "", rtmp.get("code").getAsString());
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -92,8 +94,8 @@ public class MengLiveControl extends LinearLayout {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    ll.removeViewAt(1);
-                                    ll.removeViewAt(2);
+                                    ll.removeView(m1);
+                                    ll.removeView(m2);
                                     btn.setText("开始直播");
                                 }
                             });

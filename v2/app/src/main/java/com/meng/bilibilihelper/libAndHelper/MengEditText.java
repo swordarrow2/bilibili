@@ -89,7 +89,13 @@ public class MengEditText extends LinearLayout {
                         return String.valueOf(pp.bliveRoom);
                     }
                 }
-            }
+            }else{
+				for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
+                    if (autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))) {
+                        return String.valueOf(pp.bliveRoom);
+					  }
+				  } 
+			}
         }
         return "";
     }

@@ -23,6 +23,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ public class MengLiveControl extends LinearLayout {
     private LinearLayout ll;
     private MengTextview m1;
     private MengTextview m2;
+    private AutoCompleteTextView autoCompleteTextView;
+    private ArrayList<LivePartList.ListItemInListItem> itemInListItem;
 
     public MengLiveControl(final Context context) {
         super(context);
@@ -41,8 +44,10 @@ public class MengLiveControl extends LinearLayout {
         Button btnRename = (Button) findViewById(R.id.btn_rename);
         newName = (EditText) findViewById(R.id.et_new_name);
         ll = (LinearLayout) findViewById(R.id.linearlayout);
-        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
-        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class).getPartInfo()));
+        autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
+        LivePartList livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
+        itemInListItem = livePartList.getPartInfo();
+        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -141,7 +146,21 @@ public class MengLiveControl extends LinearLayout {
         });
     }
 
+    public String getIdByName(String name) {
+        for (LivePartList.ListItemInListItem item : itemInListItem) {
+            if (name.equals(item.name)) {
+                return item.id;
+            }
+        }
+        return null;
+    }
+
     public void start(int roomID, String cookie) throws IOException {
+        String partID = getIdByName(autoCompleteTextView.getText().toString());
+        if (partID == null) {
+            partID = "235";
+            MainActivity.instence.showToast("没有发现这个分区，已自动选择\"其他分区\"");
+        }
         Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/startLive");
         String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
         Map<String, String> liveHead = new HashMap<>();
@@ -158,7 +177,7 @@ public class MengLiveControl extends LinearLayout {
                 .method(Connection.Method.POST)
                 .data("room_id", String.valueOf(roomID))
                 .data("platform", "pc")
-                .data("area_v2", "235")
+                .data("area_v2", partID)
                 .data("csrf_token", csrf)
                 .data("csrf", csrf);
         Connection.Response response = connection.execute();

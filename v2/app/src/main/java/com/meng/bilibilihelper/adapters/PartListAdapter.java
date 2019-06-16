@@ -38,7 +38,7 @@ public class PartListAdapter extends BaseAdapter implements Filterable {
         if (convertView == null) {
             convertView = activity.getLayoutInflater().inflate(android.R.layout.simple_dropdown_item_1line, null);
         }
-        ((TextView) convertView).setText("data.get(position)");
+        ((TextView) convertView).setText(data.get(position));
         return convertView;
     }
 

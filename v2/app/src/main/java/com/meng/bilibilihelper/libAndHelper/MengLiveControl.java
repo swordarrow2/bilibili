@@ -2,6 +2,8 @@ package com.meng.bilibilihelper.libAndHelper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -41,9 +43,25 @@ public class MengLiveControl extends LinearLayout {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
         btnStart = (Button) findViewById(R.id.btn_start);
-        Button btnRename = (Button) findViewById(R.id.btn_rename);
+        final Button btnRename = (Button) findViewById(R.id.btn_rename);
         newName = (EditText) findViewById(R.id.et_new_name);
         ll = (LinearLayout) findViewById(R.id.linearlayout);
+        newName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                btnRename.setVisibility(editable.toString().equals("") ? GONE : VISIBLE);
+            }
+        });
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
         LivePartList livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
         itemInListItem = livePartList.getPartInfo();
@@ -186,7 +204,7 @@ public class MengLiveControl extends LinearLayout {
         }
         JsonParser parser = new JsonParser();
         JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-        MainActivity.instence.showToast(obj.get("message").getAsString());
+        //   MainActivity.instence.showToast(obj.get("message").getAsString());
     }
 
 

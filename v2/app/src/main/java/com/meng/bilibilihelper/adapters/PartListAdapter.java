@@ -34,11 +34,11 @@ public class PartListAdapter extends BaseAdapter implements Filterable {
         return data.get(position).hashCode();
     }
 
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = activity.getLayoutInflater().inflate(android.R.layout.simple_dropdown_item_1line, null);
         }
-        ((TextView) convertView).setText(data.get(position));
+        ((TextView) convertView).setText("data.get(position)");
         return convertView;
     }
 
@@ -63,8 +63,12 @@ public class PartListAdapter extends BaseAdapter implements Filterable {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                data = (ArrayList<String>) results.values;
-                notifyDataSetChanged();
+                data = (ArrayList) results.values;
+                if (results.count > 0) {
+                    notifyDataSetChanged();
+                } else {
+                    notifyDataSetInvalidated();
+                }
             }
         };
     }

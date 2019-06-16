@@ -56,6 +56,11 @@ public class GiftActivity extends Activity {
                             GiftActivity.this.finish();
                         }
                         listView.setAdapter(giftAdapter);
+						int ii=0;
+						for(LiveBag.LiveBagDataList i:liveBag.data.list){
+						  ii+=i.gift_num;
+						}
+						MainActivity.instence.showToast("共有"+ii+"辣条");
                     }
                 });
             }

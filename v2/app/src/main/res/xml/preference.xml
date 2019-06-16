@@ -8,6 +8,10 @@
         android:summaryOff="使用finish"
         android:summaryOn="使用System.exit"
         android:title="退出功能实现方式" />
+	<EditTextPreference
+        android:key="port"
+        android:summary="飞机佬服务器端口"
+        android:title="设置端口" />
     <EditTextPreference
         android:key="mainAccount"
         android:summary="主页未输入账号时将会对此账号的直播间进行操作"

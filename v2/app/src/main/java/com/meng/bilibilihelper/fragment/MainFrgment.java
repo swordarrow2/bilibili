@@ -55,7 +55,7 @@ public class MainFrgment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Socket client = new Socket("123.207.65.93", 9700);
+                    Socket client = new Socket("123.207.65.93", Integer.parseInt(SharedPreferenceHelper.getValue("port","9603")));
                     OutputStream out = client.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(out);
                     dos.writeUTF("getFull");

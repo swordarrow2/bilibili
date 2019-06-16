@@ -5,4 +5,6 @@
     <string name="user_id">用户ID</string>
     <string name="liveid">直播间ID</string>
     <string name="send">发送</string>
+    <string name="rename">修改房间名</string>
+    <string name="new_room_name">新房间名</string>
 </resources>

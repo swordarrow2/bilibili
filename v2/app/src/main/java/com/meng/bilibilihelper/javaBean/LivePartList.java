@@ -6,11 +6,7 @@ public class LivePartList {
     public int code;
     public String message;
     public String msg;
-    public Data data;
-
-    public class Data {
-        public ArrayList<DataListItem> data;
-    }
+    public ArrayList<DataListItem> data;
 
     public class DataListItem {
         public int id;
@@ -34,7 +30,7 @@ public class LivePartList {
 
     public ArrayList<ListItemInListItem> getPartInfo() {
         ArrayList<ListItemInListItem> list = new ArrayList<>();
-        for (DataListItem dataListItem : data.data) {
+        for (DataListItem dataListItem : data) {
             list.addAll(dataListItem.list);
         }
         return list;

@@ -42,7 +42,7 @@ public class MengLiveControl extends LinearLayout {
         newName = (EditText) findViewById(R.id.et_new_name);
         ll = (LinearLayout) findViewById(R.id.linearlayout);
         AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
-        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, new Gson().fromJson(MainActivity.instence.mainFrgment.getFromAssets("partlist.json"), LivePartList.class).getPartInfo()));
+        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class).getPartInfo()));
         new Thread(new Runnable() {
             @Override
             public void run() {

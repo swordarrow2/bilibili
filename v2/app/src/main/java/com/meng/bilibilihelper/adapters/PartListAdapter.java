@@ -23,15 +23,15 @@ public class PartListAdapter extends BaseAdapter implements Filterable {
     }
 
     public int getCount() {
-        return items.size();
+        return data.size();
     }
 
     public Object getItem(int position) {
-        return items.get(position);
+        return data.get(position);
     }
 
     public long getItemId(int position) {
-        return items.get(position).hashCode();
+        return data.get(position).hashCode();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {

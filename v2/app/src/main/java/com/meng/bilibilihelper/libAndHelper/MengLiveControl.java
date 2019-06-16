@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -13,7 +14,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.adapters.PartListAdapter;
+import com.meng.bilibilihelper.javaBean.LivePartList;
 import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
+import com.meng.bilibilihelper.javaBean.personInfo.ConfigJavaBean;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -25,7 +29,6 @@ import java.util.Map;
 public class MengLiveControl extends LinearLayout {
 
     private Button btnStart;
-    private Button btnRename;
     private EditText newName;
     private LinearLayout ll;
     private MengTextview m1;
@@ -35,9 +38,11 @@ public class MengLiveControl extends LinearLayout {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
         btnStart = (Button) findViewById(R.id.btn_start);
-        btnRename = (Button) findViewById(R.id.btn_rename);
+        Button btnRename = (Button) findViewById(R.id.btn_rename);
         newName = (EditText) findViewById(R.id.et_new_name);
         ll = (LinearLayout) findViewById(R.id.linearlayout);
+        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
+        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, new Gson().fromJson(MainActivity.instence.mainFrgment.getFromAssets("partlist.json"), LivePartList.class).getPartInfo()));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -132,7 +137,6 @@ public class MengLiveControl extends LinearLayout {
                         }
                     }
                 }).start();
-                ;
             }
         });
     }

@@ -1,71 +1,71 @@
 package com.meng.bilibilihelper.javaBean;
 
 public class BilibiliMyInfo {
-    public int code = 0;
-    public String message = "";
-    public int ttl = 0;
-    public MyInfoData data = new MyInfoData();
+    public int code;
+    public String message;
+    public int ttl;
+    public MyInfoData data;
 
     public class MyInfoData {
-        public long mid = 0;
-        public String name = "";
-        public String sex = "";
-        public String face = "";
-        public String sign = "";
-        public int rank = 0;
-        public int level = 0;
-        public long jointime = 0;
-        public int moral = 0;
-        public int silence = 0;
-        public int email_status = 0;
-        public int tel_status = 0;
-        public int identification = 0;
-        public Vip vip = new Vip();
-        public Pendant pendant = new Pendant();
-        public Official official = new Official();
-        public long birthday = 0;
-        public int is_tourist = 0;
-        public LevelExp level_exp = new LevelExp();
-        public float coins = 0f;
-        public int following = 0;
-        public int follower = 0;
+        public long mid;
+        public String name;
+        public String sex;
+        public String face;
+        public String sign;
+        public int rank;
+        public int level;
+        public long jointime;
+        public int moral;
+        public int silence;
+        public int email_status;
+        public int tel_status;
+        public int identification;
+        public Vip vip;
+        public Pendant pendant;
+        public Official official;
+        public long birthday;
+        public int is_tourist;
+        public LevelExp level_exp;
+        public float coins;
+        public int following;
+        public int follower;
     }
 
     public class LevelExp {
-        public int current_level = 0;
-        public int current_min = 0;
-        public int current_exp = 0;
-        public int next_exp = 0;
+        public int current_level;
+        public int current_min;
+        public int current_exp;
+        public int next_exp;
     }
 
     public class Nameplate {
-        public int nid = 0;
-        public String name = "";
-        public String image = "";
-        public String image_small = "";
-        public String level = "";
-        public String condition = "";
+        public int nid;
+        public String name;
+        public String image;
+        public String image_small;
+        public String level;
+        public String condition;
     }
 
     public class Official {
-        public int role = 0;
-        public String title = "";
-        public String desc = "";
+        public int role;
+        public String title;
+        public String desc;
     }
 
     public class Pendant {
-        public int pid = 0;
-        public String name = "";
-        public String image = "";
-        public int expire = 0;
+        public int pid;
+        public String name;
+        public String image;
+        public int expire;
     }
 
     public class Vip {
-        public int type = 0;
-        public int status = 0;
-        public long due_date = 0;
-        public int vip_pay_type = 0;
-        public int theme_type = 0;
+        public int type;
+        public int status;
+        public long due_date;
+        public int vip_pay_type;
+        public int theme_type;
     }
 
 

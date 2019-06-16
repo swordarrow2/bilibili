@@ -6,13 +6,13 @@ import android.content.pm.PackageInfo;
 
 public class UpdateInfo {
 
-    public boolean error = false;
+    public boolean error;
     private int[] nowVersion;
     private String newVersionLink;
 
-    public boolean newFunction = false;
-    public boolean optimize = false;
-    public boolean bugFix = false;
+    public boolean newFunction;
+    public boolean optimize;
+    public boolean bugFix;
 
     public UpdateInfo(Context context) {
         try {

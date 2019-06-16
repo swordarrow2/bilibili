@@ -1,43 +1,43 @@
 package com.meng.bilibilihelper.javaBean;
 
 public class BilibiliUserInfo {
-    public int code = 0;
-    public String message = "";
+    public int code;
+    public String message;
     public bilibiliPersonInfoData data = new bilibiliPersonInfoData();
 
     public class bilibiliPersonInfoData {
-        public long mid = 0;
-        public String name = "";
-        public String sex = "";
-        public String face = "";
-        public String sign = "";
-        public int rank = 0;
-        public int level = 0;
-        public int jointime = 0;
-        public int moral = 0;
-        public int silence = 0;
-        public String birthday = "";
-        public float coins = 0f;
-        public Official official = new Official();
-        public Vip vip = new Vip();
-        public boolean is_followed = false;
-        public String top_photo = "";
-        public Theme theme = new Theme();
+        public long mid;
+        public String name;
+        public String sex;
+        public String face;
+        public String sign;
+        public int rank;
+        public int level;
+        public int jointime;
+        public int moral;
+        public int silence;
+        public String birthday;
+        public float coins;
+        public Official official;
+        public Vip vip;
+        public boolean is_followed;
+        public String top_photo;
+        public Theme theme;
     }
 
     public class Official {
-        public int mid = 0;
-        public String title = "";
-        public String desc = "";
+        public int mid;
+        public String title;
+        public String desc;
     }
 
     public class Theme {
     }
 
     public class Vip {
-        public int type = 0;
-        public int status = 0;
-        public int theme_type = 0;
+        public int type;
+        public int status;
+        public int theme_type;
     }
 
 }

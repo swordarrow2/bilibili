@@ -57,7 +57,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     public ChoujiangFragment choujiangFragment;
 
     public FragmentManager fragmentManager;
-    public RelativeLayout relativeLayout;
     public TextView rightText;
     public MengInfoHeaderView infoHeaderLeft;
     public MengLiveControl mengLiveControl;
@@ -102,7 +101,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         mengLiveControl = new MengLiveControl(this);
         findViews();
         initFragment();
-     //   setActionBar();
+        //   setActionBar();
         setListener();
         jsonPath = getApplicationContext().getFilesDir() + "/info.json";
         File f = new File(jsonPath);
@@ -267,16 +266,16 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                         initManagerFragment(true);
                         break;
                     case "发送弹幕":
-                        initSendDanmakuFragment(true);
+                        initSendDanmakuFragment();
                         break;
                     case "视频投币（2个）":
-                        initCoinFragment(true);
+                        initCoinFragment();
                         break;
                     case "cj":
-                        initChouJiangFragment(true);
+                        initChouJiangFragment();
                         break;
                     case "赞视频":
-                        initZanFragment(true);
+                        initZanFragment();
                         break;
                     case "奶":
                         initNaiFragment(true);
@@ -287,12 +286,12 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                                 .setPositiveButton("瓜子买辣条", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface p11, int p2) {
-                                        initHotStripFragment(true);
+                                        initHotStripFragment();
                                     }
                                 }).setNegativeButton("包裹中的辣条", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                initGiftFragment(true);
+                                initGiftFragment();
                             }
                         }).show();
                         break;
@@ -300,19 +299,19 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                         initPersionInfoFragment(true);
                         break;
                     case "挂机":
-                        initGuajiFragment(true);
+                        initGuajiFragment();
                         break;
                     case "发送视频评论":
-                        initReplyVideoFragment(true);
+                        initReplyVideoFragment();
                         break;
                     case "关注其他用户":
-                        initFollowFragment(true);
+                        initFollowFragment();
                         break;
                     case "签到":
                         initSignFragment(true);
                         break;
                     case "设置":
-                        initSettingsFragment(true);
+                        initSettingsFragment();
                         break;
                     case "退出":
                         if (SharedPreferenceHelper.getBoolean("exit", false)) {
@@ -330,7 +329,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     };
 
     private void findViews() {
-        relativeLayout = (RelativeLayout) findViewById(R.id.right_drawer);
         rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
@@ -407,29 +405,25 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         transactionBusR.commit();
     }
 
-    private void initGuajiFragment(boolean showNow) {
+    private void initGuajiFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (guaJiFragment == null) {
             guaJiFragment = new GuaJiFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, guaJiFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(guaJiFragment);
-        }
+        transactionBusR.show(guaJiFragment);
         transactionBusR.commit();
     }
 
-    private void initSettingsFragment(boolean showNow) {
+    private void initSettingsFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (settingsFragment == null) {
             settingsFragment = new SettingsFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, settingsFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(settingsFragment);
-        }
+        transactionBusR.show(settingsFragment);
         transactionBusR.commit();
     }
 
@@ -446,107 +440,91 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         transactionBusR.commit();
     }
 
-    private void initSendDanmakuFragment(boolean showNow) {
+    private void initSendDanmakuFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (sendDanmakuFragment == null) {
             sendDanmakuFragment = new SendDanmakuFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, sendDanmakuFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(sendDanmakuFragment);
-        }
+        transactionBusR.show(sendDanmakuFragment);
         transactionBusR.commit();
     }
 
-    private void initHotStripFragment(boolean showNow) {
+    private void initHotStripFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (sendHotStripFragment == null) {
             sendHotStripFragment = new SendHotStripFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, sendHotStripFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(sendHotStripFragment);
-        }
+        transactionBusR.show(sendHotStripFragment);
         transactionBusR.commit();
     }
 
-    private void initGiftFragment(boolean showNow) {
+    private void initGiftFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (giftFragment == null) {
             giftFragment = new GiftFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, giftFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(giftFragment);
-        }
+        transactionBusR.show(giftFragment);
         transactionBusR.commit();
     }
 
-    private void initReplyVideoFragment(boolean showNow) {
+    private void initReplyVideoFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (replayVidoeFragment == null) {
             replayVidoeFragment = new ReplyVideoFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, replayVidoeFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(replayVidoeFragment);
-        }
+        transactionBusR.show(replayVidoeFragment);
         transactionBusR.commit();
     }
 
-    private void initFollowFragment(boolean showNow) {
+    private void initFollowFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (followFragment == null) {
             followFragment = new FollowFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, followFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(followFragment);
-        }
+        transactionBusR.show(followFragment);
         transactionBusR.commit();
     }
 
-    private void initCoinFragment(boolean showNow) {
+    private void initCoinFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (giveCoinFragment == null) {
             giveCoinFragment = new GiveCoinFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, giveCoinFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(giveCoinFragment);
-        }
+        transactionBusR.show(giveCoinFragment);
         transactionBusR.commit();
     }
 
-    private void initZanFragment(boolean showNow) {
+    private void initZanFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (zanFragment == null) {
             zanFragment = new ZanFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, zanFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(zanFragment);
-        }
+        transactionBusR.show(zanFragment);
         transactionBusR.commit();
     }
 
-    private void initChouJiangFragment(boolean showNow) {
+    private void initChouJiangFragment() {
         FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
         if (choujiangFragment == null) {
             choujiangFragment = new ChoujiangFragment();
             transactionBusR.add(R.id.main_activityLinearLayout, choujiangFragment);
         }
         hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(choujiangFragment);
-        }
+        transactionBusR.show(choujiangFragment);
         transactionBusR.commit();
     }
 
@@ -601,7 +579,9 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
     public void doVibrate(long time) {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(time);
+        if (vibrator != null) {
+            vibrator.vibrate(time);
+        }
     }
 
     public String getSourceCode(String url) {
@@ -632,7 +612,10 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return response.body();
+        if (response != null) {
+            return response.body();
+        }
+        return "";
     }
 
     public Map<String, String> cookieToMap(String value) {
@@ -680,9 +663,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             writer = new OutputStreamWriter(fos, "utf-8");
             writer.write(gson.toJson(loginInfo));
             writer.flush();
-            if (fos != null) {
-                fos.close();
-            }
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

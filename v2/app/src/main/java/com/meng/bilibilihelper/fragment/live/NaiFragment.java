@@ -36,43 +36,39 @@ public class NaiFragment extends BaseFrgment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        customSentenseFile = new File(Environment.getExternalStorageDirectory() + "/sjf.json");
-        if (!customSentenseFile.exists()) {
-            try {
-                customSentenseFile.createNewFile();
-            } catch (IOException e) {
-            }
-            customSentence = new CustomSentence();
-            String[] strings = new String[]{
-                    "发发发", "你稳了", "不会糟的", "稳的很",
-                    "今天,也是发气满满的一天",
-                    "你这把全关稳了",
-                    "点歌 信仰は儚き人間の為に",
-                    "点歌 星条旗のピエロ",
-                    "点歌 春の湊に-上海アリス幻樂団",
-                    "点歌 the last crusade",
-                    "点歌 ピュアヒューリーズ~心の在処",
-                    "点歌 忘れがたき、よすがの緑",
-                    "点歌 遥か38万キロのボヤージュ",
-                    "点歌 プレイヤーズスコア"};
-            customSentence.sent.addAll(Arrays.asList(strings));
-            saveConfig();
-        } else {
-            String s = "{}";
-            try {
-                s = readFileToString();
-            } catch (IOException e) {
-            }
-            customSentence = new Gson().fromJson(s, CustomSentence.class);
-        }
-
+        customSentenseFile = MainActivity.instence.methodsManager.newFile(Environment.getExternalStorageDirectory() + "/sjf.json",
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        customSentence = new Gson().fromJson(MainActivity.instence.methodsManager.readFileToString(customSentenseFile), CustomSentence.class);
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        customSentence = new CustomSentence();
+                        String[] strings = new String[]{
+                                "发发发", "你稳了", "不会糟的", "稳的很",
+                                "今天,也是发气满满的一天",
+                                "你这把全关稳了",
+                                "点歌 信仰は儚き人間の為に",
+                                "点歌 星条旗のピエロ",
+                                "点歌 春の湊に-上海アリス幻樂団",
+                                "点歌 the last crusade",
+                                "点歌 ピュアヒューリーズ~心の在処",
+                                "点歌 忘れがたき、よすがの緑",
+                                "点歌 遥か38万キロのボヤージュ",
+                                "点歌 プレイヤーズスコア"};
+                        customSentence.sent.addAll(Arrays.asList(strings));
+                        saveConfig();
+                    }
+                });
         ListView mainListview = (ListView) view.findViewById(R.id.normal_listview);
         mainListview.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
         mainListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
                 ListView naiSentenseListview = new ListView(getActivity());
-                naiSentenseListview.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent));
+                naiSentenseListview.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent));
                 naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
                     @Override
@@ -81,11 +77,7 @@ public class NaiFragment extends BaseFrgment {
 
                             @Override
                             public void run() {
-                                try {
-                                    sendDanmakuData((String) p1.getItemAtPosition(p3), ((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                sendDanmakuData((String) p1.getItemAtPosition(p3), ((LoginInfoPeople) parent.getItemAtPosition(position)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
                             }
                         }).start();
                         alertDialog.dismiss();
@@ -99,26 +91,15 @@ public class NaiFragment extends BaseFrgment {
         });
     }
 
-    public String readFileToString() throws IOException, UnsupportedEncodingException {
-        Long filelength = customSentenseFile.length();
-        byte[] filecontent = new byte[filelength.intValue()];
-        FileInputStream in = new FileInputStream(customSentenseFile);
-        in.read(filecontent);
-        in.close();
-        return new String(filecontent, "UTF-8");
-    }
-
     public void saveConfig() {
         try {
-            FileOutputStream fos = null;
-            OutputStreamWriter writer = null;
+            FileOutputStream fos;
+            OutputStreamWriter writer;
             fos = new FileOutputStream(customSentenseFile);
             writer = new OutputStreamWriter(fos, "utf-8");
             writer.write(new Gson().toJson(customSentence));
             writer.flush();
-            if (fos != null) {
-                fos.close();
-            }
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,30 +109,29 @@ public class NaiFragment extends BaseFrgment {
         return customSentence.sent.get(new Random().nextInt(customSentence.sent.size()));
     }
 
-    public void sendDanmakuData(String msg, String cookie, final String roomId) throws IOException {
-
-        Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
-        String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
-        connection.userAgent(MainActivity.instence.userAgent)
-                .headers(liveHead)
-                .ignoreContentType(true)
-                .referrer("https://live.bilibili.com/" + roomId)
-                .cookies(MainActivity.instence.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("color", "16777215")
-                .data("fontsize", "25")
-                .data("msg", msg)
-                .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
-                .data("roomid", roomId)
-                .data("bubble", "0")
-                .data("csrf_token", csrf)
-                .data("csrf", csrf);
-        Connection.Response response = connection.execute();
-        if (response.statusCode() != 200) {
-            MainActivity.instence.showToast(String.valueOf(response.statusCode()));
-        }
-
+    public void sendDanmakuData(String msg, String cookie, final String roomId) {
+        Connection.Response response = null;
         try {
+            Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
+            String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
+            connection.userAgent(MainActivity.instence.userAgent)
+                    .headers(liveHead)
+                    .ignoreContentType(true)
+                    .referrer("https://live.bilibili.com/" + roomId)
+                    .cookies(MainActivity.instence.cookieToMap(cookie))
+                    .method(Connection.Method.POST)
+                    .data("color", "16777215")
+                    .data("fontsize", "25")
+                    .data("msg", msg)
+                    .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
+                    .data("roomid", roomId)
+                    .data("bubble", "0")
+                    .data("csrf_token", csrf)
+                    .data("csrf", csrf);
+            response = connection.execute();
+            if (response.statusCode() != 200) {
+                MainActivity.instence.showToast(String.valueOf(response.statusCode()));
+            }
             JsonParser parser = new JsonParser();
             JsonObject obj = parser.parse(response.body()).getAsJsonObject();
             switch (obj.get("code").getAsInt()) {
@@ -181,7 +161,9 @@ public class NaiFragment extends BaseFrgment {
                     break;
             }
         } catch (Exception e) {
-            MainActivity.instence.showToast(response.body());
+            if (response != null) {
+                MainActivity.instence.showToast(response.body());
+            }
         }
     }
 }

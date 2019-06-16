@@ -71,6 +71,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
     public String jsonPath;
     public String mainDic = "";
+    public MethodsManager methodsManager;
 
     public static boolean onWifi = false;
 
@@ -82,6 +83,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         ExceptionCatcher.getInstance().init(getApplicationContext());
         SharedPreferenceHelper.init(getApplicationContext(), "settings");
         DataBaseHelper.init(getBaseContext());
+        methodsManager = new MethodsManager(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -113,10 +115,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             loginInfo = new LoginInfo();
             saveConfig();
         }
-        try {
-            fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
-        } catch (Exception e) {
-        }
+        methodsManager.fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
         arrayList = new ArrayList<>();
         try {
             loginInfo = gson.fromJson(readFileToString(), LoginInfo.class);
@@ -338,20 +337,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
         rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
         rightList = (ListView) findViewById(R.id.right_list);
-    }
-
-    private void fileCopy(String src, String des) throws Exception {
-        //io流固定格式
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src));
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(des));
-        int i = -1;//记录获取长度
-        byte[] bt = new byte[2014];//缓冲区
-        while ((i = bis.read(bt)) != -1) {
-            bos.write(bt, 0, i);
-        }
-        bis.close();
-        bos.close();
-        //关闭流
     }
 
     private void initFragment() {

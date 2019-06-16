@@ -91,17 +91,8 @@ public class SettingsFragment extends PreferenceFragment {
 				}
 			});
 	  }
-	private void deleteFiles(File folder){
-		File[] fs=folder.listFiles();
-		for(File f:fs){
-			if(f.isDirectory()){
-				deleteFiles(f);
-				f.delete();
-			  }else{
-				f.delete();
-			  }
-
 		  }*/
+
     }
 }
 	

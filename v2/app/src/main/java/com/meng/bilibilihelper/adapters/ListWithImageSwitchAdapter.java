@@ -46,7 +46,6 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
-
         final ViewHolder holder;
         if (convertView == null) {
             convertView = activity.getLayoutInflater().inflate(R.layout.list_item_image_text_switch, null);
@@ -65,10 +64,8 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton p1, boolean p2) {
                 checked.set(position, p2);
-
             }
         });
-
         holder.switchEnable.setChecked(checked.get(position));
         File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
         if (bilibiliImageFile.exists()) {
@@ -86,7 +83,6 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
                 });
             }
         }
-
         return convertView;
     }
 

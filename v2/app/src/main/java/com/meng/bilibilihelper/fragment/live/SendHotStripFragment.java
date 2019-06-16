@@ -79,8 +79,6 @@ public class SendHotStripFragment extends BaseFrgment {
     }
 
     public void sendHotStrip(long uid, String ruid, int roomID, String cookie) throws IOException {
-
-
         Connection connection = Jsoup.connect("http://api.live.bilibili.com/gift/v2/gift/send");
         String csrf = MainActivity.instence.cookieToMap(cookie).get("bili_jct");
         connection.userAgent(MainActivity.instence.userAgent)

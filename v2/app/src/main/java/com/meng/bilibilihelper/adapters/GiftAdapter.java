@@ -3,8 +3,10 @@ package com.meng.bilibilihelper.adapters;
 import android.app.*;
 import android.view.*;
 import android.widget.*;
+
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.javaBean.*;
+
 import java.text.*;
 import java.util.*;
 
@@ -43,10 +45,10 @@ public class GiftAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-		LiveBag.LiveBagDataList liveBagDataList = infos.get(position);
+        LiveBag.LiveBagDataList liveBagDataList = infos.get(position);
         holder.tvGiftName.setText(liveBagDataList.gift_name);
-        holder.tvGiftCount.setText("数量:"+liveBagDataList.gift_num);
-        holder.tvExpire.setText("过期时间:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(liveBagDataList.expire_at * 1000)));
+        holder.tvGiftCount.setText("数量:" + liveBagDataList.gift_num);
+        holder.tvExpire.setText("过期时间:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(liveBagDataList.expire_at * 1000)));
         holder.tvMark.setText(liveBagDataList.corner_mark);
         return convertView;
     }

@@ -40,7 +40,7 @@ public class MainFrgment extends Fragment {
         l1 = (LinearLayout) view.findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
         btn.setOnClickListener(onClickListener);
         btn2.setOnClickListener(onClickListener);
-        planePlayerList = new Gson().fromJson(getFromAssets("list.json"), ConfigJavaBean.class);
+        planePlayerList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("list.json"), ConfigJavaBean.class);
         PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.personInfo);
         MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
         ArrayList<String> list = new ArrayList<>();
@@ -88,21 +88,6 @@ public class MainFrgment extends Fragment {
                 }
             }
         }).start();
-    }
-
-    public String getFromAssets(String fileName) {
-        try {
-            InputStreamReader inputReader = new InputStreamReader(getResources().getAssets().open(fileName));
-            BufferedReader bufReader = new BufferedReader(inputReader);
-            String line = "";
-            StringBuilder Result = new StringBuilder();
-            while ((line = bufReader.readLine()) != null)
-                Result.append(line);
-            return Result.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 
     OnClickListener onClickListener = new OnClickListener() {

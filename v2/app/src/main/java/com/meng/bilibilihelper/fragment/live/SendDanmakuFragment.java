@@ -44,11 +44,7 @@ public class SendDanmakuFragment extends BaseFrgment {
                         ListWithImageSwitchAdapter cda = (ListWithImageSwitchAdapter) listview.getAdapter();
                         for (int i = 0; i < cda.getCount(); ++i) {
                             if (cda.getChecked(i)) {
-                                try {
-                                    MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
-                                } catch (Exception e) {
-
-                                }
+                                MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
                             }
                         }
                     }

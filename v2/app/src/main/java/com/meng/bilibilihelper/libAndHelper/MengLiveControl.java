@@ -39,6 +39,8 @@ public class MengLiveControl extends LinearLayout {
     private AutoCompleteTextView autoCompleteTextView;
     private ArrayList<LivePartList.ListItemInListItem> itemInListItem;
 
+    private LivePartList livePartList;
+
     public MengLiveControl(final Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
@@ -63,12 +65,21 @@ public class MengLiveControl extends LinearLayout {
             }
         });
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
-        LivePartList livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
+        livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
         itemInListItem = livePartList.getPartInfo();
         autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
+
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    livePartList = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Area/getList"), LivePartList.class);
+                    itemInListItem = livePartList.getPartInfo();
+                    autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
+                    MainActivity.instence.showToast("分区服务器连接成功");
+                } catch (Exception e) {
+                    MainActivity.instence.showToast("分区服务器连接失败");
+                }
                 final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
                 if (!mainUID.equals("")) {
                     final UserSpaceToLive sjb = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UserSpaceToLive.class);

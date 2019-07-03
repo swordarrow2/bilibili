@@ -2,7 +2,6 @@ package com.meng.bilibilihelper.fragment;
 
 import android.app.*;
 import android.os.*;
-import android.text.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
@@ -23,7 +22,7 @@ public class MainFrgment extends Fragment {
 
     public ConfigJavaBean planePlayerList = null;
     public LinearLayout l1;
-    public ArrayAdapter<String> arrayAdapter;
+    public NameAdapter nameAdapter;
     public MengEditText mengEditText;
 
     @Override
@@ -43,19 +42,14 @@ public class MainFrgment extends Fragment {
         planePlayerList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("list.json"), ConfigJavaBean.class);
         PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.personInfo);
         MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
-        ArrayList<String> list = new ArrayList<>();
-        for (PersonInfo planePlayer : planePlayerList.personInfo) {
-            if (planePlayer.bliveRoom == 0) continue;
-            list.add(planePlayer.name);
-        }
-        arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list);
-        mengEditText.setAdapter(arrayAdapter);
+        nameAdapter = new NameAdapter(getActivity(), planePlayerList.personInfo);
+        mengEditText.setAdapter(nameAdapter);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Socket client = new Socket("123.207.65.93", Integer.parseInt(SharedPreferenceHelper.getValue("port","9603")));
+                    Socket client = new Socket("123.207.65.93", Integer.parseInt(SharedPreferenceHelper.getValue("port", "9603")));
                     OutputStream out = client.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(out);
                     dos.writeUTF("getFull");
@@ -72,14 +66,7 @@ public class MainFrgment extends Fragment {
                                 Toast.makeText(getActivity(), "飞机佬信息服务器连接成功", Toast.LENGTH_SHORT).show();
                                 PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.personInfo);
                                 MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
-                                ArrayList<String> list = new ArrayList<>();
-                                for (PersonInfo planePlayer : planePlayerList.personInfo) {
-                                    if (planePlayer.bliveRoom == 0) continue;
-                                    if (planePlayer.bid == 0) continue;
-                                    list.add(planePlayer.name);
-                                    list.add(String.valueOf(planePlayer.bliveRoom));
-                                }
-                                mengEditText.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, list));
+                                nameAdapter = new NameAdapter(getActivity(), planePlayerList.personInfo);
                             }
                         }
                     });

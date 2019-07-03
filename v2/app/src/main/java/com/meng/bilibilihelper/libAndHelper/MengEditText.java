@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.meng.bilibilihelper.R;
 import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.adapters.NameAdapter;
 import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
 import com.meng.bilibilihelper.javaBean.UserSpaceToLive;
 import com.meng.bilibilihelper.javaBean.personInfo.PersonInfo;
@@ -66,7 +67,7 @@ public class MengEditText extends LinearLayout {
         radioButtonLiveID = (RadioButton) findViewById(R.id.rbLiveId);
     }
 
-    public void setAdapter(ArrayAdapter<String> adapter) {
+    public void setAdapter(NameAdapter adapter) {
         autoCompleteTextView.setAdapter(adapter);
     }
 
@@ -89,13 +90,13 @@ public class MengEditText extends LinearLayout {
                         return String.valueOf(pp.bliveRoom);
                     }
                 }
-            }else{
-				for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
+            } else {
+                for (PersonInfo pp : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
                     if (autoCompleteTextView.getText().toString().equals(String.valueOf(pp.bid))) {
                         return String.valueOf(pp.bliveRoom);
-					  }
-				  } 
-			}
+                    }
+                }
+            }
         }
         return "";
     }

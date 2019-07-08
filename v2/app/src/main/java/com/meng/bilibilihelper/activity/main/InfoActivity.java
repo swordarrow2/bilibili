@@ -125,6 +125,7 @@ public class InfoActivity extends Activity {
                         public void run() {
                             l1.addView(new MengTextview(context, "播放量", upInfo.get("archive").getAsJsonObject().get("view").getAsInt()));
                             l1.addView(new MengTextview(context, "阅读量", upInfo.get("article").getAsJsonObject().get("view").getAsInt()));
+                            l1.addView(new MengTextview(context, "cookie", getIntent().getStringExtra("cookie")));
                         }
                     });
                 } catch (Exception e) {

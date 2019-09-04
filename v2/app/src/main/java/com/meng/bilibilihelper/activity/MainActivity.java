@@ -80,7 +80,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instence = this;
-        ExceptionCatcher.getInstance().init(getApplicationContext());
+      //  ExceptionCatcher.getInstance().init(getApplicationContext());
         SharedPreferenceHelper.init(getApplicationContext(), "settings");
         DataBaseHelper.init(getBaseContext());
         methodsManager = new MethodsManager(this);
@@ -103,14 +103,15 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             }
             loginInfo = new LoginInfo();
             saveConfig();
-        }
+		  }
      //   methodsManager.fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
         arrayList = new ArrayList<>();
         try {
             loginInfo = gson.fromJson(readFileToString(), LoginInfo.class);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+		  }
+		  saveConfig2();
         if (loginInfo != null) {
             for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
                 arrayList.add(loginInfoPeople.personInfo.data.name);
@@ -182,6 +183,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                 }
             }).start();
         }
+		
         new GithubUpdateManager(this, "swordarrow2", "bilibili", "app.apk");
     }
 
@@ -661,6 +663,21 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         }
     }
 
+	public void saveConfig2() {
+        try {
+            FileOutputStream fos = null;
+            OutputStreamWriter writer = null;
+            File file = new File(Environment.getExternalStorageDirectory()+"/info.json");
+            fos = new FileOutputStream(file);
+            writer = new OutputStreamWriter(fos, "utf-8");
+            writer.write(gson.toJson(loginInfo));
+            writer.flush();
+            fos.close();
+		  } catch (IOException e) {
+            e.printStackTrace();
+		  }
+	  }
+	
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {

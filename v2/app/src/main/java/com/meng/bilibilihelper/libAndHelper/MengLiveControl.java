@@ -65,9 +65,9 @@ public class MengLiveControl extends LinearLayout {
             }
         });
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.part);
-        livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
-        itemInListItem = livePartList.getPartInfo();
-        autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
+      //  livePartList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("partlist.json"), LivePartList.class);
+      //  itemInListItem = livePartList.getPartInfo();
+      //  autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
 
         new Thread(new Runnable() {
             @Override
@@ -75,10 +75,15 @@ public class MengLiveControl extends LinearLayout {
                 try {
                     livePartList = new Gson().fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Area/getList"), LivePartList.class);
                     itemInListItem = livePartList.getPartInfo();
-                    autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
-                    MainActivity.instence.showToast("分区服务器连接成功");
-                } catch (Exception e) {
-                    MainActivity.instence.showToast("分区服务器连接失败");
+					((Activity) context).runOnUiThread(new Runnable() {
+						  @Override
+						  public void run() {
+							  autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
+							  MainActivity.instence.showToast("分区服务器连接成功");
+							}
+						});         
+                          } catch (Exception e) {
+                    MainActivity.instence.showToast(e.toString());
                 }
                 final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
                 if (!mainUID.equals("")) {

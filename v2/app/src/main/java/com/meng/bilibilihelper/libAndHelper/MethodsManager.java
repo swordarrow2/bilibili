@@ -68,29 +68,6 @@ public class MethodsManager {
         return "";
     }
 
-    public File newFile(String path, Runnable fileExist, Runnable fileNotExist) {
-        File file = new File(path);
-        try {
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            if (!file.exists()) {
-                file.createNewFile();
-                if (fileNotExist != null) {
-                    fileNotExist.run();
-                }
-            } else {
-                if (fileExist != null) {
-                    fileExist.run();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return file;
-    }
-
     private void deleteFiles(File folder) {
         File[] fs = folder.listFiles();
         for (File f : fs) {

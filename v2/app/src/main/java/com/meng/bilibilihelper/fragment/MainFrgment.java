@@ -39,11 +39,11 @@ public class MainFrgment extends Fragment {
         l1 = (LinearLayout) view.findViewById(R.id.info_listLinearLayout_MengNetworkTextview);
         btn.setOnClickListener(onClickListener);
         btn2.setOnClickListener(onClickListener);
-        planePlayerList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("list.json"), ConfigJavaBean.class);
-        PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.personInfo);
-        MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
-        nameAdapter = new NameAdapter(getActivity(), planePlayerList.personInfo);
-        mengEditText.setAdapter(nameAdapter);
+       // planePlayerList = new Gson().fromJson(MainActivity.instence.methodsManager.getFromAssets("list.json"), ConfigJavaBean.class);
+      //  PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), planePlayerList.personInfo);
+     //   MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
+      //  nameAdapter = new NameAdapter(getActivity(), planePlayerList.personInfo);
+      //  mengEditText.setAdapter(nameAdapter);
 
         new Thread(new Runnable() {
             @Override
@@ -64,9 +64,10 @@ public class MainFrgment extends Fragment {
                                 Toast.makeText(getActivity(), "飞机佬信息服务器连接失败", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getActivity(), "飞机佬信息服务器连接成功", Toast.LENGTH_SHORT).show();
-                                PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), MainActivity.instence.mainFrgment.planePlayerList.personInfo);
+                                PersonInfoAdapter personInfoAdapter = new PersonInfoAdapter(getActivity(), planePlayerList.personInfo);
                                 MainActivity.instence.personInfoFragment.listview.setAdapter(personInfoAdapter);
                                 nameAdapter = new NameAdapter(getActivity(), planePlayerList.personInfo);
+								mengEditText.setAdapter(nameAdapter);
                             }
                         }
                     });

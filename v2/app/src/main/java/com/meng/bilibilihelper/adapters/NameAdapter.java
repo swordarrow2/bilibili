@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class NameAdapter extends BaseAdapter implements Filterable {
     private Activity activity;
     private ArrayList<PersonInfo> personInfos;
-    private ArrayList<PersonInfo> data;
+    private ArrayList<PersonInfo> data=new ArrayList<>();
 
     public NameAdapter(Activity context, ArrayList<PersonInfo> personInfo) {
         this.activity = context;
@@ -38,11 +38,11 @@ public class NameAdapter extends BaseAdapter implements Filterable {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults results = new FilterResults();
-                ArrayList<String> willShow = new ArrayList<>();
+                ArrayList<PersonInfo> willShow = new ArrayList<>();
                 if (constraint != null) {
                     for (PersonInfo listItem : personInfos) {
                         if (listItem.name.contains(constraint)) {
-                            willShow.add(listItem.name);
+                            willShow.add(listItem);
                         }
                     }
                 }
@@ -64,15 +64,15 @@ public class NameAdapter extends BaseAdapter implements Filterable {
     }
 
     public int getCount() {
-        return personInfos.size();
+        return data.size();
     }
 
     public Object getItem(int position) {
-        return personInfos.get(position);
+        return data.get(position).bid;
     }
 
     public long getItemId(int position) {
-        return personInfos.get(position).hashCode();
+        return data.get(position).hashCode();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -89,7 +89,7 @@ public class NameAdapter extends BaseAdapter implements Filterable {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final PersonInfo loginInfoPeople = personInfos.get(position);
+        final PersonInfo loginInfoPeople = data.get(position);
         holder.tvName.setText(loginInfoPeople.name);
         File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + loginInfoPeople.bid + ".jpg");
         if (bilibiliImageFile.exists()) {

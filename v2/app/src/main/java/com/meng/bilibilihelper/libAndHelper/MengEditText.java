@@ -139,14 +139,6 @@ public class MengEditText extends LinearLayout {
         @Override
         public void afterTextChanged(final Editable s) {
             final Gson gson = new Gson();
-            if (MainActivity.instence.mainFrgment.planePlayerList != null) {
-                for (final PersonInfo planePlayer : MainActivity.instence.mainFrgment.planePlayerList.personInfo) {
-                    if (s.toString().equals(planePlayer.name)) {
-                        autoCompleteTextView.setText(String.valueOf(planePlayer.bid));
-                        break;
-                    }
-                }
-            }
             new Thread(new Runnable() {
 
                 @Override
@@ -155,6 +147,11 @@ public class MengEditText extends LinearLayout {
                         if (s.toString().equals("0")) {
                             return;
                         }
+					try{
+					  int bid=Integer.parseInt(s.toString());
+					}catch(Exception e){
+					 return; 
+					}
                         if (radioButtonUID.isChecked()) {
                             final BilibiliUserInfo person = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + s.toString() + "&jsonp=jsonp"), BilibiliUserInfo.class);
                             final UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + s.toString()), UserSpaceToLive.class);

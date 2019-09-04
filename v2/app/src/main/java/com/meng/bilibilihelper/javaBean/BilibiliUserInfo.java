@@ -19,7 +19,7 @@ public class BilibiliUserInfo {
         public String birthday;
         public float coins;
         public Official official;
-        public Vip vip;
+        public Vip vip = new Vip();
         public boolean is_followed;
         public String top_photo;
         public Theme theme;

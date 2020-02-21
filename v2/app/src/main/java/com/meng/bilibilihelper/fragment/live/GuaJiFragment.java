@@ -1,18 +1,13 @@
 package com.meng.bilibilihelper.fragment.live;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-
-import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.GuaJiService;
-import com.meng.bilibilihelper.activity.MainActivity;
-import com.meng.bilibilihelper.fragment.BaseFrgment;
+import android.content.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
+import android.widget.AdapterView.*;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
 
 public class GuaJiFragment extends BaseFrgment {
@@ -34,7 +29,7 @@ public class GuaJiFragment extends BaseFrgment {
                 Intent intentOne = new Intent(getActivity(), GuaJiService.class);
 				intentOne.putExtra("name",((LoginInfoPeople)p1.getItemAtPosition(p3)).personInfo.data.name);
                 intentOne.putExtra("cookie", MainActivity.instence.loginInfo.loginInfoPeople.get(p3).cookie);
-				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.mainFrgment.mengEditText.getLiveId());
+				intentOne.putExtra("refer","https://live.bilibili.com/"+MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.getLiveId());
                 getActivity().startService(intentOne);
             }
         });

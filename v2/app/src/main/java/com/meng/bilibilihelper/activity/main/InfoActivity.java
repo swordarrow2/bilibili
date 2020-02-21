@@ -7,13 +7,12 @@ import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
-
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
-import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.*;
-
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -47,7 +46,7 @@ public class InfoActivity extends Activity {
             public void onClick(View p1) {
                 File imf = new File(MainActivity.instence.mainDic + "bilibili/" + intent.getStringExtra("bid") + ".jpg");
                 imf.delete();
-                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), HeadType.BilibiliUser));
+                MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), DownloadImageRunnable.BilibiliUser));
             }
         });
 
@@ -55,7 +54,7 @@ public class InfoActivity extends Activity {
         if (imf.exists()) {
             im.setImageBitmap(BitmapFactory.decodeFile(imf.getAbsolutePath()));
         } else {
-            MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), HeadType.BilibiliUser));
+            MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(InfoActivity.this, im, intent.getStringExtra("bid"), DownloadImageRunnable.BilibiliUser));
         }
         l1.addView(im);
         getBilibiliUserInfo(intent.getStringExtra("bid"), MainActivity.instence.loginInfo.loginInfoPeople.get(intent.getIntExtra("pos", 0)).cookie);

@@ -2,18 +2,14 @@ package com.meng.bilibilihelper.fragment.live;
 
 import android.os.*;
 import android.view.*;
-
-import com.meng.bilibilihelper.*;
-
-import android.widget.*;
-
-import com.meng.bilibilihelper.activity.*;
-
 import android.view.View.*;
-
-import com.meng.bilibilihelper.adapters.ListWithImageSwitchAdapter;
-import com.meng.bilibilihelper.fragment.BaseFrgment;
+import android.widget.*;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.adapters.*;
+import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.*;
 
 public class SendDanmakuFragment extends BaseFrgment {
     public ListView listview;
@@ -35,22 +31,22 @@ public class SendDanmakuFragment extends BaseFrgment {
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));
         btn.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View p1) {
-                new Thread(new Runnable() {
+				@Override
+				public void onClick(View p1) {
+					new Thread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        ListWithImageSwitchAdapter cda = (ListWithImageSwitchAdapter) listview.getAdapter();
-                        for (int i = 0; i < cda.getCount(); ++i) {
-                            if (cda.getChecked(i)) {
-                                MainActivity.instence.naiFragment.sendDanmakuData(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.mainFrgment.mengEditText.getLiveId());
-                            }
-                        }
-                    }
-                }).start();
-            }
-        });
+							@Override
+							public void run() {
+								ListWithImageSwitchAdapter cda = (ListWithImageSwitchAdapter) listview.getAdapter();
+								for (int i = 0; i < cda.getCount(); ++i) {
+									if (cda.getChecked(i)) {
+										Tools.BilibiliTool.sendLiveDanmaku(et.getText().toString(), ((LoginInfoPeople) cda.getItem(i)).cookie, MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.getLiveId());
+									}
+								}
+							}
+						}).start();
+				}
+			});
     }
 
 }

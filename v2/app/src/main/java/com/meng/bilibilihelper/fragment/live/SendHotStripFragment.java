@@ -25,6 +25,7 @@ import org.jsoup.Jsoup;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import com.meng.bilibilihelper.fragment.*;
 
 public class SendHotStripFragment extends BaseFrgment {
     ListView listview;
@@ -52,7 +53,7 @@ public class SendHotStripFragment extends BaseFrgment {
 
                     @Override
                     public void run() {
-                        final String uid = MainActivity.instence.mainFrgment.mengEditText.getUId();
+                        final String uid = MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.getUId();
                         if (uid.equals("")) {
                             Toast.makeText(getActivity(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
                             return;

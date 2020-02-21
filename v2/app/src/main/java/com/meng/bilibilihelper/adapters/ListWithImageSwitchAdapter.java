@@ -1,20 +1,17 @@
 package com.meng.bilibilihelper.adapters;
 
-import android.app.Activity;
+import android.app.*;
 import android.graphics.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.CompoundButton.*;
-
 import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.activity.*;
-
+import com.meng.bilibilihelper.fragment.*;
+import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.*;
 import java.io.*;
 import java.util.*;
-
-import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
-import com.meng.bilibilihelper.libAndHelper.HeadType;
 
 public class ListWithImageSwitchAdapter extends BaseAdapter {
     private Activity activity;
@@ -72,13 +69,13 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
             holder.ivHeader.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {
             if (MainActivity.onWifi) {
-                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), HeadType.BilibiliUser));
+                MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), DownloadImageRunnable.BilibiliUser));
             } else {
                 holder.ivHeader.setImageResource(R.drawable.stat_sys_download_anim0);
                 holder.ivHeader.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), HeadType.BilibiliUser));
+                        MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), DownloadImageRunnable.BilibiliUser));
                     }
                 });
             }

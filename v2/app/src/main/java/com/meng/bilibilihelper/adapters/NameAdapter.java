@@ -1,26 +1,16 @@
 package com.meng.bilibilihelper.adapters;
 
-import android.app.Activity;
-import android.graphics.BitmapFactory;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.Switch;
-import android.widget.TextView;
-
-import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.activity.MainActivity;
-import com.meng.bilibilihelper.javaBean.LivePartList;
-import com.meng.bilibilihelper.javaBean.LoginInfoPeople;
-import com.meng.bilibilihelper.javaBean.personInfo.PersonInfo;
-import com.meng.bilibilihelper.libAndHelper.DownloadImageRunnable;
-import com.meng.bilibilihelper.libAndHelper.HeadType;
-
-import java.io.File;
-import java.util.ArrayList;
+import android.app.*;
+import android.graphics.*;
+import android.view.*;
+import android.widget.*;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.fragment.*;
+import com.meng.bilibilihelper.javaBean.personInfo.*;
+import com.meng.bilibilihelper.libAndHelper.*;
+import java.io.*;
+import java.util.*;
 
 public class NameAdapter extends BaseAdapter implements Filterable {
     private Activity activity;
@@ -96,13 +86,13 @@ public class NameAdapter extends BaseAdapter implements Filterable {
             holder.ivHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {
             if (MainActivity.onWifi) {
-                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(loginInfoPeople.bid), HeadType.BilibiliUser));
+                MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(loginInfoPeople.bid), DownloadImageRunnable.BilibiliUser));
             } else {
                 holder.ivHead.setImageResource(R.drawable.stat_sys_download_anim0);
                 holder.ivHead.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(loginInfoPeople.bid), HeadType.BilibiliUser));
+                        MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(loginInfoPeople.bid), DownloadImageRunnable.BilibiliUser));
                     }
                 });
             }

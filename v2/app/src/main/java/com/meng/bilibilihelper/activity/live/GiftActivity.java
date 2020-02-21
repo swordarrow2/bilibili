@@ -16,6 +16,7 @@ import java.io.*;
 import java.net.*;
 
 import android.widget.AdapterView.*;
+import com.meng.bilibilihelper.fragment.*;
 
 public class GiftActivity extends Activity {
     private BilibiliMyInfo myInfo;
@@ -31,7 +32,7 @@ public class GiftActivity extends Activity {
         if (position == -1) {
             finish();
 		  }
-        uid = MainActivity.instence.mainFrgment.mengEditText.getUId();
+        uid = MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.getUId();
         if (uid.equals("")) {
             Toast.makeText(getApplicationContext(), "请在主页中输入用户ID而不是直播间ID", Toast.LENGTH_SHORT).show();
             finish();

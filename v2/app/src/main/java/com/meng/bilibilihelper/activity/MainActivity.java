@@ -11,9 +11,9 @@ import android.os.*;
 import android.support.v4.widget.*;
 import android.view.*;
 import android.widget.*;
-
+import android.widget.AdapterView.*;
 import com.google.gson.*;
-import com.meng.bilibilihelper.activity.main.*;
+import com.meng.bilibilihelper.*;
 import com.meng.bilibilihelper.adapters.*;
 import com.meng.bilibilihelper.fragment.*;
 import com.meng.bilibilihelper.fragment.live.*;
@@ -21,10 +21,11 @@ import com.meng.bilibilihelper.fragment.main.*;
 import com.meng.bilibilihelper.javaBean.*;
 import com.meng.bilibilihelper.libAndHelper.*;
 import com.meng.bilibilihelper.materialDesign.*;
-
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
-
+import java.util.concurrent.*;
+import java.util.regex.*;
 import org.jsoup.*;
 
 import com.meng.bilibilihelper.R;
@@ -36,31 +37,14 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     public ListView mDrawerList;
     private RelativeLayout rightDrawer;
-    public ListView rightList;
+    public ListView lvRecent;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerArrowDrawable drawerArrow;
 
-    public MainFrgment mainFrgment;
-    public NaiFragment naiFragment;
-    public SignFragment signFragment;
-    public ManagerFragment managerFragment;
-    public GuaJiFragment guaJiFragment;
-    public SettingsFragment settingsFragment;
-    public PersonInfoFragment personInfoFragment;
-    public SendDanmakuFragment sendDanmakuFragment;
-    public SendHotStripFragment sendHotStripFragment;
-    public GiftFragment giftFragment;
-    public ReplyVideoFragment replayVidoeFragment;
-    public FollowFragment followFragment;
-    public GiveCoinFragment giveCoinFragment;
-    public ZanFragment zanFragment;
-    public ChoujiangFragment choujiangFragment;
-
-    public FragmentManager fragmentManager;
+	public HashMap<String,Fragment> fragments=new HashMap<>();
     public TextView rightText;
     public MengInfoHeaderView infoHeaderLeft;
     public MengLiveControl mengLiveControl;
-    public MengInfoHeaderView infoHeaderRight;
 
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public Gson gson = new Gson();
@@ -71,27 +55,31 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
     public String jsonPath;
     public String mainDic = "";
-    public MethodsManager methodsManager;
 
     public static boolean onWifi = false;
+	private RecentAdapter recentAdapter;
+
+	public static final String UID="uid";
+	public static final String AV="av";
+	public static final String Live="lv";
+
+	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instence = this;
-      //  ExceptionCatcher.getInstance().init(getApplicationContext());
+		//  ExceptionCatcher.getInstance().init(getApplicationContext());
         SharedPreferenceHelper.init(getApplicationContext(), "settings");
         DataBaseHelper.init(getBaseContext());
-        methodsManager = new MethodsManager(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
         infoHeaderLeft = new MengInfoHeaderView(this);
-        infoHeaderRight = new MengInfoHeaderView(this);
+
         mengLiveControl = new MengLiveControl(this);
         findViews();
-        initFragment();
         //   setActionBar();
         setListener();
         jsonPath = getApplicationContext().getFilesDir() + "/info.json";
@@ -103,15 +91,15 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             }
             loginInfo = new LoginInfo();
             saveConfig();
-		  }
-     //   methodsManager.fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
+		}
+		//   methodsManager.fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
         arrayList = new ArrayList<>();
         try {
             loginInfo = gson.fromJson(readFileToString(), LoginInfo.class);
         } catch (IOException e) {
             e.printStackTrace();
-		  }
-		  saveConfig2();
+		}
+		saveConfig2();
         if (loginInfo != null) {
             for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
                 arrayList.add(loginInfoPeople.personInfo.data.name);
@@ -151,40 +139,34 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         if (!mainUID.equals("")) {
             mDrawerList.addHeaderView(infoHeaderLeft);
             mDrawerList.addHeaderView(mengLiveControl);
-            rightList.addHeaderView(infoHeaderRight);
             File imf = new File(mainDic + "bilibili/" + mainUID + ".jpg");
             if (imf.exists()) {
                 Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
                 MainActivity.instence.infoHeaderLeft.setImage(b);
-                MainActivity.instence.infoHeaderRight.setImage(b);
             } else {
-                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(this, infoHeaderLeft.getImageView(), mainUID, HeadType.BilibiliUser));
-                MainActivity.instence.personInfoFragment.threadPool.execute(new DownloadImageRunnable(this, infoHeaderRight.getImageView(), mainUID, HeadType.BilibiliUser));
-            }
+                MainActivity.instence.getFragment("人员信息", PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(this, infoHeaderLeft.getImageView(), mainUID, DownloadImageRunnable.BilibiliUser));
+			}
             new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final BilibiliUserInfo info = gson.fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
-                    UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
-                    String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
-                    JsonParser parser = new JsonParser();
-                    JsonObject obj = parser.parse(json).getAsJsonObject();
-                    final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            JsonArray ja = obj2.get("next").getAsJsonArray();
-                            infoHeaderLeft.setTitle("主播 Lv." + obj2.get("level").getAsInt());
-                            infoHeaderLeft.setSummry(obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
-                            infoHeaderRight.setTitle(info.data.name);
-                            infoHeaderRight.setSummry("主站 Lv." + info.data.level);
-                        }
-                    });
-                }
-            }).start();
+					@Override
+					public void run() {
+						final BilibiliUserInfo info = gson.fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
+						UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+						String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
+						JsonParser parser = new JsonParser();
+						JsonObject obj = parser.parse(json).getAsJsonObject();
+						final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
+						runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									JsonArray ja = obj2.get("next").getAsJsonArray();
+									infoHeaderLeft.setTitle(info.data.name);
+									infoHeaderLeft.setSummry("主站 Lv." + info.data.level + "\n主播 Lv." + obj2.get("level").getAsInt() + "\n" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
+								}
+							});
+					}
+				}).start();
         }
-		
-        new GithubUpdateManager(this, "swordarrow2", "bilibili", "app.apk");
+		showFragment("Main");
     }
 
     private void setActionBar() {
@@ -201,8 +183,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     showToast("缺失权限会使应用工作不正常");
                 } else {
-                    initNaiFragment(false);
-                    initNaiFragment(true);
+					//      showFragment(NaiFragment.class);
                 }
             }
         }
@@ -236,14 +217,22 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         mDrawerToggle.syncState();
 
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-                "首页(大概)", "奶", "挂机", "发送弹幕", "发送礼物", "cj", "签到", "设置", "退出"
-        }));
-        rightList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-                "信息", "添加账号", "管理账号", "发送视频评论", "赞视频", "视频投币（2个）", "关注其他用户", "设置", "退出"
-        }));
+															"首页(大概)","输入ID", "挂机", "信息", "管理账号", "签到", "设置", "退出"
+														}));
+		recentAdapter = new RecentAdapter();
+        lvRecent.setAdapter(recentAdapter);
+		lvRecent.setOnItemClickListener(new OnItemClickListener(){
+
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+					String s=(String)p1.getAdapter().getItem(p3);
+					showFragment(s);
+					showToast(s);
+				}
+			});
         mDrawerList.setOnItemClickListener(itemClickListener);
-        rightList.setOnItemClickListener(itemClickListener);
-    }
+        lvRecent.setOnItemClickListener(itemClickListener);
+	}
 
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -251,61 +240,47 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             if (view instanceof TextView) {
                 switch (((TextView) view).getText().toString()) {
                     case "首页(大概)":
-                        initMainFragment(true);
+                        showFragment("Main");
                         break;
-                    case "添加账号":
-                        startActivity(new Intent(MainActivity.this, Login.class));
-                        break;
+					case "输入ID":
+						final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
+						final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
+						new AlertDialog.Builder(MainActivity.this)
+							.setTitle("输入ID")
+							.setView(seView)
+							.setNegativeButton("取消", null)
+							.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									String content = et.getText().toString();
+									RadioButton uid,av,live;
+									uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
+									av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
+									live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
+									if (uid.isChecked()) {
+										newIDFragment(UidFragment.class, UID , getId(content));
+									} else if (av.isChecked()) {
+										newIDFragment(AvFragment.class, AV , getId(content));
+									} else if (live.isChecked()) {
+										newIDFragment(LiveFragment.class, Live , getId(content));
+									}
+								}
+							}).show();
+						break;
                     case "管理账号":
-                        initManagerFragment(true);
+                        showFragment("管理账号");
                         break;
-                    case "发送弹幕":
-                        initSendDanmakuFragment();
-                        break;
-                    case "视频投币（2个）":
-                        initCoinFragment();
-                        break;
-                    case "cj":
-                        initChouJiangFragment();
-                        break;
-                    case "赞视频":
-                        initZanFragment();
-                        break;
-                    case "奶":
-                        initNaiFragment(true);
-                        break;
-                    case "发送礼物":
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("选择礼物类型")
-                                .setPositiveButton("瓜子买辣条", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface p11, int p2) {
-                                        initHotStripFragment();
-                                    }
-                                }).setNegativeButton("包裹中的辣条", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                initGiftFragment();
-                            }
-                        }).show();
-                        break;
-                    case "信息":
-                        initPersionInfoFragment(true);
+					case "信息":
+                        showFragment("人员信息");
                         break;
                     case "挂机":
-                        initGuajiFragment();
+                        showFragment("挂机");
                         break;
-                    case "发送视频评论":
-                        initReplyVideoFragment();
-                        break;
-                    case "关注其他用户":
-                        initFollowFragment();
-                        break;
-                    case "签到":
-                        initSignFragment(true);
+					case "签到":
+                        showFragment("签到");
                         break;
                     case "设置":
-                        initSettingsFragment();
+                        showFragment("设置");
                         break;
                     case "退出":
                         if (SharedPreferenceHelper.getBoolean("exit", false)) {
@@ -322,230 +297,101 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         }
     };
 
+	private int getId(String s) {
+		String reg = "\\D{0,}(\\d{1,})\\D{0,}";
+		Pattern p2 = Pattern.compile(reg);  
+		Matcher m2 = p2.matcher(s);  
+		int historyHighestLevel = -1;
+		if (m2.find()) {  
+			historyHighestLevel = Integer.parseInt(m2.group(1));
+		}
+		return historyHighestLevel;
+	}
+
     private void findViews() {
         rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
         rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
-        rightList = (ListView) findViewById(R.id.right_list);
+        lvRecent = (ListView) findViewById(R.id.right_list);
     }
 
-    private void initFragment() {
-        fragmentManager = getFragmentManager();
-        initSignFragment(false);
-        initManagerFragment(false);
-        //  initGuajiFragment(false);
-        //   initSettingsFragment(false);
-        initPersionInfoFragment(false);
-        //   initSendDanmakuFragment(false);
-        initNaiFragment(false);
-        //    initHotStripFragment(false);
-        //    initGiftFragment(false);
-        //    initReplyVideoFragment(false);
-        //    initFollowFragment(false);
-        //    initChouJiangFragment(false);
-        initMainFragment(true);
+	public <T extends Fragment> T getFragment(String id, Class<T> c) {
+		return (T)fragments.get(id);
+	}
+
+	public void showFragment(String id) {
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		Fragment frag=fragments.get(id);
+		if (frag == null) {
+			switch (id) {
+				case "Main":
+					frag = new MainFragment();
+					fragments.put(id, frag);
+					break;
+				case "管理账号":
+					frag = new ManagerFragment();
+					fragments.put(id, frag);
+					break;
+				case "人员信息":
+					frag = new PersonInfoFragment();
+					fragments.put(id, frag);
+					break;
+				case "挂机":
+					frag = new GuaJiFragment();
+					fragments.put(id, frag);
+					break;
+				case "签到":
+					frag = new SignFragment();
+					fragments.put(id, frag);
+					break;
+				case "设置":
+					frag = new SettingsFragment();
+					fragments.put(id, frag);
+					break;
+				default:
+					throw new RuntimeException("获取不存在的碎片");
+			}
+			transaction.add(R.id.main_activityLinearLayout, frag);
+		}
+        hideFragment();
+		transaction.show(frag);
+        transaction.commit();
+	}
+
+	public <T extends Fragment> void newIDFragment(Class<T> c, String type, int id) {
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		Fragment frag=null;
+		try {
+			Class<?> cls = Class.forName(c.getName());
+			Constructor con=cls.getConstructor(int.class);
+			frag = (Fragment) con.newInstance(id);
+			fragments.put(type + id, frag);
+			recentAdapter.add(type + id);
+			transaction.add(R.id.main_activityLinearLayout, frag);	
+		} catch (Exception e) {
+			throw new RuntimeException("反射爆炸:" + e.toString());
+		}
+		hideFragment();
+		transaction.show(frag);
+        transaction.commit();
+	}
+
+    public void hideFragment() {
+		FragmentTransaction ft=getFragmentManager().beginTransaction();
+        for (Fragment f : fragments.values()) {
+			ft.hide(f);
+        }
+		ft.commit();
     }
 
-    public void initMainFragment(boolean showNow) {
-        FragmentTransaction transactionWelcome = fragmentManager.beginTransaction();
-        if (mainFrgment == null) {
-            mainFrgment = new MainFrgment();
-            transactionWelcome.add(R.id.main_activityLinearLayout, mainFrgment);
-        }
-        hideFragment(transactionWelcome);
-        if (showNow) {
-            transactionWelcome.show(mainFrgment);
-        }
-        transactionWelcome.commit();
-    }
-
-    private void initNaiFragment(boolean showNow) {
-        FragmentTransaction transactionsettings = fragmentManager.beginTransaction();
-        if (naiFragment == null) {
-            naiFragment = new NaiFragment();
-            transactionsettings.add(R.id.main_activityLinearLayout, naiFragment);
-        }
-        hideFragment(transactionsettings);
-        if (showNow) {
-            transactionsettings.show(naiFragment);
-        }
-        transactionsettings.commit();
-    }
-
-    private void initSignFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (signFragment == null) {
-            signFragment = new SignFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, signFragment);
-        }
-        hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(signFragment);
-        }
-        transactionBusR.commit();
-    }
-
-    private void initManagerFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (managerFragment == null) {
-            managerFragment = new ManagerFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, managerFragment);
-        }
-        hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(managerFragment);
-        }
-        transactionBusR.commit();
-    }
-
-    private void initGuajiFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (guaJiFragment == null) {
-            guaJiFragment = new GuaJiFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, guaJiFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(guaJiFragment);
-        transactionBusR.commit();
-    }
-
-    private void initSettingsFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (settingsFragment == null) {
-            settingsFragment = new SettingsFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, settingsFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(settingsFragment);
-        transactionBusR.commit();
-    }
-
-    private void initPersionInfoFragment(boolean showNow) {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (personInfoFragment == null) {
-            personInfoFragment = new PersonInfoFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, personInfoFragment);
-        }
-        hideFragment(transactionBusR);
-        if (showNow) {
-            transactionBusR.show(personInfoFragment);
-        }
-        transactionBusR.commit();
-    }
-
-    private void initSendDanmakuFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (sendDanmakuFragment == null) {
-            sendDanmakuFragment = new SendDanmakuFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, sendDanmakuFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(sendDanmakuFragment);
-        transactionBusR.commit();
-    }
-
-    private void initHotStripFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (sendHotStripFragment == null) {
-            sendHotStripFragment = new SendHotStripFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, sendHotStripFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(sendHotStripFragment);
-        transactionBusR.commit();
-    }
-
-    private void initGiftFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (giftFragment == null) {
-            giftFragment = new GiftFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, giftFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(giftFragment);
-        transactionBusR.commit();
-    }
-
-    private void initReplyVideoFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (replayVidoeFragment == null) {
-            replayVidoeFragment = new ReplyVideoFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, replayVidoeFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(replayVidoeFragment);
-        transactionBusR.commit();
-    }
-
-    private void initFollowFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (followFragment == null) {
-            followFragment = new FollowFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, followFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(followFragment);
-        transactionBusR.commit();
-    }
-
-    private void initCoinFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (giveCoinFragment == null) {
-            giveCoinFragment = new GiveCoinFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, giveCoinFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(giveCoinFragment);
-        transactionBusR.commit();
-    }
-
-    private void initZanFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (zanFragment == null) {
-            zanFragment = new ZanFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, zanFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(zanFragment);
-        transactionBusR.commit();
-    }
-
-    private void initChouJiangFragment() {
-        FragmentTransaction transactionBusR = fragmentManager.beginTransaction();
-        if (choujiangFragment == null) {
-            choujiangFragment = new ChoujiangFragment();
-            transactionBusR.add(R.id.main_activityLinearLayout, choujiangFragment);
-        }
-        hideFragment(transactionBusR);
-        transactionBusR.show(choujiangFragment);
-        transactionBusR.commit();
-    }
-
-    public void hideFragment(FragmentTransaction transaction) {
-        Fragment fs[] = {
-                mainFrgment,
-                naiFragment,
-                signFragment,
-                managerFragment,
-                guaJiFragment,
-                giftFragment,
-                settingsFragment,
-                personInfoFragment,
-                sendDanmakuFragment,
-                sendHotStripFragment,
-                replayVidoeFragment,
-                followFragment,
-                giveCoinFragment,
-                choujiangFragment,
-                zanFragment
-        };
-        for (Fragment f : fs) {
-            if (f != null) {
-                transaction.hide(f);
-            }
-        }
-    }
+	public void removeFragment(String id) {
+		if (!fragments.containsKey(id)) {
+			throw new RuntimeException("no such key");
+		}
+		getFragmentManager().beginTransaction().remove(fragments.get(id)).commit();
+		fragments.remove(id);
+	}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -667,17 +513,17 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         try {
             FileOutputStream fos = null;
             OutputStreamWriter writer = null;
-            File file = new File(Environment.getExternalStorageDirectory()+"/info.json");
+            File file = new File(Environment.getExternalStorageDirectory() + "/info.json");
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
             writer.write(gson.toJson(loginInfo));
             writer.flush();
             fos.close();
-		  } catch (IOException e) {
+		} catch (IOException e) {
             e.printStackTrace();
-		  }
-	  }
-	
+		}
+	}
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {
@@ -694,11 +540,11 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     public void showToast(final String msg) {
         runOnUiThread(new Runnable() {
 
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
+				@Override
+				public void run() {
+					Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+				}
+			});
     }
 }
 

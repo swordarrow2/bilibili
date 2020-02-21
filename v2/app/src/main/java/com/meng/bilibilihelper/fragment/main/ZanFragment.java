@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 public class ZanFragment extends BaseFrgment {
     public ListView listview;
@@ -46,6 +47,7 @@ public class ZanFragment extends BaseFrgment {
         btn = (Button) view.findViewById(R.id.send_danmaku_button);
         et = (EditText) view.findViewById(R.id.send_danmaku_editText);
         et.setHint("AID");
+		et.setText(String.valueOf(new Random().nextInt()));
         listview.setAdapter(new ListWithImageSwitchAdapter(MainActivity.instence, MainActivity.instence.loginInfo.loginInfoPeople));
         btn.setOnClickListener(new View.OnClickListener() {
 

@@ -1,26 +1,26 @@
 package com.meng.bilibilihelper.libAndHelper;
 
+import android.app.*;
 import android.graphics.*;
 import android.widget.*;
-
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
-import com.meng.bilibilihelper.javaBean.BilibiliUserInfo;
-
+import com.meng.bilibilihelper.javaBean.*;
 import java.io.*;
 import java.net.*;
 
-import android.app.*;
-
 public class DownloadImageRunnable implements Runnable {
 
+	public static final int QQGroup=0;
+    public static final int QQUser=1;
+    public static final int BilibiliUser=2;
     private ImageView imageView;
-    private HeadType headType;
+    private int headType;
     private String id = "";
     private File imageFile;
     private Activity activity;
 
-    public DownloadImageRunnable(Activity context, ImageView imageView, String id, HeadType headType) {
+    public DownloadImageRunnable(Activity context, ImageView imageView, String id, int headType) {
         this.activity = context;
         this.imageView = imageView;
         this.headType = headType;

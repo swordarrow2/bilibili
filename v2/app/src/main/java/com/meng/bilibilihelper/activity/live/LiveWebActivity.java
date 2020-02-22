@@ -32,7 +32,7 @@ public class LiveWebActivity extends Activity{
         settings.setLoadWithOverviewMode(true);
         settings.setPluginState(WebSettings.PluginState.ON);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE); // 不加载缓存内容
-		settings.setUserAgentString(MainActivity.instence.userAgent);
+		settings.setUserAgentString(MainActivity.instance.userAgent);
 		webView.setWebViewClient(new WebViewClient() {
 			  @Override
 			  public boolean shouldOverrideUrlLoading(WebView view,String url){

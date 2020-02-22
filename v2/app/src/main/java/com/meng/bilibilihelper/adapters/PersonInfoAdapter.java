@@ -55,8 +55,8 @@ public class PersonInfoAdapter extends BaseAdapter {
         holder.textViewQQNumber.setText(String.valueOf(personInfo.qq));
         holder.textViewBilibiliUid.setText(String.valueOf(personInfo.bid));
         holder.textViewBilibiliLiveId.setText(String.valueOf(personInfo.bliveRoom));
-        File qqImageFile = new File(MainActivity.instence.mainDic + "user/" + personInfo.qq + ".jpg");
-        File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + personInfo.bid + ".jpg");
+        File qqImageFile = new File(MainActivity.instance.mainDic + "user/" + personInfo.qq + ".jpg");
+        File bilibiliImageFile = new File(MainActivity.instance.mainDic + "bilibili/" + personInfo.bid + ".jpg");
         if (personInfo.qq == 0) {
             holder.imageViewQQHead.setImageResource(R.drawable.stat_sys_download_anim0);
         } else {
@@ -64,13 +64,13 @@ public class PersonInfoAdapter extends BaseAdapter {
                 holder.imageViewQQHead.setImageBitmap(BitmapFactory.decodeFile(qqImageFile.getAbsolutePath()));
             } else {
                 if (MainActivity.onWifi) {
-                    MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), DownloadImageRunnable.QQUser));
+                    MainActivity.instance.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), DownloadImageRunnable.QQUser));
                 } else {
                     holder.imageViewQQHead.setImageResource(R.drawable.stat_sys_download_anim0);
                     holder.imageViewQQHead.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), DownloadImageRunnable.QQUser));
+                            MainActivity.instance.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewQQHead, String.valueOf(personInfo.qq), DownloadImageRunnable.QQUser));
                         }
                     });
                 }
@@ -83,13 +83,13 @@ public class PersonInfoAdapter extends BaseAdapter {
                 holder.imageViewBilibiiliHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
             } else {
                 if (MainActivity.onWifi) {
-                    MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), DownloadImageRunnable.BilibiliUser));
+                    MainActivity.instance.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), DownloadImageRunnable.BilibiliUser));
                 } else {
                     holder.imageViewBilibiiliHead.setImageResource(R.drawable.stat_sys_download_anim0);
                     holder.imageViewBilibiiliHead.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), DownloadImageRunnable.BilibiliUser));
+                            MainActivity.instance.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(context, holder.imageViewBilibiiliHead, String.valueOf(personInfo.bid), DownloadImageRunnable.BilibiliUser));
                         }
                     });
                 }

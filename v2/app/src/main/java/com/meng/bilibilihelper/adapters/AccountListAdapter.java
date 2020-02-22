@@ -1,6 +1,5 @@
 package com.meng.bilibilihelper.adapters;
 
-import android.app.*;
 import android.graphics.*;
 import android.view.*;
 import android.widget.*;
@@ -13,21 +12,19 @@ import com.meng.bilibilihelper.libAndHelper.*;
 import java.io.*;
 import java.util.*;
 
-public class ListWithImageSwitchAdapter extends BaseAdapter {
-    private Activity activity;
-    private ArrayList<LoginInfoPeople> loginInfoPeopleArrayList;
+public class AccountListAdapter extends BaseAdapter {
+    private MainActivity activity;
     private ArrayList<Boolean> checked = new ArrayList<>();
 
-    public ListWithImageSwitchAdapter(Activity context, ArrayList<LoginInfoPeople> groupReplies) {
+    public AccountListAdapter(MainActivity context) {
         this.activity = context;
-        this.loginInfoPeopleArrayList = groupReplies;
-        for (LoginInfoPeople l : groupReplies) {
+        for (int i=0,j=activity.loginAccounts.size();i < j;++i) {
             checked.add(false);
         }
     }
 
     public int getCount() {
-        return loginInfoPeopleArrayList.size();
+        return activity.loginAccounts.size();
     }
 
     public boolean getChecked(int position) {
@@ -35,11 +32,11 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return loginInfoPeopleArrayList.get(position);
+        return activity.loginAccounts.get(position);
     }
 
     public long getItemId(int position) {
-        return loginInfoPeopleArrayList.get(position).hashCode();
+        return activity.loginAccounts.get(position).hashCode();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -48,36 +45,36 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
             convertView = activity.getLayoutInflater().inflate(R.layout.list_item_image_text_switch, null);
             holder = new ViewHolder();
             holder.tvName = (TextView) convertView.findViewById(R.id.group_reply_list_itemTextView);
-            holder.switchEnable = (Switch) convertView.findViewById(R.id.group_reply_list_itemSwitch);
+            holder.aSwitch = (Switch) convertView.findViewById(R.id.group_reply_list_itemSwitch);
             holder.ivHeader = (ImageView) convertView.findViewById(R.id.group_reply_list_itemImageView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final LoginInfoPeople loginInfoPeople = loginInfoPeopleArrayList.get(position);
-        holder.tvName.setText(loginInfoPeople.personInfo.data.name);
-        holder.switchEnable.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        final AccountInfo account = activity.loginAccounts.get(position);
+        holder.tvName.setText(account.name);
+        holder.aSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-            @Override
-            public void onCheckedChanged(CompoundButton p1, boolean p2) {
-                checked.set(position, p2);
-            }
-        });
-        holder.switchEnable.setChecked(checked.get(position));
-        File bilibiliImageFile = new File(MainActivity.instence.mainDic + "bilibili/" + loginInfoPeople.personInfo.data.mid + ".jpg");
+				@Override
+				public void onCheckedChanged(CompoundButton p1, boolean p2) {
+					checked.set(position, p2);
+				}
+			});
+        holder.aSwitch.setChecked(checked.get(position));
+        File bilibiliImageFile = new File(MainActivity.instance.mainDic + "bilibili/" + account.uid + ".jpg");
         if (bilibiliImageFile.exists()) {
             holder.ivHeader.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {
             if (MainActivity.onWifi) {
-                MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), DownloadImageRunnable.BilibiliUser));
+                MainActivity.instance.getFragment("人员信息", PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(account.uid), DownloadImageRunnable.BilibiliUser));
             } else {
                 holder.ivHeader.setImageResource(R.drawable.stat_sys_download_anim0);
                 holder.ivHeader.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(loginInfoPeople.personInfo.data.mid), DownloadImageRunnable.BilibiliUser));
-                    }
-                });
+						@Override
+						public void onClick(View v) {
+							MainActivity.instance.getFragment("人员信息", PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(activity, holder.ivHeader, String.valueOf(account.uid), DownloadImageRunnable.BilibiliUser));
+						}
+					});
             }
         }
         return convertView;
@@ -86,7 +83,7 @@ public class ListWithImageSwitchAdapter extends BaseAdapter {
     private class ViewHolder {
         private ImageView ivHeader;
         private TextView tvName;
-        private Switch switchEnable;
+        private Switch aSwitch;
     }
 }
 

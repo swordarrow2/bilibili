@@ -30,7 +30,7 @@ public class RecentAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
         if (convertView == null) {
-            convertView = MainActivity.instence.getLayoutInflater().inflate(R.layout.recent_list_item, null);
+            convertView = MainActivity.instance.getLayoutInflater().inflate(R.layout.recent_list_item, null);
             holder = new ViewHolder();
             holder.tvName = (TextView) convertView.findViewById(R.id.recent_list_itemTextView);
             holder.close = (ImageButton) convertView.findViewById(R.id.recent_list_itemImageButton);
@@ -44,15 +44,15 @@ public class RecentAdapter extends BaseAdapter {
 
 				@Override
 				public void onClick(View p1) {
-					MainActivity.instence.showFragment(holder.tvName.getText().toString());
+					MainActivity.instance.showFragment(holder.tvName.getText().toString());
 				}
 			});
 		holder.close.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View p1) {
-					MainActivity.instence.hideFragment();
-					MainActivity.instence.removeFragment(s);
+					MainActivity.instance.hideFragment();
+					MainActivity.instance.removeFragment(s);
 					names.remove(position);
 					notifyDataSetChanged();
 				}

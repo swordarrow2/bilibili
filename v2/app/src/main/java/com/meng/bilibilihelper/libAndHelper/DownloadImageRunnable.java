@@ -31,21 +31,21 @@ public class DownloadImageRunnable implements Runnable {
     public void run() {
         switch (headType) {
             case QQGroup:
-                imageFile = new File(MainActivity.instence.mainDic + "group/" + id + ".jpg");
+                imageFile = new File(MainActivity.instance.mainDic + "group/" + id + ".jpg");
                 if (imageFile.exists()) {
                     return;
                 }
                 downloadFile("http://p.qlogo.cn/gh/" + id + "/" + id + "/100/");
                 break;
             case QQUser:
-                imageFile = new File(MainActivity.instence.mainDic + "user/" + id + ".jpg");
+                imageFile = new File(MainActivity.instance.mainDic + "user/" + id + ".jpg");
                 if (imageFile.exists()) {
                     return;
                 }
                 downloadFile("http://q2.qlogo.cn/headimg_dl?bs=" + id + "&dst_uin=" + id + "&dst_uin=" + id + "&;dst_uin=" + id + "&spec=100&url_enc=0&referer=bu_interface&term_type=PC");
                 break;
             case BilibiliUser:
-                imageFile = new File(MainActivity.instence.mainDic + "bilibili/" + id + ".jpg");
+                imageFile = new File(MainActivity.instance.mainDic + "bilibili/" + id + ".jpg");
                 if (imageFile.exists()) {
                     return;
                 }

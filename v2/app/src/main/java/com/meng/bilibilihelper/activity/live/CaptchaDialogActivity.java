@@ -1,7 +1,6 @@
 package com.meng.bilibilihelper.activity.live;
 
 import Decoder.*;
-
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -9,14 +8,11 @@ import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
-
 import com.google.gson.*;
 import com.meng.bilibilihelper.*;
-import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.libAndHelper.DataBaseHelper;
-import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
-
+import com.meng.bilibilihelper.libAndHelper.*;
 import java.io.*;
 
 public class CaptchaDialogActivity extends Activity {
@@ -104,7 +100,7 @@ public class CaptchaDialogActivity extends Activity {
                                 });
                                 break;
                             case -903:
-                                MainActivity.instence.showToast("已经领取过了");
+                                MainActivity.instance.showToast("已经领取过了");
                                 if (SharedPreferenceHelper.getBoolean("notifi", false)) {
                                     manager.cancel(guaji.id);
                                 }
@@ -131,14 +127,14 @@ public class CaptchaDialogActivity extends Activity {
     }
 
     public String getLiveCaptcha(String refer, String cookie) {
-        return MainActivity.instence.getSourceCode(
+        return Tools.Network.getSourceCode(
                 "https://api.live.bilibili.com/lottery/v1/SilverBox/getCaptcha?ts=" + System.currentTimeMillis(),
                 cookie, refer);
     }
 
     public String getGetAward(long time_start, long time_end, String captcha, String cookie, String refer) {
         return
-                MainActivity.instence.getSourceCode(
+                Tools.Network.getSourceCode(
                         "https://api.live.bilibili.com/lottery/v1/SilverBox/getAward?time_start=" + time_start +
                                 "&end_time=" + time_end +
                                 "&captcha=" + captcha, cookie, refer);

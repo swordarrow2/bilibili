@@ -29,11 +29,12 @@ import java.util.regex.*;
 import org.jsoup.*;
 
 import com.meng.bilibilihelper.R;
+import com.google.gson.reflect.*;
 
 
 public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
-    public static MainActivity instence;
+    public static MainActivity instance;
     private DrawerLayout mDrawerLayout;
     public ListView mDrawerList;
     private RelativeLayout rightDrawer;
@@ -43,15 +44,14 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
 	public HashMap<String,Fragment> fragments=new HashMap<>();
     public TextView rightText;
-    public MengInfoHeaderView infoHeaderLeft;
+    public UserInfoHeaderView infoHeaderLeft;
     public MengLiveControl mengLiveControl;
 
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public Gson gson = new Gson();
-    public LoginInfo loginInfo;
+    public ArrayList<AccountInfo> loginAccounts;
 
-    public MainListAdapter loginInfoPeopleAdapter;
-    public ArrayList<String> arrayList;
+    public MainListAdapter mainAccountAdapter;
 
     public String jsonPath;
     public String mainDic = "";
@@ -65,47 +65,57 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
+	public Map<String, String> liveHead = new HashMap<>();
+    public Map<String, String> mainHead = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        instence = this;
+		liveHead.put("Host", "api.live.bilibili.com");
+        liveHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        liveHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        liveHead.put("Connection", "keep-alive");
+        liveHead.put("Origin", "https://live.bilibili.com");
+
+        mainHead.put("Host", "api.bilibili.com");
+        mainHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        mainHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        mainHead.put("Connection", "keep-alive");
+        mainHead.put("Origin", "https://www.bilibili.com");
+
+        instance = this;
 		//  ExceptionCatcher.getInstance().init(getApplicationContext());
         SharedPreferenceHelper.init(getApplicationContext(), "settings");
         DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
-        infoHeaderLeft = new MengInfoHeaderView(this);
+        infoHeaderLeft = new UserInfoHeaderView(this);
 
         mengLiveControl = new MengLiveControl(this);
         findViews();
         //   setActionBar();
         setListener();
-        jsonPath = getApplicationContext().getFilesDir() + "/info.json";
+        jsonPath = getApplicationContext().getFilesDir() + "/account.json";
         File f = new File(jsonPath);
         if (!f.exists()) {
             try {
                 f.createNewFile();
             } catch (IOException e) {
             }
-            loginInfo = new LoginInfo();
+            loginAccounts = new ArrayList<>();
             saveConfig();
 		}
 		//   methodsManager.fileCopy(jsonPath, Environment.getExternalStorageDirectory() + "/fafafa.json");
-        arrayList = new ArrayList<>();
         try {
-            loginInfo = gson.fromJson(readFileToString(), LoginInfo.class);
+			Type tt=new TypeToken<ArrayList<AccountInfo>>(){}.getType();
+            loginAccounts = gson.fromJson(readFileToString(), tt);
         } catch (IOException e) {
             e.printStackTrace();
 		}
-		saveConfig2();
-        if (loginInfo != null) {
-            for (LoginInfoPeople loginInfoPeople : loginInfo.loginInfoPeople) {
-                arrayList.add(loginInfoPeople.personInfo.data.name);
-            }
-        }
-        loginInfoPeopleAdapter = new MainListAdapter(this, loginInfo.loginInfoPeople);
+		//saveConfig2();
+        mainAccountAdapter = new MainListAdapter(this);
         if (SharedPreferenceHelper.getBoolean("opendraw", true)) {
             mDrawerLayout.openDrawer(mDrawerList);
         } else {
@@ -132,9 +142,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        onWifi = wifiNetworkInfo.isConnected();
+        onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
         final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
         if (!mainUID.equals("")) {
             mDrawerList.addHeaderView(infoHeaderLeft);
@@ -142,16 +150,16 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             File imf = new File(mainDic + "bilibili/" + mainUID + ".jpg");
             if (imf.exists()) {
                 Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
-                MainActivity.instence.infoHeaderLeft.setImage(b);
+                MainActivity.instance.infoHeaderLeft.setImage(b);
             } else {
-                MainActivity.instence.getFragment("人员信息", PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(this, infoHeaderLeft.getImageView(), mainUID, DownloadImageRunnable.BilibiliUser));
+                MainActivity.instance.getFragment("人员信息", PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(this, infoHeaderLeft.getImageView(), mainUID, DownloadImageRunnable.BilibiliUser));
 			}
-            new Thread(new Runnable() {
+            threadPool.execute(new Runnable() {
 					@Override
 					public void run() {
-						final BilibiliUserInfo info = gson.fromJson(getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
-						UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
-						String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
+						final BilibiliUserInfo info = gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + mainUID + "&jsonp=jsonp"), BilibiliUserInfo.class);
+						UserSpaceToLive sjb = gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+						String json = Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
 						JsonParser parser = new JsonParser();
 						JsonObject obj = parser.parse(json).getAsJsonObject();
 						final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
@@ -164,7 +172,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 								}
 							});
 					}
-				}).start();
+				});
         }
 		showFragment("Main");
     }
@@ -215,9 +223,8 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-															"首页(大概)","输入ID", "挂机", "信息", "管理账号", "签到", "设置", "退出"
+															"首页(大概)","输入ID", "信息", "管理账号", "设置", "退出"
 														}));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
@@ -272,12 +279,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                         break;
 					case "信息":
                         showFragment("人员信息");
-                        break;
-                    case "挂机":
-                        showFragment("挂机");
-                        break;
-					case "签到":
-                        showFragment("签到");
                         break;
                     case "设置":
                         showFragment("设置");
@@ -335,14 +336,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 					break;
 				case "人员信息":
 					frag = new PersonInfoFragment();
-					fragments.put(id, frag);
-					break;
-				case "挂机":
-					frag = new GuaJiFragment();
-					fragments.put(id, frag);
-					break;
-				case "签到":
-					frag = new SignFragment();
 					fragments.put(id, frag);
 					break;
 				case "设置":
@@ -424,57 +417,9 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         }
     }
 
-    public String getSourceCode(String url) {
-        return getSourceCode(url, null, null);
-    }
-
-    public String getSourceCode(String url, String cookie) {
-        return getSourceCode(url, cookie, null);
-    }
-
-    public String getSourceCode(String url, String cookie, String refer) {
-        Connection.Response response = null;
-        Connection connection;
-        try {
-            connection = Jsoup.connect(url);
-            if (cookie != null) {
-                connection.cookies(cookieToMap(cookie));
-            }
-            if (refer != null) {
-                connection.referrer(refer);
-            }
-            connection.userAgent(userAgent);
-            connection.ignoreContentType(true).method(Connection.Method.GET);
-            response = connection.execute();
-            if (response.statusCode() != 200) {
-                showToast(String.valueOf(response.statusCode()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (response != null) {
-            return response.body();
-        }
-        return "";
-    }
-
-    public Map<String, String> cookieToMap(String value) {
-        Map<String, String> map = new HashMap<String, String>();
-        String values[] = value.split("; ");
-        for (String val : values) {
-            String vals[] = val.split("=");
-            if (vals.length == 2) {
-                map.put(vals[0], vals[1]);
-            } else if (vals.length == 1) {
-                map.put(vals[0], "");
-            }
-        }
-        return map;
-    }
-
     public String getCookie(long bid) {
-        for (LoginInfoPeople l : loginInfo.loginInfoPeople) {
-            if (bid == l.personInfo.data.mid) {
+        for (AccountInfo l : loginAccounts) {
+            if (bid == l.uid) {
                 return l.cookie;
             }
         }
@@ -501,22 +446,23 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             File file = new File(jsonPath);
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(gson.toJson(loginInfo));
+            writer.write(gson.toJson(loginAccounts));
             writer.flush();
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+		saveConfig2();
     }
 
 	public void saveConfig2() {
         try {
             FileOutputStream fos = null;
             OutputStreamWriter writer = null;
-            File file = new File(Environment.getExternalStorageDirectory() + "/info.json");
+            File file = new File(Environment.getExternalStorageDirectory() + "/account.json");
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(gson.toJson(loginInfo));
+            writer.write(gson.toJson(loginAccounts));
             writer.flush();
             fos.close();
 		} catch (IOException e) {

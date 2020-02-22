@@ -11,13 +11,13 @@ import android.widget.TextView;
 
 import com.meng.bilibilihelper.R;
 
-public class MengInfoHeaderView extends LinearLayout {
+public class UserInfoHeaderView extends LinearLayout {
 
     private ImageView imageView;
     private TextView textViewTitle;
     private TextView textViewSummry;
 
-    public MengInfoHeaderView(Context context) {
+    public UserInfoHeaderView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.main_account_list_header, this);
         imageView = (ImageView) findViewById(R.id.imageView);

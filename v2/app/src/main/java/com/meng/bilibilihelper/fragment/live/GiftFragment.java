@@ -1,19 +1,15 @@
 package com.meng.bilibilihelper.fragment.live;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
+import com.meng.bilibilihelper.*;
+import com.meng.bilibilihelper.activity.*;
+import com.meng.bilibilihelper.activity.live.*;
 
-import com.meng.bilibilihelper.R;
-import com.meng.bilibilihelper.activity.live.GiftActivity;
-import com.meng.bilibilihelper.activity.MainActivity;
-import com.meng.bilibilihelper.fragment.BaseFrgment;
-
-public class GiftFragment extends BaseFrgment {
+public class GiftFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -24,7 +20,7 @@ public class GiftFragment extends BaseFrgment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ListView mainListview = (ListView) view.findViewById(R.id.normal_listview);
-        mainListview.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
+        mainListview.setAdapter(MainActivity.instance.mainAccountAdapter);
         mainListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {

@@ -3,10 +3,10 @@ package com.meng.bilibilihelper.activity.main;
 import android.app.*;
 import android.os.*;
 import android.webkit.*;
-
 import com.google.gson.*;
-import com.meng.bilibilihelper.activity.MainActivity;
+import com.meng.bilibilihelper.activity.*;
 import com.meng.bilibilihelper.javaBean.*;
+import com.meng.bilibilihelper.libAndHelper.*;
 
 public class Login extends Activity {
 
@@ -20,7 +20,7 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         WebView webView = new WebView(this);
         setContentView(webView);
-        webView.getSettings().setUserAgentString(MainActivity.instence.userAgent);
+        webView.getSettings().setUserAgentString(MainActivity.instance.userAgent);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setBuiltInZoomControls(true);
         clearWebViewCache();
@@ -42,37 +42,28 @@ public class Login extends Activity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        LoginInfoPeople loginInfoPeople = new LoginInfoPeople();
-                        loginInfoPeople.cookie = cookieStr;
-
-                        String myInfoJson = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr);
-                        BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(myInfoJson, BilibiliUserInfo.class);
-                        String json2 = MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + bilibiliPersonInfo.data.mid + "&jsonp=jsonp");
-
-                        loginInfoPeople.personInfo = new Gson().fromJson(json2, BilibiliUserInfo.class);
-                        int i;
-                        for (i = 0; i < MainActivity.instence.loginInfo.loginInfoPeople.size(); ++i) {
-                            if (MainActivity.instence.loginInfo.loginInfoPeople.get(i).personInfo.data.mid == loginInfoPeople.personInfo.data.mid) {
+						BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
+                        AccountInfo account = new AccountInfo();
+                        account.cookie = cookieStr;
+                        account.name = bilibiliPersonInfo.data.name;
+						account.uid=bilibiliPersonInfo.data.mid;
+                        int i,j;
+                        for (i = 0,j= MainActivity.instance.loginAccounts.size();i<j; ++i) {
+                            if (MainActivity.instance.loginAccounts.get(i).uid == account.uid) {
                                 break;
                             }
                         }
-                        if (i != MainActivity.instence.loginInfo.loginInfoPeople.size()) {
-                            MainActivity.instence.loginInfo.loginInfoPeople.set(i, loginInfoPeople);
+                        if (i != MainActivity.instance.loginAccounts.size()) {
+                            MainActivity.instance.loginAccounts.set(i, account);
                         } else {
-                            MainActivity.instence.loginInfo.loginInfoPeople.add(loginInfoPeople);
+                            MainActivity.instance.loginAccounts.add(account);
                         }
-                        MainActivity.instence.saveConfig();
+                        MainActivity.instance.saveConfig();
                         runOnUiThread(new Runnable() {
 
                             @Override
                             public void run() {
-                                if (MainActivity.instence.loginInfo != null) {
-                                    MainActivity.instence.arrayList.clear();
-                                    for (LoginInfoPeople loginInfoPeople : MainActivity.instence.loginInfo.loginInfoPeople) {
-                                        MainActivity.instence.arrayList.add(loginInfoPeople.personInfo.data.name);
-                                    }
-                                }
-                                MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
+                                MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
                                 finish();
                             }
                         });

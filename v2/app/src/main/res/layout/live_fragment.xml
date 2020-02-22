@@ -15,6 +15,14 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
+		<TextView
+			android:id="@+id/live_fragmentTextView_info"
+			android:focusable="true"
+			android:longClickable="true"
+			android:textIsSelectable="true"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"/>
+
 		<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
@@ -27,6 +35,7 @@
 				android:layout_weight="6"/>
 
 			<Button
+				android:id="@+id/live_fragmentButton_send"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="发送"
@@ -39,6 +48,12 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content">
 
+			<Spinner
+				android:id="@+id/live_fragmentSpinner"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.7"/>
+
 			<Button
 				android:id="@+id/live_fragmentButton_preset"
 				android:layout_width="0dp"
@@ -47,6 +62,7 @@
 				android:layout_weight="1"/>
 
 			<Button
+				android:id="@+id/live_fragmentButton_edit_pre"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:text="编辑预设"

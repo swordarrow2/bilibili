@@ -31,9 +31,9 @@ public class PersonInfoFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
                 long l = ((PersonInfo) p1.getItemAtPosition(p3)).bid;
-                MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.checkUidButton();
-                MainActivity.instence.getFragment("Main",MainFragment.class).mengEditText.setText(String.valueOf(l));
-                MainActivity.instence.showFragment(MainFragment.class.getName());
+                MainActivity.instance.getFragment("Main",MainFragment.class).mengEditText.checkUidButton();
+                MainActivity.instance.getFragment("Main",MainFragment.class).mengEditText.setText(String.valueOf(l));
+                MainActivity.instance.showFragment(MainFragment.class.getName());
             }
         });
     }

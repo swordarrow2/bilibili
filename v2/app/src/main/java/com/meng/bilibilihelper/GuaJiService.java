@@ -4,13 +4,11 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.util.*;
-
 import com.google.gson.*;
 import com.meng.bilibilihelper.activity.*;
-import com.meng.bilibilihelper.activity.live.CaptchaDialogActivity;
+import com.meng.bilibilihelper.activity.live.*;
 import com.meng.bilibilihelper.javaBean.*;
-import com.meng.bilibilihelper.libAndHelper.SharedPreferenceHelper;
-
+import com.meng.bilibilihelper.libAndHelper.*;
 import java.text.*;
 import java.util.*;
 
@@ -33,7 +31,7 @@ public class GuaJiService extends Service {
         super.onCreate();
         manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         builder = new Notification.Builder(this);
-        new Thread(new Runnable() {
+        MainActivity.instance.threadPool.execute(new Runnable() {
 
 			  @Override
 			  public void run() {
@@ -54,8 +52,8 @@ public class GuaJiService extends Service {
 						}
 					}
 				}
-			}).start();
-        new Thread(new Runnable() {
+			});
+        MainActivity.instance.threadPool.execute(new Runnable() {
 
 			  @Override
 			  public void run() {
@@ -72,7 +70,7 @@ public class GuaJiService extends Service {
 								  if (g.liveTimeStamp.code == -10017) {
 									  g.finish = true;
 									  sendRunningNotifi();
-									  MainActivity.instence.showToast(g.liveTimeStamp.message);
+									  MainActivity.instance.showToast(g.liveTimeStamp.message);
 									  if (!SharedPreferenceHelper.getBoolean("notifi", false)) {
 										  sendEndNotification(g);
 										}
@@ -106,23 +104,23 @@ public class GuaJiService extends Service {
 						}
 					}
 				}
-			}).start();
+			});
 
 	  }
 
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-
-        new Thread(new Runnable() {
+        MainActivity.instance.threadPool.execute(new Runnable() {
 
 			  @Override
 			  public void run() {
-				  MainActivity.instence.showToast("任务开始");
-				  LiveGuajiJavaBean gua = new LiveGuajiJavaBean(intent.getStringExtra("name"), intent.getStringExtra("refer"), intent.getStringExtra("cookie"));
+				  MainActivity.instance.showToast("任务开始");
+				  AccountInfo ai=MainActivity.instance.loginAccounts.get(intent.getIntExtra("pos",-1));
+				  LiveGuajiJavaBean gua = new LiveGuajiJavaBean(ai.name, "https://live.bilibili.com/"+new Random().nextInt(2500000), ai.cookie);
 				  for (LiveGuajiJavaBean g : guajijavabean) {
 					  if (g.cookie.equals(gua.cookie)) {
-						  MainActivity.instence.showToast("任务已添加");
+						  MainActivity.instance.showToast("任务已添加");
 						  return;
 						}
 					}
@@ -143,8 +141,7 @@ public class GuaJiService extends Service {
 					}
 
 				}
-			}).start();
-
+			});
         return super.onStartCommand(intent, flags, startId);
 	  }
 
@@ -161,7 +158,6 @@ public class GuaJiService extends Service {
             notificationManager.notify(g.id, notification);
 		  }
 	  }
-
 
     private void sendEndNotification(LiveGuajiJavaBean g) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -226,7 +222,7 @@ public class GuaJiService extends Service {
 
     public LiveGuajiJavaBean.LiveTimeStamp getLiveTimeStamp(String refer, String cookie) {
         return new Gson().fromJson(
-		  MainActivity.instence.getSourceCode(
+		  Tools.Network.getSourceCode(
 			"https://api.live.bilibili.com/lottery/v1/SilverBox/getCurrentTask",
 			cookie),
 		  LiveGuajiJavaBean.LiveTimeStamp.class);
@@ -235,16 +231,16 @@ public class GuaJiService extends Service {
     public void sendHeartBeat(boolean isFirst, String cookie) {
         if (isFirst) {
 			/*      return new Gson().fromJson(
-			 MainActivity.instence.getSourceCode(
+			 Tools.Network.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis()),
 			 LiveGetAward.class);*/
-            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis(), cookie);
+            Tools.Network.getSourceCode("https://api.live.bilibili.com/relation/v1/feed/heartBeat?_=" + System.currentTimeMillis(), cookie);
 		  } else {
 			/*    return new Gson().fromJson(
-			 MainActivity.instence.getSourceCode(
+			 Tools.Network.getSourceCode(
 			 "https://api.live.bilibili.com/relation/v1/Feed/heartBeat"),
 			 LiveGetAward.class);*/
-            MainActivity.instence.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat", cookie);
+            Tools.Network.getSourceCode("https://api.live.bilibili.com/relation/v1/Feed/heartBeat", cookie);
 		  }
 	  }
 

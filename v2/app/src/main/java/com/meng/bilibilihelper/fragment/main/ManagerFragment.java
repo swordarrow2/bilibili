@@ -25,14 +25,14 @@ public class ManagerFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ListView list = (ListView) view.findViewById(R.id.account_managerListView);
-        list.setAdapter(MainActivity.instence.loginInfoPeopleAdapter);
+        list.setAdapter(MainActivity.instance.mainAccountAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
 					Intent intent = new Intent(getActivity(), InfoActivity.class);
-					intent.putExtra("bid", String.valueOf(((LoginInfoPeople) parent.getItemAtPosition(position)).personInfo.data.mid));
+					intent.putExtra("bid", String.valueOf(MainActivity.instance.loginAccounts.get(position).uid));
 					intent.putExtra("pos", position);
-					intent.putExtra("cookie", String.valueOf(((LoginInfoPeople) parent.getItemAtPosition(position)).cookie));
+					intent.putExtra("cookie", MainActivity.instance.loginAccounts.get(position).cookie);
 					startActivity(intent);
 				}
 			});
@@ -51,10 +51,9 @@ public class ManagerFragment extends Fragment {
 									.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface p1, int p2) {
-											MainActivity.instence.loginInfo.loginInfoPeople.remove(p3);
-											MainActivity.instence.arrayList.remove(p3);
-											MainActivity.instence.saveConfig();
-											MainActivity.instence.loginInfoPeopleAdapter.notifyDataSetChanged();
+											MainActivity.instance.loginAccounts.remove(p3);
+											MainActivity.instance.saveConfig();
+											MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
 										}
 									}).setNegativeButton("取消", null).show();
                             }

@@ -24,21 +24,21 @@ public class SettingsFragment extends PreferenceFragment {
         editTextPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, final Object newValue) {
-					MainActivity.instence.mDrawerList.addHeaderView(MainActivity.instence.infoHeaderLeft);
-					File imf = new File(MainActivity.instence.mainDic + "bilibili/" + newValue + ".jpg");
+					MainActivity.instance.mDrawerList.addHeaderView(MainActivity.instance.infoHeaderLeft);
+					File imf = new File(MainActivity.instance.mainDic + "bilibili/" + newValue + ".jpg");
 					if (imf.exists()) {
 						Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
-						MainActivity.instence.infoHeaderLeft.setImage(b);
+						MainActivity.instance.infoHeaderLeft.setImage(b);
 					} else {
-						MainActivity.instence.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instence.infoHeaderLeft.getImageView(), (String) newValue, DownloadImageRunnable.BilibiliUser));
+						MainActivity.instance.getFragment("人员信息",PersonInfoFragment.class).threadPool.execute(new DownloadImageRunnable(getActivity(), MainActivity.instance.infoHeaderLeft.getImageView(), (String) newValue, DownloadImageRunnable.BilibiliUser));
 					}
 					new Thread(new Runnable() {
 							@Override
 							public void run() {
 								Gson gson = new Gson();
-								final BilibiliUserInfo info = gson.fromJson(MainActivity.instence.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
-								UserSpaceToLive sjb = gson.fromJson(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
-								String json = MainActivity.instence.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
+								final BilibiliUserInfo info = gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + newValue + "&jsonp=jsonp"), BilibiliUserInfo.class);
+								UserSpaceToLive sjb = gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+								String json = Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
 								JsonParser parser = new JsonParser();
 								JsonObject obj = parser.parse(json).getAsJsonObject();
 								final JsonObject obj2 = obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
@@ -46,8 +46,8 @@ public class SettingsFragment extends PreferenceFragment {
 										@Override
 										public void run() {
 											JsonArray ja = obj2.get("next").getAsJsonArray();
-											MainActivity.instence.infoHeaderLeft.setTitle(info.data.name);
-											MainActivity.instence.infoHeaderLeft.setSummry("主站 Lv." + info.data.level + "\n主播 Lv." + obj2.get("level").getAsInt() + "\n" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
+											MainActivity.instance.infoHeaderLeft.setTitle(info.data.name);
+											MainActivity.instance.infoHeaderLeft.setSummry("主站 Lv." + info.data.level + "\n主播 Lv." + obj2.get("level").getAsInt() + "\n" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1));
 										}
 									});
 							}

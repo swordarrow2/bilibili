@@ -7,11 +7,11 @@ import android.widget.*;
 public class MvideoView extends VideoView {
 	public MvideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
-		setMediaController(new MediaController(context));
+	//	setMediaController(new MediaController(context));
     }
 
-	/*@Override
+	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec), getSuggestedMinimumHeight());
-	}*/
+	}
 }

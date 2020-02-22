@@ -21,8 +21,11 @@ public class LiveFragment extends Fragment {
 
 	private Uri uri;
 	private MvideoView videoView;
-	private Button preset;
+	private Button send,editPre,preset;
 	private EditText et;
+	private TextView info;
+	private Spinner selectAccount;
+	private int id;
 
 	private CustomSentence customSentence;
 	private File customSentenseFile;
@@ -30,26 +33,8 @@ public class LiveFragment extends Fragment {
 
 	private ArrayAdapter<String> adapter;
 
-	public LiveFragment(final int liveId) {
-		MainActivity.instence.threadPool.execute(new Runnable(){
-
-				@Override
-				public void run() {
-					JsonParser parser = new JsonParser();
-					JsonObject obj = parser.parse(MainActivity.instence.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + liveId + "&quality=4&platform=web")).getAsJsonObject();
-					final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-					getActivity().runOnUiThread(new Runnable(){
-
-							@Override
-							public void run() {
-								uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-								videoView.setVideoURI(uri);  
-								videoView.start();  
-								videoView.requestFocus(); 
-							}
-						});
-				}
-			});
+	public LiveFragment(int liveId) {
+		id = liveId;
 	}
 
 	@Override
@@ -64,36 +49,47 @@ public class LiveFragment extends Fragment {
 		if (customSentenseFile.exists()) {
 			customSentence = new Gson().fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
 		} else {
-			try {
-				customSentenseFile.createNewFile();
-			} catch (IOException e) {}
 			customSentence = new CustomSentence();
-			String[] strings = new String[]{
-				"此生无悔入东方,来世愿生幻想乡",
-				"红魔地灵夜神雪,永夜风神星莲船",
-				"非想天则文花贴,萃梦神灵绯想天",
-				"冥界地狱异变起,樱下华胥主谋现",
-				"净罪无改渡黄泉,华鸟风月是非辨",
-				"境界颠覆入迷途,幻想花开啸风弄",
-				"二色花蝶双生缘,前缘未尽今生还",
-				"星屑洒落雨霖铃,虹彩彗光银尘耀",
-				"无寿迷蝶彼岸归,幻真如画妖如月",
-				"永劫夜宵哀伤起,幼社灵中幻似梦",
-				"追忆往昔巫女缘,须弥之间冥梦现",
-				"仁榀华诞井中天,歌雅风颂心无念"
-			};
+			String[] strings = new String[]{ "此生无悔入东方,来世愿生幻想乡","红魔地灵夜神雪,永夜风神星莲船","非想天则文花贴,萃梦神灵绯想天","冥界地狱异变起,樱下华胥主谋现","净罪无改渡黄泉,华鸟风月是非辨","境界颠覆入迷途,幻想花开啸风弄","二色花蝶双生缘,前缘未尽今生还","星屑洒落雨霖铃,虹彩彗光银尘耀","无寿迷蝶彼岸归,幻真如画妖如月","永劫夜宵哀伤起,幼社灵中幻似梦","追忆往昔巫女缘,须弥之间冥梦现","仁榀华诞井中天,歌雅风颂心无念" };
 			customSentence.sent.addAll(Arrays.asList(strings));
 			saveConfig();
 		}
+		send=(Button) view.findViewById(R.id.live_fragmentButton_send);
+		editPre=(Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.live_fragmentButton_preset);
 		et = (EditText) view.findViewById(R.id.live_fragmentEditText_danmaku);
-		//	uri = Uri.parse("https://txy.live-play.acgvideo.com/live-txy/600467/live_130324472_3085508.flv?wsSecret=177505333bfeb3dce31e18d644b1c164&wsTime=1582289846&trid=9af5d39aefc74ba0ba554f05b66e0201&pt=web&oi=3549062321&order=1&sig=no");
 		videoView = (MvideoView) view.findViewById(R.id.live_fragmentVideoView);  
-		//videoView.setMediaController(new MediaController(getActivity()));
+		info=(TextView) view.findViewById(R.id.live_fragmentTextView_info);
+		selectAccount=(Spinner) view.findViewById(R.id.live_fragmentSpinner);
+		
+		
+		videoView.setMediaController(new MediaController(getActivity()));
 		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent);
-	preset.setOnClickListener(onclick);
-		}
-	public void saveConfig() {
+		preset.setOnClickListener(onclick);
+
+
+		MainActivity.instance.threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					JsonParser parser = new JsonParser();
+					JsonObject obj = parser.parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
+					final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+					getActivity().runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
+								videoView.setVideoURI(uri);  
+								//videoView.start();  
+								videoView.requestFocus(); 
+							}
+						});
+				}
+			});
+	}
+
+	private void saveConfig() {
         try {
 			FileOutputStream fos = new FileOutputStream(customSentenseFile);
             OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
@@ -104,7 +100,8 @@ public class LiveFragment extends Fragment {
             throw new RuntimeException(customSentenseFile.getAbsolutePath() + " not found");
 		}
 	}
-	OnClickListener onclick=new OnClickListener(){
+
+	private OnClickListener onclick=new OnClickListener(){
 
 		@Override
 		public void onClick(View p1) {

@@ -1,0 +1,467 @@
+package com.meng.biliv3.activity;
+
+import android.*;
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+import android.content.res.*;
+import android.net.*;
+import android.os.*;
+import android.support.v4.widget.*;
+import android.view.*;
+import android.widget.*;
+import android.widget.AdapterView.*;
+import com.google.gson.*;
+import com.google.gson.reflect.*;
+import com.meng.biliv3.*;
+import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.fragment.*;
+import com.meng.biliv3.fragment.main.*;
+import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.materialDesign.*;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+import com.meng.biliv3.R;
+
+
+public class MainActivity extends android.support.v7.app.AppCompatActivity {
+
+    public static MainActivity instance;
+    private DrawerLayout mDrawerLayout;
+    public ListView mDrawerList;
+    private RelativeLayout rightDrawer;
+    public ListView lvRecent;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerArrowDrawable drawerArrow;
+
+	public HashMap<String,Fragment> fragments=new HashMap<>();
+    public TextView rightText;
+    public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
+    public Gson gson = new Gson();
+    public ArrayList<AccountInfo> loginAccounts;
+
+    public MainListAdapter mainAccountAdapter;
+
+    public String jsonPath;
+    public String mainDic = "";
+
+    public static boolean onWifi = false;
+	private RecentAdapter recentAdapter;
+
+	public static final String UID="uid";
+	public static final String AV="av";
+	public static final String Live="lv";
+
+	public ExecutorService threadPool = Executors.newCachedThreadPool();
+
+	public Map<String, String> liveHead = new HashMap<>();
+    public Map<String, String> mainHead = new HashMap<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_activity);
+		liveHead.put("Host", "api.live.bilibili.com");
+        liveHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        liveHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        liveHead.put("Connection", "keep-alive");
+        liveHead.put("Origin", "https://live.bilibili.com");
+
+        mainHead.put("Host", "api.bilibili.com");
+        mainHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        mainHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        mainHead.put("Connection", "keep-alive");
+        mainHead.put("Origin", "https://www.bilibili.com");
+
+        instance = this;
+		  ExceptionCatcher.getInstance().init(getApplicationContext());
+        SharedPreferenceHelper.init(getApplicationContext(), "settings");
+        DataBaseHelper.init(getBaseContext());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
+        }
+		//   infoHeaderLeft = new UserInfoHeaderView(this);
+
+		//  mengLiveControl = new MengLiveControl(this);
+        findViews();
+        //   setActionBar();
+        setListener();
+        jsonPath = getApplicationContext().getFilesDir() + "/account.json";
+        File f = new File(jsonPath);
+        if (!f.exists()) {
+            saveConfig();
+		}
+		Type tt=new TypeToken<ArrayList<AccountInfo>>(){}.getType();
+		loginAccounts = gson.fromJson(Tools.FileTool.readString(jsonPath), tt);
+		if (loginAccounts == null) {
+			loginAccounts = new ArrayList<>();
+		}
+        mainAccountAdapter = new MainListAdapter(this);
+        if (SharedPreferenceHelper.getBoolean("opendraw", true)) {
+            mDrawerLayout.openDrawer(mDrawerList);
+        } else {
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }
+        mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
+        File ff = new File(mainDic + "group/");
+        if (!ff.exists()) {
+            ff.mkdirs();
+        }
+        File f2 = new File(mainDic + "user/");
+        if (!f2.exists()) {
+            f2.mkdirs();
+        }
+        File f3 = new File(mainDic + "bilibili/");
+        if (!f3.exists()) {
+            f3.mkdirs();
+        }
+        File f4 = new File(mainDic + ".nomedia");
+        if (!f4.exists()) {
+            try {
+                f4.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
+        onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+    }
+
+    private void setActionBar() {
+        ActionBar ab = getActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 321) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    showToast("缺失权限会使应用工作不正常");
+                } else {
+					//      showFragment(NaiFragment.class);
+                }
+            }
+        }
+    }
+
+    private void setListener() {
+        drawerArrow = new DrawerArrowDrawable(this) {
+            @Override
+            public boolean isLayoutRtl() {
+                return false;
+            }
+        };
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.open, R.string.close) {
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
+															"首页(大概)","输入ID", "管理账号", "设置", "退出"
+														}));
+		recentAdapter = new RecentAdapter();
+        lvRecent.setAdapter(recentAdapter);
+		lvRecent.setOnItemClickListener(new OnItemClickListener(){
+
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+					String s=(String)p1.getAdapter().getItem(p3);
+					showFragment(s);
+					showToast(s);
+				}
+			});
+        mDrawerList.setOnItemClickListener(itemClickListener);
+        lvRecent.setOnItemClickListener(itemClickListener);
+	}
+
+    AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (view instanceof TextView) {
+                switch (((TextView) view).getText().toString()) {
+//                    case "首页(大概)":
+//                        showFragment("Main");
+//                        break;
+					case "输入ID":
+						final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
+						final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
+						new AlertDialog.Builder(MainActivity.this)
+							.setTitle("输入ID")
+							.setView(seView)
+							.setNegativeButton("取消", null)
+							.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									String content = et.getText().toString();
+									RadioButton uid,av,live;
+									//	uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
+									av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
+									live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
+									/*	if (uid.isChecked()) {
+									 newIDFragment(UidFragment.class, UID , getId(content));
+									 } else*/ if (av.isChecked()) {
+										newIDFragment(AvFragment.class, AV , getId(content));
+									} else if (live.isChecked()) {
+										newIDFragment(LiveFragment.class, Live , getId(content));
+									}
+								}
+							}).show();
+						break;
+						  case "管理账号":
+						 showFragment("管理账号");
+						 break;
+						/* case "信息":
+						 showFragment("人员信息");
+						 break;*/
+                    case "设置":
+                        showFragment("设置");
+                        break;
+                    case "退出":
+                        if (SharedPreferenceHelper.getBoolean("exit", false)) {
+                            System.exit(0);
+                        } else {
+                            finish();
+                        }
+                        break;
+                }
+            }
+            mDrawerToggle.syncState();
+            mDrawerLayout.closeDrawer(mDrawerList);
+            mDrawerLayout.closeDrawer(rightDrawer);
+        }
+    };
+
+	private int getId(String s) {
+		String reg = "\\D{0,}(\\d{3,})\\D{0,}";
+		Pattern p2 = Pattern.compile(reg);  
+		Matcher m2 = p2.matcher(s);  
+		int historyHighestLevel = -1;
+		if (m2.find()) {  
+			historyHighestLevel = Integer.parseInt(m2.group(1));
+		}
+		return historyHighestLevel;
+	}
+
+    private void findViews() {
+        rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.navdrawer);
+        rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
+        lvRecent = (ListView) findViewById(R.id.right_list);
+    }
+
+	public <T extends Fragment> T getFragment(String id, Class<T> c) {
+		return (T)fragments.get(id);
+	}
+
+	public void showFragment(String id) {
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		Fragment frag=fragments.get(id);
+		if (frag == null) {
+			switch (id) {
+				case "管理账号":
+					frag = new ManagerFragment();
+					fragments.put(id, frag);
+					break;
+				case "设置":
+					frag = new SettingsFragment();
+					fragments.put(id, frag);
+					break;
+				default:
+					throw new RuntimeException("获取不存在的碎片");
+			}
+			transaction.add(R.id.main_activityLinearLayout, frag);
+		}
+        hideFragment();
+		transaction.show(frag);
+        transaction.commit();
+	}
+
+	public <T extends Fragment> void newIDFragment(Class<T> c, String type, int id) {
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		Fragment frag=null;
+		try {
+			Class<?> cls = Class.forName(c.getName());
+			Constructor con=cls.getConstructor(int.class);
+			frag = (Fragment) con.newInstance(id);
+			fragments.put(type + id, frag);
+			recentAdapter.add(type + id);
+			transaction.add(R.id.main_activityLinearLayout, frag);	
+		} catch (Exception e) {
+			throw new RuntimeException("反射爆炸:" + e.toString());
+		}
+		hideFragment();
+		transaction.show(frag);
+        transaction.commit();
+	}
+
+    public void hideFragment() {
+		FragmentTransaction ft=getFragmentManager().beginTransaction();
+        for (Fragment f : fragments.values()) {
+			ft.hide(f);
+        }
+		ft.commit();
+    }
+
+	public void removeFragment(String id) {
+		if (!fragments.containsKey(id)) {
+			throw new RuntimeException("no such key");
+		}
+		getFragmentManager().beginTransaction().remove(fragments.get(id)).commit();
+		fragments.remove(id);
+
+	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                mDrawerLayout.closeDrawer(mDrawerList);
+            } else {
+                mDrawerLayout.openDrawer(mDrawerList);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public void doVibrate(long time) {
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        if (vibrator != null) {
+            vibrator.vibrate(time);
+        }
+    }
+
+    public String getCookie(long bid) {
+        for (AccountInfo l : loginAccounts) {
+            if (bid == l.uid) {
+                return l.cookie;
+            }
+        }
+        return null;
+    }
+
+	public AccountInfo getAccount(long id) {
+		for (AccountInfo ai:loginAccounts) {
+			if (ai.uid == id) {
+				return ai;
+			}
+		}
+		return null;
+	}
+
+	public AccountInfo getAccount(String name) {
+		for (AccountInfo ai:loginAccounts) {
+			if (ai.name.equals(name)) {
+				return ai;
+			}
+		}
+		return null;
+	}
+
+	public int getAccountIndex(long uid) {
+		for (int i=0;i < loginAccounts.size();++i) {
+			if (loginAccounts.get(i).uid == uid) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/*public int getAccountIndex(String name) {
+	 for (int i=0;i < loginAccounts.size();++i) {
+	 if (loginAccounts.get(i).name.equals(name)) {
+	 return i;
+	 }
+	 }
+	 return -1;
+	 }
+	 */
+    public void saveConfig() {
+        try {
+            FileOutputStream fos = null;
+            OutputStreamWriter writer = null;
+            File file = new File(jsonPath);
+            fos = new FileOutputStream(file);
+            writer = new OutputStreamWriter(fos, "utf-8");
+            writer.write(gson.toJson(loginAccounts));
+            writer.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		saveConfig2();
+    }
+
+	public void saveConfig2() {
+        try {
+            FileOutputStream fos = null;
+            OutputStreamWriter writer = null;
+            File file = new File(Environment.getExternalStorageDirectory() + "/account.json");
+            fos = new FileOutputStream(file);
+            writer = new OutputStreamWriter(fos, "utf-8");
+            writer.write(gson.toJson(loginAccounts));
+            writer.flush();
+            fos.close();
+		} catch (IOException e) {
+            e.printStackTrace();
+		}
+	}
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {
+            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                mDrawerLayout.closeDrawer(mDrawerList);
+            } else {
+                mDrawerLayout.openDrawer(mDrawerList);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void showToast(final String msg) {
+        runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+				}
+			});
+    }
+}
+

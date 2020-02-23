@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<VideoView
+		android:layout_width="fill_parent"
+		android:layout_height="200dp"
+		android:id="@+id/live_fragmentVideoView"/>
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/live_fragmentTextView_info"
+			android:focusable="true"
+			android:longClickable="true"
+			android:textIsSelectable="true"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"/>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/live_fragmentEditText_danmaku"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="6"/>
+
+			<Button
+				android:id="@+id/live_fragmentButton_send"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:text="发送"
+				android:layout_weight="1"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+
+			<Spinner
+				android:id="@+id/live_fragmentSpinner"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.7"/>
+
+			<Button
+				android:id="@+id/live_fragmentButton_preset"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:text="预设"
+				android:layout_weight="1"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<Button
+				android:id="@+id/live_fragmentButton_silver"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:text="发送辣条(瓜子)"
+				android:layout_weight="1.0"/>
+
+			<Button
+				android:id="@+id/live_fragmentButton_pack"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:text="发送礼物(抽奖)"
+				android:layout_weight="1.0"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="签到"
+		android:id="@+id/livefragmentButton_sign"/>
+
+</LinearLayout>
+

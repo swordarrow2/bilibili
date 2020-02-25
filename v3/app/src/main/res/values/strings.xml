@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SJFV3 Beta</string>
+    <string name="app_name">SJFV3</string>
     <string name="open">打开</string>
     <string name="close">关闭</string>
     <string name="user_id">用户ID</string>

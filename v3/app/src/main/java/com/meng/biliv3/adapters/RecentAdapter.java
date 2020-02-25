@@ -15,6 +15,18 @@ public class RecentAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
+	public void remove(String id) {
+//		MainActivity.instance.hideFragment();
+//		MainActivity.instance.removeFragment(id);
+		for (int i=0;i < names.size();++i) {
+			if (names.get(i).equals(id)) {
+				names.remove(i);
+				break;
+			}
+		}
+		notifyDataSetChanged();
+	}
+
     public int getCount() {
         return names.size();
     }
@@ -51,10 +63,7 @@ public class RecentAdapter extends BaseAdapter {
 
 				@Override
 				public void onClick(View p1) {
-					MainActivity.instance.hideFragment();
-					MainActivity.instance.removeFragment(s);
-					names.remove(position);
-					notifyDataSetChanged();
+					remove(s);
 				}
 			});
         return convertView;

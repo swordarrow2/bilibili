@@ -114,6 +114,7 @@ public class UserInfoHeaderView extends LinearLayout {
 
 								@Override
 								public void run() {
+									tvBLive.setVisibility(View.VISIBLE);
 									tvBLive.setText("未开通直播间");
 								}
 							});

@@ -27,6 +27,7 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 
 import com.meng.biliv3.R;
+import com.meng.biliv3.update.*;
 
 
 public class MainActivity extends android.support.v7.app.AppCompatActivity {
@@ -40,7 +41,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     private DrawerArrowDrawable drawerArrow;
 
 	public HashMap<String,Fragment> fragments=new HashMap<>();
-    public TextView rightText;
+    public TextView tvMemory;
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public Gson gson = new Gson();
     public ArrayList<AccountInfo> loginAccounts;
@@ -53,9 +54,11 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
 
-	public static final String UID="uid";
-	public static final String AV="av";
-	public static final String Live="lv";
+	public static final String UID = "uid";
+	public static final String AV = "av";
+	public static final String Live = "lv";
+	public static final String AccountManager = "管理账号";
+	public static final String Settings = "设置";
 
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -79,17 +82,13 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         mainHead.put("Origin", "https://www.bilibili.com");
 
         instance = this;
-		  ExceptionCatcher.getInstance().init(getApplicationContext());
+		ExceptionCatcher.getInstance().init(getApplicationContext());
         SharedPreferenceHelper.init(getApplicationContext(), "settings");
         DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
-		//   infoHeaderLeft = new UserInfoHeaderView(this);
-
-		//  mengLiveControl = new MengLiveControl(this);
         findViews();
-        //   setActionBar();
         setListener();
         jsonPath = getApplicationContext().getFilesDir() + "/account.json";
         File f = new File(jsonPath);
@@ -128,14 +127,11 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                 e.printStackTrace();
             }
         }
+		try {
+			new SanaeConnect().connect();
+		} catch (Exception e) {}
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-    }
-
-    private void setActionBar() {
-        ActionBar ab = getActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeButtonEnabled(true);
     }
 
     @Override
@@ -183,6 +179,39 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 														}));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
+		lvRecent.addHeaderView(tvMemory);
+
+		threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					while (true) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {}
+						runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+									//最大分配内存
+									int memory = activityManager.getMemoryClass();
+									System.out.println("memory:" + memory);
+									//最大分配内存获取方法2
+									float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+									//当前分配的总内存
+									float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+									//剩余内存
+									float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+									System.out.println("maxMemory: " + maxMemory);
+									System.out.println("totalMemory: " + totalMemory);
+									System.out.println("freeMemory: " + freeMemory);
+									tvMemory.setText("\n最大内存:" + maxMemory + "\n当前分配:" + totalMemory + "\n剩余:" + freeMemory);
+								}
+							});
+					}
+				}
+			});
 		lvRecent.setOnItemClickListener(new OnItemClickListener(){
 
 				@Override
@@ -222,21 +251,21 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 									/*	if (uid.isChecked()) {
 									 newIDFragment(UidFragment.class, UID , getId(content));
 									 } else*/ if (av.isChecked()) {
-										newIDFragment(AvFragment.class, AV , getId(content));
+										showFragment(AvFragment.class, AV , getId(content));
 									} else if (live.isChecked()) {
-										newIDFragment(LiveFragment.class, Live , getId(content));
+										showFragment(LiveFragment.class, Live , getId(content));
 									}
 								}
 							}).show();
 						break;
-						  case "管理账号":
-						 showFragment("管理账号");
-						 break;
+					case "管理账号":
+						showFragment(ManagerFragment.class, AccountManager);
+						break;
 						/* case "信息":
 						 showFragment("人员信息");
 						 break;*/
                     case "设置":
-                        showFragment("设置");
+                        showFragment(SettingsFragment.class, Settings);
                         break;
                     case "退出":
                         if (SharedPreferenceHelper.getBoolean("exit", false)) {
@@ -265,52 +294,62 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 	}
 
     private void findViews() {
-        rightText = (TextView) findViewById(R.id.main_activityTextViewRight);
+        tvMemory = new TextView(this);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
         rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
         lvRecent = (ListView) findViewById(R.id.right_list);
     }
 
-	public <T extends Fragment> T getFragment(String id, Class<T> c) {
-		return (T)fragments.get(id);
-	}
-
+	/*public <T extends Fragment> T getFragment(String id, Class<T> c) {
+	 return (T)fragments.get(id);
+	 }
+	 */
 	public void showFragment(String id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		Fragment frag=fragments.get(id);
-		if (frag == null) {
-			switch (id) {
-				case "管理账号":
-					frag = new ManagerFragment();
-					fragments.put(id, frag);
-					break;
-				case "设置":
-					frag = new SettingsFragment();
-					fragments.put(id, frag);
-					break;
-				default:
-					throw new RuntimeException("获取不存在的碎片");
-			}
-			transaction.add(R.id.main_activityLinearLayout, frag);
+		Fragment frag = fragments.get(id);
+		if (frag == null) 	{
+			throw new RuntimeException("获取不存在的碎片");
 		}
-        hideFragment();
+		transaction.add(R.id.main_activityLinearLayout, frag);
+		hideFragment();
+		transaction.show(frag);
+		transaction.commit();
+	}
+
+	public <T extends Fragment> void showFragment(Class<T> c, String type) {
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		Fragment frag = fragments.get(type);
+		if (frag == null) {
+			try {
+				Class<?> cls = Class.forName(c.getName());
+				frag = (Fragment) cls.newInstance();
+				fragments.put(type, frag);
+				recentAdapter.add(type);
+				transaction.add(R.id.main_activityLinearLayout, frag);	
+			} catch (Exception e) {
+				throw new RuntimeException("反射爆炸:" + e.toString());
+			}
+		}
+		hideFragment();
 		transaction.show(frag);
         transaction.commit();
 	}
 
-	public <T extends Fragment> void newIDFragment(Class<T> c, String type, int id) {
+	public <T extends Fragment> void showFragment(Class<T> c, String type, int id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		Fragment frag=null;
-		try {
-			Class<?> cls = Class.forName(c.getName());
-			Constructor con=cls.getConstructor(int.class);
-			frag = (Fragment) con.newInstance(id);
-			fragments.put(type + id, frag);
-			recentAdapter.add(type + id);
-			transaction.add(R.id.main_activityLinearLayout, frag);	
-		} catch (Exception e) {
-			throw new RuntimeException("反射爆炸:" + e.toString());
+		Fragment frag = fragments.get(type + id);
+		if (frag == null) {
+			try {
+				Class<?> cls = Class.forName(c.getName());
+				Constructor con=cls.getConstructor(int.class);
+				frag = (Fragment) con.newInstance(id);
+				fragments.put(type + id, frag);
+				recentAdapter.add(type + id);
+				transaction.add(R.id.main_activityLinearLayout, frag);	
+			} catch (Exception e) {
+				throw new RuntimeException("反射爆炸:" + e.toString());
+			}
 		}
 		hideFragment();
 		transaction.show(frag);
@@ -331,7 +370,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
 		}
 		getFragmentManager().beginTransaction().remove(fragments.get(id)).commit();
 		fragments.remove(id);
-
+		recentAdapter.remove(id);
 	}
 
     @Override
@@ -423,7 +462,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-		saveConfig2();
+		//saveConfig2();
     }
 
 	public void saveConfig2() {

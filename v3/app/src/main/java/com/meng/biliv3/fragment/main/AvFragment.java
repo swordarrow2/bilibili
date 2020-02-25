@@ -138,39 +138,117 @@ public class AvFragment extends Fragment {
 	private OnClickListener onclick=new OnClickListener(){
 
 		@Override
-		public void onClick(View p1) {
-			switch (p1.getId()) {
-				case R.id.av_fragmentButton_preset:
-					ListView naiSentenseListview = new ListView(getActivity());
-					naiSentenseListview.setAdapter(sencencesAdapter);
-					naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
+		public void onClick(final View p1) {
+			if (p1.getId() == R.id.av_fragmentButton_preset) {
+				ListView naiSentenseListview = new ListView(getActivity());
+				naiSentenseListview.setAdapter(sencencesAdapter);
+				naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
-							@Override
-							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								String msg=(String)p1.getAdapter().getItem(p3);
-								sendMsg(msg);
+						@Override
+						public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+							String msg=(String)p1.getAdapter().getItem(p3);
+							sendMsg(msg);
+						}
+					});
+				new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
+				return;
+			}
+
+			final String sel=(String) selectAccount.getSelectedItem();
+			if (sel.equals("每次选择")) {
+				String items[] = new String[MainActivity.instance.loginAccounts.size()];
+				for (int i=0;i < items.length;++i) {
+					items[i] = MainActivity.instance.loginAccounts.get(i).name;
+				}
+				final boolean checkedItems[] = new boolean[items.length];
+				new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+							checkedItems[which] = isChecked;
+						}
+					}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							for (int i = 0; i < checkedItems.length; i++) {
+								if (checkedItems[i]) {
+									final AccountInfo ai = MainActivity.instance.loginAccounts.get(i);
+									MainActivity.instance.threadPool.execute(new Runnable(){
+
+											@Override
+											public void run() {
+												switch (p1.getId()) {
+													case R.id.av_fragmentButton_send:
+														Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
+														break;
+													case R.id.av_fragmentButton_zan:
+														Tools.BilibiliTool.sendLike(id, ai.cookie);
+														break;
+													case R.id.av_fragmentButton_coin1:
+														Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+														break;
+													case R.id.av_fragmentButton_coin2:
+														Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+														break;
+													case R.id.av_fragmentButton_favorite:
+														MainActivity.instance.showToast("未填坑");
+														break;
+												}
+											}
+										});
+								}
 							}
-						});
-					new AlertDialog.Builder(getActivity())
-						.setView(naiSentenseListview)
-						.setTitle("选择预设语句")
-						.setNegativeButton("返回", null).show();
-					break;
-				case R.id.av_fragmentButton_send:
-					sendMsg(et.getText().toString());
-					break;
-				case R.id.av_fragmentButton_zan:
-					sendLike();
-					break;
-				case R.id.av_fragmentButton_coin1:
-					sendCoin(1);
-					break;
-				case R.id.av_fragmentButton_coin2:
-					sendCoin(2);
-					break;
-				case R.id.av_fragmentButton_favorite:
-					MainActivity.instance.showToast("未填坑");
-					break;
+						}
+					}).show();
+			} else if (sel.equals("主账号")) {
+				MainActivity.instance.threadPool.execute(new Runnable(){
+
+						@Override
+						public void run() {
+							AccountInfo ai = MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", "")));
+							switch (p1.getId()) {
+								case R.id.av_fragmentButton_send:
+									Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_zan:
+									Tools.BilibiliTool.sendLike(id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_coin1:
+									Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_coin2:
+									Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_favorite:
+									MainActivity.instance.showToast("未填坑");
+									break;
+							}
+						}
+					});
+			} else {
+				MainActivity.instance.threadPool.execute(new Runnable(){
+
+						@Override
+						public void run() {
+							AccountInfo ai = MainActivity.instance.getAccount(sel);
+							switch (p1.getId()) {
+								case R.id.av_fragmentButton_send:
+									Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_zan:
+									Tools.BilibiliTool.sendLike(id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_coin1:
+									Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_coin2:
+									Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+									break;
+								case R.id.av_fragmentButton_favorite:
+									MainActivity.instance.showToast("未填坑");
+									break;
+							}
+						}
+					});
 			}
 		}
 	};
@@ -220,105 +298,6 @@ public class AvFragment extends Fragment {
 					@Override
 					public void run() {
 						Tools.BilibiliTool.sendVideoJudge(msg, id, MainActivity.instance.getAccount(sel).cookie);
-					}
-				});
-		}
-	}
-	private void sendLike() {
-		final String sel=(String) selectAccount.getSelectedItem();
-		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-			}
-			final boolean checkedItems[] = new boolean[items.length];
-			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-						checkedItems[which] = isChecked;
-					}
-				})
-				.setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						for (int i = 0; i < checkedItems.length; i++) {
-							if (checkedItems[i]) {
-								final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
-								MainActivity.instance.threadPool.execute(new Runnable(){
-
-										@Override
-										public void run() {
-											Tools.BilibiliTool.sendLike(id, ai.cookie);
-										}
-									});
-							}
-						}
-					}
-				}).show();
-		} else if (sel.equals("主账号")) {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendLike(id, MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))).cookie);
-					}
-				});
-		} else {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendLike(id, MainActivity.instance.getAccount(sel).cookie);
-					}
-				});
-		}
-	}
-
-	private void sendCoin(final int count) {
-		final String sel=(String) selectAccount.getSelectedItem();
-		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-			}
-			final boolean checkedItems[] = new boolean[items.length];
-			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-						checkedItems[which] = isChecked;
-					}
-				})
-				.setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						for (int i = 0; i < checkedItems.length; i++) {
-							if (checkedItems[i]) {
-								final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
-								MainActivity.instance.threadPool.execute(new Runnable(){
-
-										@Override
-										public void run() {
-											Tools.BilibiliTool.sendCoin(count, id, ai.cookie);
-										}
-									});
-							}
-						}
-					}
-				}).show();
-		} else if (sel.equals("主账号")) {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendCoin(count, id, MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))).cookie);
-					}
-				});
-		} else {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendCoin(count, id, MainActivity.instance.getAccount(sel).cookie);
 					}
 				});
 		}

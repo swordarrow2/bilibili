@@ -165,43 +165,188 @@ public class LiveFragment extends Fragment {
 	private OnClickListener onclick=new OnClickListener(){
 
 		@Override
-		public void onClick(View p1) {
-			switch (p1.getId()) {
-				case R.id.live_fragmentButton_preset:
-					ListView naiSentenseListview = new ListView(getActivity());
-					naiSentenseListview.setAdapter(sencencesAdapter);
-					naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
+		public void onClick(final View p1) {
+			if (p1.getId() == R.id.live_fragmentButton_preset) {
+				ListView naiSentenseListview = new ListView(getActivity());
+				naiSentenseListview.setAdapter(sencencesAdapter);
+				naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
-							@Override
-							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								String msg=(String)p1.getAdapter().getItem(p3);
-								sendDanmaku(msg);
+						@Override
+						public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+							String msg=(String)p1.getAdapter().getItem(p3);
+							sendDanmaku(msg);
+						}
+					});
+				new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
+				return;
+			}
+			final String sel=(String) selectAccount.getSelectedItem();
+			if (sel.equals("每次选择")) {
+				String items[] = new String[MainActivity.instance.loginAccounts.size()];
+				for (int i=0;i < items.length;++i) {
+					items[i] = MainActivity.instance.loginAccounts.get(i).name;
+				}
+				final boolean checkedItems[] = new boolean[items.length];
+				new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+							checkedItems[which] = isChecked;
+						}
+					}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							for (int i = 0; i < checkedItems.length; i++) {
+								if (checkedItems[i]) {
+									final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
+									MainActivity.instance.threadPool.execute(new Runnable(){
+
+											@Override
+											public void run() {
+												switch (p1.getId()) {
+													case R.id.live_fragmentButton_send:
+														Tools.BilibiliTool.sendLiveDanmaku(et.getText().toString(), ai.cookie, id);
+														break;
+													case R.id.live_fragmentButton_silver:
+														MainActivity.instance.runOnUiThread(new Runnable(){
+
+																@Override
+																public void run() {
+																	final EditText editText = new EditText(getActivity());
+																	new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+																			@Override
+																			public void onClick(DialogInterface dialog, int which) {
+																				MainActivity.instance.threadPool.execute(new Runnable(){
+
+																						@Override
+																						public void run() {
+																							String content = editText.getText().toString();
+																							JsonObject liveToMainInfo=null;
+																							try {
+																								liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+																							} catch (Exception e) {
+																								return;
+																							}
+																							long uid=liveToMainInfo.get("uid").getAsLong();
+																							Tools.BilibiliTool.sendHotStrip(ai.uid, uid, id, Integer.parseInt(content), ai.cookie);
+
+																						}
+																					});
+																			}
+																		}).show();
+																}
+															});
+														break;
+													case R.id.live_fragmentButton_pack:
+														sendPackDialog(ai);
+														break;
+													case R.id.livefragmentButton_sign:
+														Tools.BilibiliTool.sendLiveSign(ai.cookie);
+														break;
+												}
+											}
+										});
+								}
 							}
-						});
-					new AlertDialog.Builder(getActivity())
-						.setView(naiSentenseListview)
-						.setTitle("选择预设语句")
-						.setNegativeButton("返回", null).show();
-					break;
-				case R.id.live_fragmentButton_send:
-					sendDanmaku(et.getText().toString());
-					break;
-				case R.id.live_fragmentButton_silver:
-					final EditText editText = new EditText(getActivity());
-					new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								String content = editText.getText().toString();
-								sendHotStrip(Integer.parseInt(content));
+						}
+					}).show();
+			} else if (sel.equals("主账号")) {
+				MainActivity.instance.threadPool.execute(new Runnable(){
+
+						@Override
+						public void run() {
+							final AccountInfo ai=MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", "")));
+							switch (p1.getId()) {
+								case R.id.live_fragmentButton_send:
+									Tools.BilibiliTool.sendLiveDanmaku(et.getText().toString(), ai.cookie, id);
+									break;
+								case R.id.live_fragmentButton_silver:
+									MainActivity.instance.runOnUiThread(new Runnable(){
+
+											@Override
+											public void run() {
+												final EditText editText = new EditText(getActivity());
+												new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+														@Override
+														public void onClick(DialogInterface dialog, int which) {
+															MainActivity.instance.threadPool.execute(new Runnable(){
+
+																	@Override
+																	public void run() {
+																		String content = editText.getText().toString();
+																		JsonObject liveToMainInfo=null;
+																		try {
+																			liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+																		} catch (Exception e) {
+																			return;
+																		}
+																		long uid=liveToMainInfo.get("uid").getAsLong();
+																		Tools.BilibiliTool.sendHotStrip(ai.uid, uid, id, Integer.parseInt(content), ai.cookie);
+																	}
+																});
+														}
+													}).show();
+											}
+										});
+									break;
+								case R.id.live_fragmentButton_pack:
+									sendPackDialog(ai);
+									break;
+								case R.id.livefragmentButton_sign:
+									Tools.BilibiliTool.sendLiveSign(ai.cookie);
+									break;
 							}
-						}).show();
-					break;
-				case R.id.live_fragmentButton_pack:
-					sendPackGift();
-					break;
-				case R.id.livefragmentButton_sign:
-					sendSign();
-					break;
+
+						}
+					});
+			} else {
+				MainActivity.instance.threadPool.execute(new Runnable(){
+
+						@Override
+						public void run() {
+							final AccountInfo ai=MainActivity.instance.getAccount(sel);
+							switch (p1.getId()) {
+								case R.id.live_fragmentButton_send:
+									Tools.BilibiliTool.sendLiveDanmaku(et.getText().toString(), ai.cookie, id);
+									break;
+								case R.id.live_fragmentButton_silver:
+									MainActivity.instance.runOnUiThread(new Runnable(){
+
+											@Override
+											public void run() {
+												final EditText editText = new EditText(getActivity());
+												new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+														@Override
+														public void onClick(DialogInterface dialog, int which) {
+															MainActivity.instance.threadPool.execute(new Runnable(){
+
+																	@Override
+																	public void run() {
+																		String content = editText.getText().toString();
+																		JsonObject liveToMainInfo=null;
+																		try {
+																			liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+																		} catch (Exception e) {
+																			return;
+																		}
+																		long uid=liveToMainInfo.get("uid").getAsLong();
+																		Tools.BilibiliTool.sendHotStrip(ai.uid, uid, id, Integer.parseInt(content), ai.cookie);
+																	}
+																});
+														}
+													}).show();
+											}
+										});
+									break;
+								case R.id.live_fragmentButton_pack:
+									sendPackDialog(ai);
+									break;
+								case R.id.livefragmentButton_sign:
+									Tools.BilibiliTool.sendLiveSign(ai.cookie);
+									break;
+							}
+
+						}
+					});
 			}
 		}
 	};
@@ -250,57 +395,6 @@ public class LiveFragment extends Fragment {
 					@Override
 					public void run() {
 						Tools.BilibiliTool.sendLiveDanmaku(msg, MainActivity.instance.getAccount(sel).cookie, id);
-					}
-				});
-		}
-	}
-
-	private void sendSign() {
-		final String sel=(String) selectAccount.getSelectedItem();
-		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-			}
-			final boolean checkedItems[] = new boolean[items.length];
-			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-						checkedItems[which] = isChecked;
-					}
-				}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						for (int i = 0; i < checkedItems.length; i++) {
-							if (checkedItems[i]) {
-								final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
-								MainActivity.instance.threadPool.execute(new Runnable(){
-
-										@Override
-										public void run() {
-											Tools.BilibiliTool.sendLiveSign(ai.cookie);
-										}
-									});
-							}
-						}
-					}
-				}).show();
-		} else if (sel.equals("主账号")) {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						AccountInfo ai=MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", "")));
-						Tools.BilibiliTool.sendLiveSign(ai.cookie);
-					}
-				});
-		} else {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						AccountInfo ai=MainActivity.instance.getAccount(sel);
-						Tools.BilibiliTool.sendLiveSign(ai.cookie);
 					}
 				});
 		}
@@ -378,49 +472,7 @@ public class LiveFragment extends Fragment {
 		}
 	}
 
-	private void sendPackGift() {
-		final String sel=(String) selectAccount.getSelectedItem();
-		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-			}
-			ListView lvAccount = new ListView(getActivity());
-			lvAccount.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items));
-			lvAccount.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> p1, View p2, final int p3, long p4) {
-						MainActivity.instance.threadPool.execute(new Runnable(){
 
-								@Override
-								public void run() {
-									AccountInfo ai=MainActivity.instance.loginAccounts.get(p3);
-									sendPackDialog(ai);
-								}
-							});
-					}
-				});
-			new AlertDialog.Builder(getActivity()).setView(lvAccount).setTitle("选择账号").setNegativeButton("返回", null).show();
-		} else if (sel.equals("主账号")) {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						AccountInfo ai=MainActivity.instance.loginAccounts.get(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", "")));
-						sendPackDialog(ai);
-					}
-				});
-		} else {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						AccountInfo ai=MainActivity.instance.getAccount(sel);
-						sendPackDialog(ai);
-					}
-				});
-		}
-	}
 
 	private void sendPackDialog(final AccountInfo ai) {
 		JsonObject liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();

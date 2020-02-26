@@ -1,6 +1,7 @@
 package com.meng.biliv3.fragment.main;
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
@@ -16,10 +17,14 @@ import java.util.*;
 import org.jsoup.*;
 
 import android.view.View.OnClickListener;
-import android.graphics.*;
 
 public class AvFragment extends Fragment {
 
+	public static final int SendJudge=0;
+	public static final int Zan=1;
+	public static final int Coin1=2;
+	public static final int Coin2=3;
+	public static final int Favorite=4;
 
 	private Button send,editPre,preset,zan,coin1,coin2,favorite;
 	private EditText et;
@@ -139,121 +144,39 @@ public class AvFragment extends Fragment {
 
 		@Override
 		public void onClick(final View p1) {
-			if (p1.getId() == R.id.av_fragmentButton_preset) {
-				ListView naiSentenseListview = new ListView(getActivity());
-				naiSentenseListview.setAdapter(sencencesAdapter);
-				naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
+			switch (p1.getId()) {
+				case R.id.av_fragmentButton_preset:
+					ListView naiSentenseListview = new ListView(getActivity());
+					naiSentenseListview.setAdapter(sencencesAdapter);
+					naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
-						@Override
-						public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-							String msg=(String)p1.getAdapter().getItem(p3);
-							sendMsg(msg);
-						}
-					});
-				new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
-				return;
-			}
-
-			final String sel=(String) selectAccount.getSelectedItem();
-			if (sel.equals("每次选择")) {
-				String items[] = new String[MainActivity.instance.loginAccounts.size()];
-				for (int i=0;i < items.length;++i) {
-					items[i] = MainActivity.instance.loginAccounts.get(i).name;
-				}
-				final boolean checkedItems[] = new boolean[items.length];
-				new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-							checkedItems[which] = isChecked;
-						}
-					}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							for (int i = 0; i < checkedItems.length; i++) {
-								if (checkedItems[i]) {
-									final AccountInfo ai = MainActivity.instance.loginAccounts.get(i);
-									MainActivity.instance.threadPool.execute(new Runnable(){
-
-											@Override
-											public void run() {
-												switch (p1.getId()) {
-													case R.id.av_fragmentButton_send:
-														Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
-														break;
-													case R.id.av_fragmentButton_zan:
-														Tools.BilibiliTool.sendLike(id, ai.cookie);
-														break;
-													case R.id.av_fragmentButton_coin1:
-														Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
-														break;
-													case R.id.av_fragmentButton_coin2:
-														Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
-														break;
-													case R.id.av_fragmentButton_favorite:
-														MainActivity.instance.showToast("未填坑");
-														break;
-												}
-											}
-										});
-								}
+							@Override
+							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+								sendBili(SendJudge, (String)p1.getAdapter().getItem(p3));
 							}
-						}
-					}).show();
-			} else if (sel.equals("主账号")) {
-				MainActivity.instance.threadPool.execute(new Runnable(){
-
-						@Override
-						public void run() {
-							AccountInfo ai = MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", "")));
-							switch (p1.getId()) {
-								case R.id.av_fragmentButton_send:
-									Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_zan:
-									Tools.BilibiliTool.sendLike(id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_coin1:
-									Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_coin2:
-									Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_favorite:
-									MainActivity.instance.showToast("未填坑");
-									break;
-							}
-						}
-					});
-			} else {
-				MainActivity.instance.threadPool.execute(new Runnable(){
-
-						@Override
-						public void run() {
-							AccountInfo ai = MainActivity.instance.getAccount(sel);
-							switch (p1.getId()) {
-								case R.id.av_fragmentButton_send:
-									Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_zan:
-									Tools.BilibiliTool.sendLike(id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_coin1:
-									Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_coin2:
-									Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
-									break;
-								case R.id.av_fragmentButton_favorite:
-									MainActivity.instance.showToast("未填坑");
-									break;
-							}
-						}
-					});
+						});
+					new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
+					break;
+				case R.id.av_fragmentButton_send:
+					sendBili(SendJudge, et.getText().toString());
+					break;
+				case R.id.av_fragmentButton_zan:
+					sendBili(Zan, "");
+					break;
+				case R.id.av_fragmentButton_coin1:
+					sendBili(Coin1, "");
+					break;
+				case R.id.av_fragmentButton_coin2:
+					sendBili(Coin2, "");
+					break;
+				case R.id.av_fragmentButton_favorite:
+					sendBili(Favorite, "");
+					break;
 			}
 		}
 	};
 
-	private void sendMsg(final String msg) {
+	private void sendBili(final int opValue, final String msg) {
 		final String sel=(String) selectAccount.getSelectedItem();
 		if (sel.equals("每次选择")) {
 			String items[] = new String[MainActivity.instance.loginAccounts.size()];
@@ -266,43 +189,46 @@ public class AvFragment extends Fragment {
 					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 						checkedItems[which] = isChecked;
 					}
-				})
-				.setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						for (int i = 0; i < checkedItems.length; i++) {
 							if (checkedItems[i]) {
-								final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
-								MainActivity.instance.threadPool.execute(new Runnable(){
-
-										@Override
-										public void run() {
-											Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
-										}
-									});
+								opSwitch(MainActivity.instance.loginAccounts.get(i), opValue, msg);
 							}
 						}
 					}
 				}).show();
-		} else if (sel.equals("主账号")) {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendVideoJudge(msg, id, MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))).cookie);
-					}
-				});
 		} else {
-			MainActivity.instance.threadPool.execute(new Runnable(){
-
-					@Override
-					public void run() {
-						Tools.BilibiliTool.sendVideoJudge(msg, id, MainActivity.instance.getAccount(sel).cookie);
-					}
-				});
+			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))): MainActivity.instance.getAccount(sel), opValue, msg);
 		}
 	}
 
+	private void opSwitch(final AccountInfo ai, final int opValue, final String msg) {
+		MainActivity.instance.threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					switch (opValue) {
+						case SendJudge:
+							Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
+							break;
+						case Zan:
+							Tools.BilibiliTool.sendLike(id, ai.cookie);
+							break;
+						case Coin1:
+							Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+							break;
+						case Coin2:
+							Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+							break;
+						case Favorite:
+							MainActivity.instance.showToast("未填坑");
+							break;
+					}
+				}
+			});
+	}
 //	private void sendFavorite() {
 //		final String sel=(String) selectAccount.getSelectedItem();
 //		if (sel.equals("每次选择")) {

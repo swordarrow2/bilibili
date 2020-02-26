@@ -100,5 +100,12 @@
 
 	</LinearLayout>
 
+	<Button
+		android:visibility="gone"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="从弹幕查找发送者"
+		android:id="@+id/avfragmentButtonGetDanmakuSender"/>
+
 </LinearLayout>
 

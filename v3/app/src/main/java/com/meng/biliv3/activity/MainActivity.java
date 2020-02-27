@@ -16,10 +16,10 @@ import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.fragment.*;
-import com.meng.biliv3.fragment.main.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
 import com.meng.biliv3.materialDesign.*;
+import com.meng.biliv3.update.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -27,10 +27,9 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 
 import com.meng.biliv3.R;
-import com.meng.biliv3.update.*;
 
 
-public class MainActivity extends android.support.v7.app.AppCompatActivity {
+public class MainActivity extends Activity {
 
     public static MainActivity instance;
     private DrawerLayout mDrawerLayout;

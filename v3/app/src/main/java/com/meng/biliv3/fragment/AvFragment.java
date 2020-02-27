@@ -1,13 +1,12 @@
-package com.meng.biliv3.fragment.main;
+package com.meng.biliv3.fragment;
 import android.app.*;
-import android.content.*;
 import android.graphics.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
@@ -15,29 +14,17 @@ import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
 import java.util.*;
 import org.jsoup.*;
+import org.xmlpull.v1.*;
 
 import android.view.View.OnClickListener;
 
-public class AvFragment extends Fragment {
+public class AvFragment extends BaseIdFragment {
 
-	public static final int SendJudge=0;
-	public static final int Zan=1;
-	public static final int Coin1=2;
-	public static final int Coin2=3;
-	public static final int Favorite=4;
-
-	private Button send,editPre,preset,zan,coin1,coin2,favorite;
+	private Button send,editPre,preset,zan,coin1,coin2,favorite,findSender;
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
-	private int id;
-
-	private CustomSentence customSentence;
-	private File customSentenseFile;
-
-	private static ArrayAdapter<String> sencencesAdapter=null;
-	private static ArrayList<String> spList=null;
-
+	private VideoInfoBean videoInfo;
 	private ImageView ivPreview;
 
 	public AvFragment(int liveId) {
@@ -52,19 +39,11 @@ public class AvFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		customSentenseFile = new File(Environment.getExternalStorageDirectory() + "/sjf.json");
-		if (customSentenseFile.exists()) {
-			customSentence = new Gson().fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
-		} else {
-			customSentence = new CustomSentence();
-			String[] strings = new String[]{ "此生无悔入东方,来世愿生幻想乡","红魔地灵夜神雪,永夜风神星莲船","非想天则文花贴,萃梦神灵绯想天","冥界地狱异变起,樱下华胥主谋现","净罪无改渡黄泉,华鸟风月是非辨","境界颠覆入迷途,幻想花开啸风弄","二色花蝶双生缘,前缘未尽今生还","星屑洒落雨霖铃,虹彩彗光银尘耀","无寿迷蝶彼岸归,幻真如画妖如月","永劫夜宵哀伤起,幼社灵中幻似梦","追忆往昔巫女缘,须弥之间冥梦现","仁榀华诞井中天,歌雅风颂心无念" };
-			customSentence.sent.addAll(Arrays.asList(strings));
-			saveConfig();
-		}
+
 		send = (Button) view.findViewById(R.id.av_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
-
+		findSender = (Button) view.findViewById(R.id.avfragmentButtonGetDanmakuSender);
 		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
 		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
 		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
@@ -74,9 +53,7 @@ public class AvFragment extends Fragment {
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.av_fragmentSpinner);
-		if (sencencesAdapter == null) {
-			sencencesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent);
-		}
+
 		preset.setOnClickListener(onclick);
 		zan.setOnClickListener(onclick);
 		coin1.setOnClickListener(onclick);
@@ -84,33 +61,26 @@ public class AvFragment extends Fragment {
 		favorite.setOnClickListener(onclick);
 		send.setOnClickListener(onclick);
 		//editPre.setOnClickListener(onclick);
-		if (spList == null) {
-			spList = new ArrayList<>();
-			spList.add("每次选择");
-			spList.add("主账号");
-			for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-				spList.add(ai.name);
-			}
-		}
-		selectAccount.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, spList));
+		findSender.setOnClickListener(onclick);
+		selectAccount.setAdapter(spinnerAccountAdapter);
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
 				public void run() {
-					final VideoInfoBean infoBean=MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfoBean.class);	
-					if (infoBean.code != 0) {
-						MainActivity.instance.showToast(infoBean.message);
+					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfoBean.class);	
+					if (videoInfo.code != 0) {
+						MainActivity.instance.showToast(videoInfo.message);
 						return;
 					}
 					getActivity().runOnUiThread(new Runnable(){
 
 							@Override
 							public void run() {
-								info.setText(infoBean.toString());
+								info.setText(videoInfo.toString());
 							}
 						});
 					try {
-						Connection.Response response = Jsoup.connect(infoBean.data.pic).ignoreContentType(true).execute();
+						Connection.Response response = Jsoup.connect(videoInfo.data.pic).ignoreContentType(true).execute();
 						byte[] img = response.bodyAsBytes();
 						final Bitmap bmp=BitmapFactory.decodeByteArray(img, 0, img.length);
 						getActivity().runOnUiThread(new Runnable(){
@@ -128,18 +98,6 @@ public class AvFragment extends Fragment {
 			});
 	}
 
-	private void saveConfig() {
-        try {
-			FileOutputStream fos = new FileOutputStream(customSentenseFile);
-            OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(new Gson().toJson(customSentence));
-            writer.flush();
-            fos.close();
-		} catch (IOException e) {
-            throw new RuntimeException(customSentenseFile.getAbsolutePath() + " not found");
-		}
-	}
-
 	private OnClickListener onclick=new OnClickListener(){
 
 		@Override
@@ -152,83 +110,122 @@ public class AvFragment extends Fragment {
 
 							@Override
 							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								sendBili(SendJudge, (String)p1.getAdapter().getItem(p3));
+								sendBili((String) selectAccount.getSelectedItem(), SendJudge, (String)p1.getAdapter().getItem(p3));
 							}
 						});
 					new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
 					break;
 				case R.id.av_fragmentButton_send:
-					sendBili(SendJudge, et.getText().toString());
+					sendBili((String) selectAccount.getSelectedItem(), SendJudge, et.getText().toString());
 					break;
 				case R.id.av_fragmentButton_zan:
-					sendBili(Zan, "");
+					sendBili((String) selectAccount.getSelectedItem(), Zan, "");
 					break;
 				case R.id.av_fragmentButton_coin1:
-					sendBili(Coin1, "");
+					sendBili((String) selectAccount.getSelectedItem(), Coin1, "");
 					break;
 				case R.id.av_fragmentButton_coin2:
-					sendBili(Coin2, "");
+					sendBili((String) selectAccount.getSelectedItem(), Coin2, "");
 					break;
 				case R.id.av_fragmentButton_favorite:
-					sendBili(Favorite, "");
+					sendBili((String) selectAccount.getSelectedItem(), Favorite, "");
+					break;
+				case R.id.avfragmentButtonGetDanmakuSender:
+					MainActivity.instance.threadPool.execute(new Runnable(){
+
+							@Override
+							public void run() {
+								try {
+									boom();
+								} catch (IOException e) {}
+								MainActivity.instance.showToast("bomb");
+							}
+						});
 					break;
 			}
 		}
 	};
 
-	private void sendBili(final int opValue, final String msg) {
-		final String sel=(String) selectAccount.getSelectedItem();
-		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-			}
-			final boolean checkedItems[] = new boolean[items.length];
-			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-						checkedItems[which] = isChecked;
-					}
-				}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						for (int i = 0; i < checkedItems.length; i++) {
-							if (checkedItems[i]) {
-								opSwitch(MainActivity.instance.loginAccounts.get(i), opValue, msg);
-							}
+	private void boom() throws IOException {
+		int cid=videoInfo.data.pages.get(0).cid;
+		Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
+		FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
+		out.write(response.bodyAsBytes());           
+		out.close();
+        InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
+        XmlPullParser xp = Xml.newPullParser();
+
+		ArrayList<String> list=new ArrayList<>();
+        try {
+            xp.setInput(is, "utf-i");
+            //获取当前节点的事件类型，通过事件类型的判断，我们可以知道当前节点是什么节点，从而确定我们应该做什么操作
+            //解析是一行一行的解析的，
+            int type = xp.getEventType();
+                    while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
+                switch (type) {
+					case XmlPullParser.START_TAG://开始节点
+						// 获取当前节点的名字
+						if (xp.getName().equals("d")) {
+							String danmaku=xp.nextText();
+					//		String p=xp.nextToken();
+							} 
+						break;
+					/*case XmlPullParser.END_TAG://结束节点,<name>QQ</name>遇到</name>什么都不做，遇到QQ文本节点什么都不做，
+						if ("city".equals(xp.getName())) {
+							//把city的javabean放入集合中
+							cityList.add(city);
 						}
-					}
-				}).show();
-		} else {
-			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))): MainActivity.instance.getAccount(sel), opValue, msg);
+						break;*/
+				}
+			}
+		} catch (Exception e) {
+
 		}
 	}
 
-	private void opSwitch(final AccountInfo ai, final int opValue, final String msg) {
-		MainActivity.instance.threadPool.execute(new Runnable(){
 
-				@Override
-				public void run() {
-					switch (opValue) {
-						case SendJudge:
-							Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
-							break;
-						case Zan:
-							Tools.BilibiliTool.sendLike(id, ai.cookie);
-							break;
-						case Coin1:
-							Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
-							break;
-						case Coin2:
-							Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
-							break;
-						case Favorite:
-							MainActivity.instance.showToast("未填坑");
-							break;
-					}
-				}
-			});
-	}
+	/*
+
+	 //1.获取cid
+	 //2.http://comment.bilibili.com/[cid].xml
+	 //3
+	 <d p="1.29800,1,25,16777215,1535026933,0,40e132dc,4133884241903620">帅气的曲风！！！！</d>
+
+	 p标签里内容，介绍
+
+	 1.29800, 为弹幕播放起始时间 （在视频中出现的时间，单位是秒）
+
+	 第二个参数是弹幕的模式1..3 滚动弹幕 4底端弹幕 5顶端弹幕 6.逆向弹幕 7精准定位 8高级弹幕 
+
+	 第三个参数是字号， 12非常小,16特小,18小,25中,36大,45很大,64特别大 
+	 第四个参数是字体的颜色以HTML颜色的十进制为准 
+	 第五个参数是Unix格式的时间戳。基准时间为 1970-1-1 08:00:00 
+	 第六个参数是弹幕池 0普通池 1字幕池 2特殊池【目前特殊池为高级弹幕专用】 
+	 第七个参数是发送者的ID，用于“屏蔽此弹幕的发送者”功能 
+	 第八个参数是弹幕在弹幕数据库中rowID 用于“历史弹幕”功能。
+
+	 //4 https://space.bilibili.com/ + uid
+	 //http://biliquery.typcn.com/api/user/hash/40e132dc
+	 //获取结果为：{"error":0,"data":[{"id":30847042}]}
+
+	 CRC32 crc32 = new CRC32();
+	 //crc32.update("30847042".getBytes());
+	 long v=Long.parseLong("40e132dc", 16);
+	 for (int i=10000000;i < 80000000;++i) {
+	 crc32.update(String.valueOf(i).getBytes());
+	 if (crc32.getValue() == v) {
+	 System.out.println("uid:" + i);
+	 break;
+	 }
+	 if (i % 1000000 == 0) {
+	 System.out.println(i);
+	 }
+	 crc32.reset();
+	 }
+
+
+	 */
+
 //	private void sendFavorite() {
 //		final String sel=(String) selectAccount.getSelectedItem();
 //		if (sel.equals("每次选择")) {

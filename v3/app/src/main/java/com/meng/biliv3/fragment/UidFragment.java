@@ -1,4 +1,4 @@
-package com.meng.biliv3.fragment.main;
+package com.meng.biliv3.fragment;
 import android.app.*;
 import android.os.*;
 import android.view.*;

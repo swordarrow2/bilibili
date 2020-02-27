@@ -1,11 +1,8 @@
-package com.meng.biliv3.fragment.main;
+package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.content.*;
-import android.net.*;
-import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.google.gson.*;
@@ -17,43 +14,33 @@ import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import android.os.*;
 
-import android.view.View.OnClickListener;
+public class BaseIdFragment extends Fragment {
 
-public class LiveFragment extends Fragment {
+	protected static final int SendDanmaku=0;
+	protected static final int Silver=1;
+	protected static final int Pack=2;
+	protected static final int Sign=3;
+	protected static final int SendJudge=4;
+	protected static final int Zan=5;
+	protected static final int Coin1=6;
+	protected static final int Coin2=7;
+	protected static final int Favorite=8;
 
-	public static final int SendDanmaku=0;
-	public static final int Silver=1;
-	public static final int Pack=2;
-	public static final int Sign=3;
+	protected int id;
 
-	private Uri uri;
-	private VideoView videoView;
-	private Button send,editPre,preset,silver,pack,sign;
-	private EditText et;
-	private TextView info;
-	private Spinner selectAccount;
-	private int id;
-
-	private CustomSentence customSentence;
-	private File customSentenseFile;
-
-	private static ArrayAdapter<String> sencencesAdapter=null;
+	protected static ArrayAdapter<String> sencencesAdapter=null;
+	protected static ArrayAdapter<String> spinnerAccountAdapter=null;
 	private static ArrayList<String> spList=null;
-	public LiveFragment(int liveId) {
-		id = liveId;
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.live_fragment, container, false);
-	}
+	private static CustomSentence customSentence;
+	private static File customSentenseFile;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		customSentenseFile = new File(Environment.getExternalStorageDirectory() + "/sjf.json");
-		if (customSentenseFile.exists()) {
+		if (customSentenseFile.exists() && customSentence != null) {
 			customSentence = new Gson().fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
 		} else {
 			customSentence = new CustomSentence();
@@ -61,27 +48,6 @@ public class LiveFragment extends Fragment {
 			customSentence.sent.addAll(Arrays.asList(strings));
 			saveConfig();
 		}
-		send = (Button) view.findViewById(R.id.live_fragmentButton_send);
-		silver = (Button) view.findViewById(R.id.live_fragmentButton_silver);
-		pack = (Button) view.findViewById(R.id.live_fragmentButton_pack);
-		sign = (Button) view.findViewById(R.id.livefragmentButton_sign);
-		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
-		preset = (Button) view.findViewById(R.id.live_fragmentButton_preset);
-		et = (EditText) view.findViewById(R.id.live_fragmentEditText_danmaku);
-		videoView = (VideoView) view.findViewById(R.id.live_fragmentVideoView);  
-		info = (TextView) view.findViewById(R.id.live_fragmentTextView_info);
-		selectAccount = (Spinner) view.findViewById(R.id.live_fragmentSpinner);
-
-		videoView.setMediaController(new MediaController(getActivity()));
-		if (sencencesAdapter == null) {
-			sencencesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent);
-		}
-		preset.setOnClickListener(onclick);
-		send.setOnClickListener(onclick);
-		silver.setOnClickListener(onclick);
-		pack.setOnClickListener(onclick);
-		sign.setOnClickListener(onclick);
-		//editPre.setOnClickListener(onclick);
 		if (spList == null) {
 			spList = new ArrayList<>();
 			spList.add("每次选择");
@@ -90,118 +56,15 @@ public class LiveFragment extends Fragment {
 				spList.add(ai.name);
 			}
 		}
-		selectAccount.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, spList));
-		MainActivity.instance.threadPool.execute(new Runnable(){
-
-				@Override
-				public void run() {
-					JsonParser parser = new JsonParser();
-					JsonObject obj = parser.parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
-					if (obj.get("code").getAsInt() == 19002003) {
-						MainActivity.instance.showToast("不存在的房间");
-						return;
-					}
-					final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-					getActivity().runOnUiThread(new Runnable(){
-
-							@Override
-							public void run() {
-								uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-								videoView.setVideoURI(uri);  
-								//videoView.start();  
-								videoView.requestFocus();
-							}
-						});
-					JsonObject liveToMainInfo=null;
-					try {
-						liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
-					} catch (Exception e) {
-						return;
-					}
-					long uid=liveToMainInfo.get("uid").getAsLong();
-					final String uname=liveToMainInfo.get("uname").getAsString();
-					final SpaceToLiveJavaBean sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), SpaceToLiveJavaBean.class);
-                    if (sjb.data.liveStatus != 1) {
-						getActivity().runOnUiThread(new Runnable(){
-
-								@Override
-								public void run() {
-									info.setText("房间号:" + id + "\n主播:" + uname + "\n未直播");
-								}
-							});
-						return;
-					} else {
-						getActivity().runOnUiThread(new Runnable(){
-
-								@Override
-								public void run() {
-									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
-								}
-							});
-					}
-					/*	String html = Tools.Network.getSourceCode("https://live.bilibili.com/" + id);
-					 String jsonInHtml = html.substring(html.indexOf("{\"roomInitRes\":"), html.lastIndexOf("}") + 1);
-					 final JsonObject data = new JsonParser().parse(jsonInHtml).getAsJsonObject().get("baseInfoRes").getAsJsonObject().get("data").getAsJsonObject();
-					 getActivity().runOnUiThread(new Runnable(){
-
-					 @Override
-					 public void run() {
-					 info.setText("房间号:" + id + "\n主播:" + uname + "\n房间标题:" + data.get("title").getAsString() +
-					 "\n分区:" + data.get("parent_area_name").getAsString() + "-" + data.get("area_name").getAsString() +
-					 "\n标签:" + data.get("tags").getAsString());
-					 }
-					 });	*/
-				}
-			});
-	}
-
-	private void saveConfig() {
-        try {
-			FileOutputStream fos = new FileOutputStream(customSentenseFile);
-            OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(new Gson().toJson(customSentence));
-            writer.flush();
-            fos.close();
-		} catch (IOException e) {
-            throw new RuntimeException(customSentenseFile.getAbsolutePath() + " not found");
+		if (spinnerAccountAdapter == null) {
+			spinnerAccountAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, spList);
+		}
+		if (sencencesAdapter == null) {
+			sencencesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent);
 		}
 	}
 
-	private OnClickListener onclick=new OnClickListener(){
-
-		@Override
-		public void onClick(final View p1) {
-			switch (p1.getId()) {
-				case R.id.live_fragmentButton_preset:
-					ListView naiSentenseListview = new ListView(getActivity());
-					naiSentenseListview.setAdapter(sencencesAdapter);
-					naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
-
-							@Override
-							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								sendBili(SendDanmaku, (String)p1.getAdapter().getItem(p3));
-							}
-						});
-					new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
-					break;
-				case R.id.live_fragmentButton_send:
-					sendBili(SendDanmaku, et.getText().toString());
-					break;
-				case R.id.live_fragmentButton_pack:
-					sendBili(Pack, "");
-					break;
-				case R.id.live_fragmentButton_silver:
-					sendBili(Silver, "");
-					break;
-				case R.id.livefragmentButton_sign:
-					sendBili(Sign, "");
-					break;
-			}
-		}
-	};
-
-	private void sendBili(final int opValue, final String msg) {
-		final String sel=(String) selectAccount.getSelectedItem();
+	protected void sendBili(final String sel, final int opValue, final String msg) {
 		if (sel.equals("每次选择")) {
 			String items[] = new String[MainActivity.instance.loginAccounts.size()];
 			for (int i=0;i < items.length;++i) {
@@ -272,6 +135,21 @@ public class LiveFragment extends Fragment {
 						case Sign:
 							Tools.BilibiliTool.sendLiveSign(ai.cookie);
 							break;
+						case SendJudge:
+							Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
+							break;
+						case Zan:
+							Tools.BilibiliTool.sendLike(id, ai.cookie);
+							break;
+						case Coin1:
+							Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+							break;
+						case Coin2:
+							Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+							break;
+						case Favorite:
+							MainActivity.instance.showToast("未填坑");
+							break;
 					}
 				}
 			});
@@ -291,12 +169,7 @@ public class LiveFragment extends Fragment {
 					ListView listView=new ListView(getActivity());
 					final GiftAdapter giftAdapter = new GiftAdapter(getActivity(), liveBag.data.list);
 					listView.setAdapter(giftAdapter);
-					int ii=0;
-					for (GiftBag.ListItem i:liveBag.data.list) {
-						if (i.gift_name.equals("辣条")) {
-							ii += i.gift_num;
-						}
-					}
+					int ii=getStripCount(liveBag.data.list);
 					MainActivity.instance.showToast("共有" + ii + "辣条");
 					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 							@Override
@@ -336,7 +209,6 @@ public class LiveFragment extends Fragment {
 																	liveBag.data.list.remove(i);
 																}
 															}										
-
 															getActivity().runOnUiThread(new Runnable() {
 																	@Override
 																	public void run() {
@@ -393,7 +265,7 @@ public class LiveFragment extends Fragment {
 		return ii;
 	}
 
-	public void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) throws IOException {
+	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) throws IOException {
         URL postUrl = new URL("https://api.live.bilibili.com/gift/v2/live/bag_send");
         String content = "";//要发出的数据
         // 打开连接
@@ -450,5 +322,17 @@ public class LiveFragment extends Fragment {
         MainActivity.instance.showToast(obj.get("msg").getAsString());
         reader.close();
         connection.disconnect();
+	}
+
+	private void saveConfig() {
+        try {
+			FileOutputStream fos = new FileOutputStream(customSentenseFile);
+            OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
+            writer.write(new Gson().toJson(customSentence));
+            writer.flush();
+            fos.close();
+		} catch (IOException e) {
+            throw new RuntimeException(customSentenseFile.getAbsolutePath() + " not found");
+		}
 	}
 }

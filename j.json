@@ -1,0 +1,82 @@
+{
+    "code": 0, 
+    "message": "0", 
+    "ttl": 1, 
+    "data": {
+        "bvid": "", 
+        "aid": 47957369, 
+        "videos": 1, 
+        "tid": 17, 
+        "tname": "单机游戏", 
+        "copyright": 1, 
+        "pic": "http://i1.hdslb.com/bfs/archive/29166a05fc35e39e479740088c171d7881139285.jpg", 
+        "title": "活游戏 养乐多天堂", 
+        "pubdate": 1554089220, 
+        "ctime": 1554089220, 
+        "desc": "", 
+        "state": 0, 
+        "attribute": 16512, 
+        "duration": 34, 
+        "rights": {
+            "bp": 0, 
+            "elec": 0, 
+            "download": 1, 
+            "movie": 0, 
+            "pay": 0, 
+            "hd5": 0, 
+            "no_reprint": 1, 
+            "autoplay": 1, 
+            "ugc_pay": 0, 
+            "is_cooperation": 0, 
+            "ugc_pay_preview": 0, 
+            "no_background": 0
+        }, 
+        "owner": {
+            "mid": 64483321, 
+            "name": "妖怪之山的厄神", 
+            "face": "http://i1.hdslb.com/bfs/face/74e9f1cbb3cd890b197562f6361a84f6b1271ed7.jpg"
+        }, 
+        "stat": {
+            "aid": 47957369, 
+            "view": 2930, 
+            "danmaku": 13, 
+            "reply": 52, 
+            "favorite": 65, 
+            "coin": 127, 
+            "share": 53, 
+            "now_rank": 0, 
+            "his_rank": 0, 
+            "like": 130, 
+            "dislike": 0, 
+            "evaluation": ""
+        }, 
+        "dynamic": "#东方幕华祭#", 
+        "cid": 84001837, 
+        "dimension": {
+            "width": 800, 
+            "height": 600, 
+            "rotate": 0
+        }, 
+        "no_cache": false, 
+        "pages": [
+            {
+                "cid": 84001837, 
+                "page": 1, 
+                "from": "vupload", 
+                "part": "2019-04-01 10-57-04", 
+                "duration": 34, 
+                "vid": "", 
+                "weblink": "", 
+                "dimension": {
+                    "width": 800, 
+                    "height": 600, 
+                    "rotate": 0
+                }
+            }
+        ], 
+        "subtitle": {
+            "allow_submit": false, 
+            "list": [ ]
+        }
+    }
+}

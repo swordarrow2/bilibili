@@ -53,9 +53,6 @@ public class MainActivity extends Activity {
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
 
-	public static final String UID = "uid";
-	public static final String AV = "av";
-	public static final String Live = "lv";
 	public static final String AccountManager = "管理账号";
 	public static final String Settings = "设置";
 
@@ -205,7 +202,7 @@ public class MainActivity extends Activity {
 									System.out.println("maxMemory: " + maxMemory);
 									System.out.println("totalMemory: " + totalMemory);
 									System.out.println("freeMemory: " + freeMemory);
-									tvMemory.setText("\n最大内存:" + maxMemory + "\n当前分配:" + totalMemory + "\n剩余:" + freeMemory);
+									tvMemory.setText("最大内存:" + maxMemory + "M\n当前分配:" + totalMemory + "M\n剩余:" + freeMemory + "M");
 								}
 							});
 					}
@@ -250,9 +247,9 @@ public class MainActivity extends Activity {
 									/*	if (uid.isChecked()) {
 									 newIDFragment(UidFragment.class, UID , getId(content));
 									 } else*/ if (av.isChecked()) {
-										showFragment(AvFragment.class, AV , getId(content));
+										showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
 									} else if (live.isChecked()) {
-										showFragment(LiveFragment.class, Live , getId(content));
+										showFragment(LiveFragment.class, BaseIdFragment.typeLive , getId(content));
 									}
 								}
 							}).show();
@@ -310,7 +307,6 @@ public class MainActivity extends Activity {
 		if (frag == null) 	{
 			throw new RuntimeException("获取不存在的碎片");
 		}
-		transaction.add(R.id.main_activityLinearLayout, frag);
 		hideFragment();
 		transaction.show(frag);
 		transaction.commit();
@@ -341,8 +337,8 @@ public class MainActivity extends Activity {
 		if (frag == null) {
 			try {
 				Class<?> cls = Class.forName(c.getName());
-				Constructor con=cls.getConstructor(int.class);
-				frag = (Fragment) con.newInstance(id);
+				Constructor con = cls.getConstructor(String.class, int.class);
+				frag = (Fragment) con.newInstance(type, id);
 				fragments.put(type + id, frag);
 				recentAdapter.add(type + id);
 				transaction.add(R.id.main_activityLinearLayout, frag);	
@@ -353,6 +349,12 @@ public class MainActivity extends Activity {
 		hideFragment();
 		transaction.show(frag);
         transaction.commit();
+	}
+
+	public void renameFragment(String origin, String newName) {
+		Fragment f=fragments.get(origin);
+		fragments.put(newName, f);
+		recentAdapter.rename(origin, newName);
 	}
 
     public void hideFragment() {
@@ -367,9 +369,17 @@ public class MainActivity extends Activity {
 		if (!fragments.containsKey(id)) {
 			throw new RuntimeException("no such key");
 		}
-		getFragmentManager().beginTransaction().remove(fragments.get(id)).commit();
+		Fragment f = fragments.get(id);
+		Iterator<Map.Entry<String,Fragment>> iterator = fragments.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<String,Fragment> entry = iterator.next();
+			if (entry.getValue() == f) {
+				recentAdapter.remove(entry.getKey());
+				iterator.remove();
+			}
+		}
+		getFragmentManager().beginTransaction().remove(f).commit();
 		fragments.remove(id);
-		recentAdapter.remove(id);
 	}
 
     @Override

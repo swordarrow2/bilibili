@@ -15,9 +15,28 @@ public class RecentAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
+	public void rename(String origin, String newName) {
+		for (int i=0;i < names.size();++i) {
+			if (names.get(i).equals(origin)) {
+				names.remove(i);
+				names.add(0, newName);
+				break;
+			}
+		}
+		notifyDataSetChanged();
+	}
+
+	public void toFirst(String name) {
+		for (int i=0;i < names.size();++i) {
+			if (names.get(i).equals(name)) {
+				names.add(0, names.remove(i));
+				break;
+			}
+		}
+		notifyDataSetChanged();
+	}
+
 	public void remove(String id) {
-//		MainActivity.instance.hideFragment();
-//		MainActivity.instance.removeFragment(id);
 		for (int i=0;i < names.size();++i) {
 			if (names.get(i).equals(id)) {
 				names.remove(i);
@@ -56,14 +75,16 @@ public class RecentAdapter extends BaseAdapter {
 
 				@Override
 				public void onClick(View p1) {
+					toFirst(names.get(position));
 					MainActivity.instance.showFragment(holder.tvName.getText().toString());
+					//names.add(0, names.remove(position));
 				}
 			});
 		holder.close.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View p1) {
-					remove(s);
+					MainActivity.instance.removeFragment(s);
 				}
 			});
         return convertView;

@@ -27,7 +27,8 @@ public class AvFragment extends BaseIdFragment {
 	private VideoInfoBean videoInfo;
 	private ImageView ivPreview;
 
-	public AvFragment(int liveId) {
+	public AvFragment(String type, int liveId) {
+		this.type = type;
 		id = liveId;
 	}
 
@@ -77,7 +78,8 @@ public class AvFragment extends BaseIdFragment {
 							@Override
 							public void run() {
 								info.setText(videoInfo.toString());
-							}
+								MainActivity.instance.renameFragment(typeAv + id, videoInfo.data.title);
+								}
 						});
 					try {
 						Connection.Response response = Jsoup.connect(videoInfo.data.pic).ignoreContentType(true).execute();
@@ -161,21 +163,21 @@ public class AvFragment extends BaseIdFragment {
             //获取当前节点的事件类型，通过事件类型的判断，我们可以知道当前节点是什么节点，从而确定我们应该做什么操作
             //解析是一行一行的解析的，
             int type = xp.getEventType();
-                    while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
+			while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
                 switch (type) {
 					case XmlPullParser.START_TAG://开始节点
 						// 获取当前节点的名字
 						if (xp.getName().equals("d")) {
 							String danmaku=xp.nextText();
-					//		String p=xp.nextToken();
-							} 
+							//		String p=xp.nextToken();
+						} 
 						break;
-					/*case XmlPullParser.END_TAG://结束节点,<name>QQ</name>遇到</name>什么都不做，遇到QQ文本节点什么都不做，
-						if ("city".equals(xp.getName())) {
-							//把city的javabean放入集合中
-							cityList.add(city);
-						}
-						break;*/
+						/*case XmlPullParser.END_TAG://结束节点,<name>QQ</name>遇到</name>什么都不做，遇到QQ文本节点什么都不做，
+						 if ("city".equals(xp.getName())) {
+						 //把city的javabean放入集合中
+						 cityList.add(city);
+						 }
+						 break;*/
 				}
 			}
 		} catch (Exception e) {

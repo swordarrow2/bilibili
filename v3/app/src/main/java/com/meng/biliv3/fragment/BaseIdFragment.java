@@ -18,6 +18,10 @@ import android.os.*;
 
 public class BaseIdFragment extends Fragment {
 
+	public static final String typeUID = "uid";
+	public static final String typeAv = "av";
+	public static final String typeLive = "lv";
+	
 	protected static final int SendDanmaku=0;
 	protected static final int Silver=1;
 	protected static final int Pack=2;
@@ -29,6 +33,7 @@ public class BaseIdFragment extends Fragment {
 	protected static final int Favorite=8;
 
 	protected int id;
+	protected String type;
 
 	protected static ArrayAdapter<String> sencencesAdapter=null;
 	protected static ArrayAdapter<String> spinnerAccountAdapter=null;

@@ -11,13 +11,8 @@ import android.widget.AdapterView.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
 
 import android.view.View.OnClickListener;
 
@@ -25,12 +20,14 @@ public class LiveFragment extends BaseIdFragment {
 
 	private Uri uri;
 	private VideoView videoView;
-	private Button send,editPre,preset,silver,pack,sign;
+	private Button send,editPre,preset,silver,pack,sign,download;
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
 
-	public LiveFragment(int liveId) {
+	private JsonObject liveInfo;
+	public LiveFragment(String type, int liveId) {
+		this.type = type;
 		id = liveId;
 	}
 
@@ -52,7 +49,8 @@ public class LiveFragment extends BaseIdFragment {
 		videoView = (VideoView) view.findViewById(R.id.live_fragmentVideoView);  
 		info = (TextView) view.findViewById(R.id.live_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.live_fragmentSpinner);
-
+		download = (Button) view.findViewById(R.id.livefragmentButtonDownload);
+		download.setOnClickListener(onclick);
 		videoView.setMediaController(new MediaController(getActivity()));
 		preset.setOnClickListener(onclick);
 		send.setOnClickListener(onclick);
@@ -60,19 +58,19 @@ public class LiveFragment extends BaseIdFragment {
 		pack.setOnClickListener(onclick);
 		sign.setOnClickListener(onclick);
 		//editPre.setOnClickListener(onclick);
-		
+
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
 				public void run() {
 					JsonParser parser = new JsonParser();
-					JsonObject obj = parser.parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
-					if (obj.get("code").getAsInt() == 19002003) {
+					liveInfo = parser.parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
+					if (liveInfo.get("code").getAsInt() == 19002003) {
 						MainActivity.instance.showToast("不存在的房间");
 						return;
 					}
-					final JsonArray ja = obj.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
 					JsonObject liveToMainInfo=null;
 					try {
 						liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
@@ -88,6 +86,7 @@ public class LiveFragment extends BaseIdFragment {
 								@Override
 								public void run() {
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n未直播");
+									MainActivity.instance.renameFragment(typeLive + id, uname + "的直播间");
 								}
 							});
 						return;
@@ -101,6 +100,7 @@ public class LiveFragment extends BaseIdFragment {
 									//videoView.start();  
 									videoView.requestFocus();
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
+									MainActivity.instance.renameFragment(typeLive + id, uname + "的直播间");
 								}
 							});
 					}
@@ -148,6 +148,14 @@ public class LiveFragment extends BaseIdFragment {
 					break;
 				case R.id.livefragmentButton_sign:
 					sendBili((String) selectAccount.getSelectedItem(), Sign, "");
+					break;
+				case R.id.livefragmentButtonDownload:
+					// 本地存储路径
+					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+					Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
+					DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
+					DownloadManager.Request request=new DownloadManager.Request(uri);
+					long downloadId=downloadManager.enqueue(request);
 					break;
 			}
 		}

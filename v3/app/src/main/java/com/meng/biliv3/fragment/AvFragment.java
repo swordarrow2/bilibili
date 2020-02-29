@@ -1,8 +1,9 @@
 package com.meng.biliv3.fragment;
 import android.app.*;
+import android.content.*;
 import android.graphics.*;
+import android.net.*;
 import android.os.*;
-import android.util.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
@@ -12,11 +13,10 @@ import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
-import java.util.*;
 import org.jsoup.*;
-import org.xmlpull.v1.*;
 
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 
 public class AvFragment extends BaseIdFragment {
 
@@ -26,6 +26,7 @@ public class AvFragment extends BaseIdFragment {
 	private Spinner selectAccount;
 	private VideoInfoBean videoInfo;
 	private ImageView ivPreview;
+	private Bitmap preview;
 
 	public AvFragment(String type, int liveId) {
 		this.type = type;
@@ -45,6 +46,7 @@ public class AvFragment extends BaseIdFragment {
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
 		findSender = (Button) view.findViewById(R.id.avfragmentButtonGetDanmakuSender);
+		findSender.setVisibility(View.GONE);
 		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
 		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
 		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
@@ -64,6 +66,17 @@ public class AvFragment extends BaseIdFragment {
 		//editPre.setOnClickListener(onclick);
 		findSender.setOnClickListener(onclick);
 		selectAccount.setAdapter(spinnerAccountAdapter);
+		ivPreview.setOnLongClickListener(new OnLongClickListener(){
+
+				@Override
+				public boolean onLongClick(View p1) {
+					try {
+						saveBitmap(type + id, preview);
+						MainActivity.instance.showToast("图片已保存至" + MainActivity.instance.mainDic + type + id + ".png");
+					} catch (Exception e) {}
+					return true;
+				}
+			});
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
@@ -79,17 +92,17 @@ public class AvFragment extends BaseIdFragment {
 							public void run() {
 								info.setText(videoInfo.toString());
 								MainActivity.instance.renameFragment(typeAv + id, videoInfo.data.title);
-								}
+							}
 						});
 					try {
 						Connection.Response response = Jsoup.connect(videoInfo.data.pic).ignoreContentType(true).execute();
 						byte[] img = response.bodyAsBytes();
-						final Bitmap bmp=BitmapFactory.decodeByteArray(img, 0, img.length);
+						preview = BitmapFactory.decodeByteArray(img, 0, img.length);
 						getActivity().runOnUiThread(new Runnable(){
 
 								@Override
 								public void run() {
-									ivPreview.setImageBitmap(bmp);
+									ivPreview.setImageBitmap(preview);
 								}
 
 							});
@@ -98,6 +111,17 @@ public class AvFragment extends BaseIdFragment {
 					}
 				}
 			});
+	}
+
+	private void saveBitmap(String bitName, Bitmap mBitmap) throws Exception {
+		File f = new File(Environment.getExternalStorageDirectory() + "/pictures/" + bitName + ".png");
+		f.createNewFile();
+		FileOutputStream fOut = null;
+		fOut = new FileOutputStream(f);
+		mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+		fOut.flush();
+		fOut.close();
+		getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(f)));
 	}
 
 	private OnClickListener onclick=new OnClickListener(){
@@ -149,40 +173,46 @@ public class AvFragment extends BaseIdFragment {
 	};
 
 	private void boom() throws IOException {
-		int cid=videoInfo.data.pages.get(0).cid;
-		Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
-		FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
-		out.write(response.bodyAsBytes());           
-		out.close();
-        InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
-        XmlPullParser xp = Xml.newPullParser();
+		/*	int cid=videoInfo.data.pages.get(0).cid;
+		 Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
+		 FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
+		 out.write(response.bodyAsBytes());           
+		 out.close();
+		 try {
+		 InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
+		 XmlPullParser xp = Xml.newPullParser();
+		 ArrayList<String> list=new ArrayList<>();
+		 xp.setInput(is, "utf-8");
+		 //获取当前节点的事件类型，通过事件类型的判断，我们可以知道当前节点是什么节点，从而确定我们应该做什么操作
+		 //解析是一行一行的解析的，
+		 int type = xp.getEventType();
+		 //	MainActivity.instance.showToast(type + "");
+		 while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
+		 switch (type) {  
+		 case XmlPullParser.START_DOCUMENT:  
+		 //	persons = new ArrayList<Person>();  
+		 break;  
+		 case XmlPullParser.START_TAG:  
+		 if ("d".equals(xp.getName())) {  
+		 String id = xp.getAttributeValue(0);  
+		 MainActivity.instance.showToast(id);
+		 }
+		 break;  
+		 case XmlPullParser.END_TAG:  
+		 if ("person".equals(parser.getName())) {  
+		 persons.add(person);  
+		 person = null;  
+		 }  
+		 break;  
+		 }  
+		 type = xp.next();
+		 }
 
-		ArrayList<String> list=new ArrayList<>();
-        try {
-            xp.setInput(is, "utf-i");
-            //获取当前节点的事件类型，通过事件类型的判断，我们可以知道当前节点是什么节点，从而确定我们应该做什么操作
-            //解析是一行一行的解析的，
-            int type = xp.getEventType();
-			while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
-                switch (type) {
-					case XmlPullParser.START_TAG://开始节点
-						// 获取当前节点的名字
-						if (xp.getName().equals("d")) {
-							String danmaku=xp.nextText();
-							//		String p=xp.nextToken();
-						} 
-						break;
-						/*case XmlPullParser.END_TAG://结束节点,<name>QQ</name>遇到</name>什么都不做，遇到QQ文本节点什么都不做，
-						 if ("city".equals(xp.getName())) {
-						 //把city的javabean放入集合中
-						 cityList.add(city);
-						 }
-						 break;*/
-				}
-			}
-		} catch (Exception e) {
 
-		}
+
+		 } catch (Exception e) {
+		 throw new RuntimeException(e.toString());
+		 }*/
 	}
 
 

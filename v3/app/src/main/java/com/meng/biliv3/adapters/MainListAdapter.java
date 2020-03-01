@@ -32,12 +32,10 @@ public class MainListAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
 		final ViewHolder holder;
         if (convertView == null) {
-            convertView = activity.getLayoutInflater().inflate(R.layout.list_item_image_text_switch, null);
+            convertView = activity.getLayoutInflater().inflate(R.layout.account_adapter, null);
             holder = new ViewHolder();
-            holder.tvName = (TextView) convertView.findViewById(R.id.group_reply_list_itemTextView);
-            holder.aSwitch = (Switch) convertView.findViewById(R.id.group_reply_list_itemSwitch);
-            holder.aSwitch.setVisibility(View.GONE);
-            holder.ivHead = (ImageView) convertView.findViewById(R.id.group_reply_list_itemImageView);
+            holder.tvName = (TextView) convertView.findViewById(R.id.account_adapterTextView_name);
+			holder.ivHead = (ImageView) convertView.findViewById(R.id.account_adapterImageView_head);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -66,7 +64,10 @@ public class MainListAdapter extends BaseAdapter {
     private class ViewHolder {
         private ImageView ivHead;
         private TextView tvName;
-        private Switch aSwitch;
+		/*	private Button up;
+		 private Button down;
+		 private Button refresh;
+		 private Button delete;*/
     }
 }
 

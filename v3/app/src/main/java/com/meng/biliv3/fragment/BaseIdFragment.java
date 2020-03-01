@@ -21,7 +21,7 @@ public class BaseIdFragment extends Fragment {
 	public static final String typeUID = "uid";
 	public static final String typeAv = "av";
 	public static final String typeLive = "lv";
-	
+
 	protected static final int SendDanmaku=0;
 	protected static final int Silver=1;
 	protected static final int Pack=2;
@@ -53,19 +53,27 @@ public class BaseIdFragment extends Fragment {
 			customSentence.sent.addAll(Arrays.asList(strings));
 			saveConfig();
 		}
-		if (spList == null) {
-			spList = new ArrayList<>();
-			spList.add("每次选择");
-			spList.add("主账号");
-			for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-				spList.add(ai.name);
-			}
-		}
-		if (spinnerAccountAdapter == null) {
-			spinnerAccountAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, spList);
-		}
+		createSpinnerList();
 		if (sencencesAdapter == null) {
 			sencencesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, customSentence.sent);
+		}
+	}
+
+	public static void createSpinnerList() {
+		if (spList == null) {
+			spList = new ArrayList<>();
+		} else {
+			spList.clear();
+		}
+		spList.add("每次选择");
+		spList.add("主账号");
+		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+			spList.add(ai.name);
+		}
+		if (spinnerAccountAdapter != null) {
+			spinnerAccountAdapter.notifyDataSetChanged();
+		} else {
+			spinnerAccountAdapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, spList);
 		}
 	}
 

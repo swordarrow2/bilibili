@@ -28,7 +28,7 @@ public class Tools {
 			MainActivity.instance.startService(intentOne);
 		}
 
-		public static void sendLiveSign(String cookie) {
+		public static int sendLiveSign(String cookie) {
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/sign/doSign");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(MainActivity.instance.liveHead)
@@ -41,13 +41,13 @@ public class Tools {
 				response = connection.execute();
 			} catch (IOException e) {
 				MainActivity.instance.showToast("连接出错");
-				return;
+				return -1;
 			}	if (response.statusCode() != 200) {
 				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 			}
 			JsonParser parser = new JsonParser();
 			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return obj.get("code").getAsInt();
 		}
 
 		public static void sendHotStrip(long myUid, long roomMasterUid, long roomID, int count, String cookie) {
@@ -467,7 +467,7 @@ public class Tools {
 		}
 	}
 
-	public static class CQ {
+	public static class Time {
 		public static String getTime() {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		}

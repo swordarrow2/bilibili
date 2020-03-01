@@ -20,7 +20,7 @@ public class LiveFragment extends BaseIdFragment {
 
 	private Uri uri;
 	private VideoView videoView;
-	private Button send,editPre,preset,silver,pack,sign,download;
+	private Button send,editPre,preset,silver,pack,download;
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
@@ -42,7 +42,6 @@ public class LiveFragment extends BaseIdFragment {
 		send = (Button) view.findViewById(R.id.live_fragmentButton_send);
 		silver = (Button) view.findViewById(R.id.live_fragmentButton_silver);
 		pack = (Button) view.findViewById(R.id.live_fragmentButton_pack);
-		sign = (Button) view.findViewById(R.id.livefragmentButton_sign);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.live_fragmentButton_preset);
 		et = (EditText) view.findViewById(R.id.live_fragmentEditText_danmaku);
@@ -56,7 +55,6 @@ public class LiveFragment extends BaseIdFragment {
 		send.setOnClickListener(onclick);
 		silver.setOnClickListener(onclick);
 		pack.setOnClickListener(onclick);
-		sign.setOnClickListener(onclick);
 		//editPre.setOnClickListener(onclick);
 
 		selectAccount.setAdapter(spinnerAccountAdapter);
@@ -146,17 +144,14 @@ public class LiveFragment extends BaseIdFragment {
 				case R.id.live_fragmentButton_silver:
 					sendBili((String) selectAccount.getSelectedItem(), Silver, "");
 					break;
-				case R.id.livefragmentButton_sign:
-					sendBili((String) selectAccount.getSelectedItem(), Sign, "");
-					break;
-				case R.id.livefragmentButtonDownload:
+			/*	case R.id.livefragmentButtonDownload:
 					// 本地存储路径
 					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
 					Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
 					DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
 					DownloadManager.Request request=new DownloadManager.Request(uri);
 					long downloadId=downloadManager.enqueue(request);
-					break;
+					break;*/
 			}
 		}
 	};

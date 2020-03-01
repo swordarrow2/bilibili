@@ -128,7 +128,49 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {}
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-    }
+		threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					StringBuilder sb= new StringBuilder();
+					for (int i=0;i < loginAccounts.size();++i) {
+						AccountInfo ai=loginAccounts.get(i);
+						if (!Tools.Time.getDate().equals(Tools.Time.getDate(ai.lastSign))) {
+							ai.setSigned(false);
+						}
+						if (!ai.isSigned() && !ai.isCookieExceed()) {
+							int rc = Tools.BilibiliTool.sendLiveSign(ai.cookie);
+							switch (rc) {
+								case -101:
+									ai.setCookieExceed(true);
+									sb.append("\n").append(ai.name).append(":cookie过期");
+									break;
+								case 0:
+									ai.lastSign = System.currentTimeMillis();
+									sb.append("\n").append(ai.name).append(":成功");
+									ai.setSigned(true);
+									break;
+								case 1011040:
+									sb.append("\n").append(ai.name).append(":今日已签到");
+									ai.setSigned(true);
+									break;
+							}
+							try {
+								Thread.sleep(200);
+							} catch (InterruptedException e) {}
+						} else if (ai.isSigned()) {
+							sb.append("\n").append(ai.name).append(":今日已签到");
+						} else if (ai.isCookieExceed()) {
+							sb.append("\n").append(ai.name).append(":cookie过期");
+						} else {
+							sb.append("\n").append(ai.name).append(":未知错误");
+						}
+					}
+					showToast("自动签到:" + sb.toString());
+					saveConfig();
+				}
+			});
+	}
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -471,7 +513,7 @@ public class MainActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-		//saveConfig2();
+		saveConfig2();
     }
 
 	public void saveConfig2() {

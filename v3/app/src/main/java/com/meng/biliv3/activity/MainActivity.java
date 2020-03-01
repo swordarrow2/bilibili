@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-															"首页(大概)","输入ID", "管理账号", "设置", "退出"
+															"输入ID", "管理账号", "设置", "退出"
 														}));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
@@ -231,20 +231,20 @@ public class MainActivity extends Activity {
 
 								@Override
 								public void run() {
-									ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+									//ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 									//最大分配内存
-									int memory = activityManager.getMemoryClass();
-									System.out.println("memory:" + memory);
+									//	int memory = activityManager.getMemoryClass();
+									//System.out.println("memory:" + memory);
 									//最大分配内存获取方法2
 									float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
 									//当前分配的总内存
 									float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
 									//剩余内存
-									float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
-									System.out.println("maxMemory: " + maxMemory);
-									System.out.println("totalMemory: " + totalMemory);
-									System.out.println("freeMemory: " + freeMemory);
-									tvMemory.setText("最大内存:" + maxMemory + "M\n当前分配:" + totalMemory + "M\n剩余:" + freeMemory + "M");
+									//float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+									/*	System.out.println("maxMemory: " + maxMemory);
+									 System.out.println("totalMemory: " + totalMemory);
+									 System.out.println("freeMemory: " + freeMemory);*/
+									tvMemory.setText("最大内存:" + maxMemory + "M\n当前分配:" + totalMemory + "M");
 								}
 							});
 					}

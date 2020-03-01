@@ -54,7 +54,7 @@ public class UserInfoHeaderView extends LinearLayout {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								AccountInfo ai=MainActivity.instance.loginAccounts.get(wi[0]);
-								if(ai==null){
+								if (ai == null) {
 									return;
 								}
 								getInfo(ai);
@@ -84,6 +84,10 @@ public class UserInfoHeaderView extends LinearLayout {
 				@Override
 				public void run() {
 					final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), BilibiliUserInfo.class);
+					if (info.code != 0) {
+						MainActivity.instance.showToast("cookie过期");
+						return;
+					}
 					UserSpaceToLive sjb = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
@@ -101,12 +105,12 @@ public class UserInfoHeaderView extends LinearLayout {
 						MainActivity.instance.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-										JsonArray ja = obj2.get("next").getAsJsonArray();
-										tvBLive.setVisibility(View.VISIBLE);
-										tvBLive.setText("主播 Lv." + obj2.get("level").getAsInt() + "(" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1).getAsInt() + ")");
-										if (MainActivity.instance.mDrawerList.getHeaderViewsCount() == 1) {
-											MainActivity.instance.mDrawerList.addHeaderView(new MengLiveControl(MainActivity.instance));
-										}
+									JsonArray ja = obj2.get("next").getAsJsonArray();
+									tvBLive.setVisibility(View.VISIBLE);
+									tvBLive.setText("主播 Lv." + obj2.get("level").getAsInt() + "(" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1).getAsInt() + ")");
+									if (MainActivity.instance.mDrawerList.getHeaderViewsCount() == 1) {
+										MainActivity.instance.mDrawerList.addHeaderView(new MengLiveControl(MainActivity.instance));
+									}
 								}
 							});
 					} catch (Exception e) {

@@ -13,6 +13,7 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
+import java.lang.reflect.*;
 
 import android.view.View.OnClickListener;
 
@@ -20,7 +21,7 @@ public class LiveFragment extends BaseIdFragment {
 
 	private Uri uri;
 	private VideoView videoView;
-	private Button send,editPre,preset,silver,pack,download;
+	private Button send,editPre,preset,silver,pack,download,milk;
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
@@ -48,6 +49,7 @@ public class LiveFragment extends BaseIdFragment {
 		videoView = (VideoView) view.findViewById(R.id.live_fragmentVideoView);  
 		info = (TextView) view.findViewById(R.id.live_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.live_fragmentSpinner);
+		milk = (Button) view.findViewById(R.id.livefragmentButtonSerialMilk);
 		download = (Button) view.findViewById(R.id.livefragmentButtonDownload);
 		download.setOnClickListener(onclick);
 		videoView.setMediaController(new MediaController(getActivity()));
@@ -56,7 +58,7 @@ public class LiveFragment extends BaseIdFragment {
 		silver.setOnClickListener(onclick);
 		pack.setOnClickListener(onclick);
 		//editPre.setOnClickListener(onclick);
-
+		milk.setOnClickListener(onclick);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
@@ -144,16 +146,56 @@ public class LiveFragment extends BaseIdFragment {
 				case R.id.live_fragmentButton_silver:
 					sendBili((String) selectAccount.getSelectedItem(), Silver, "");
 					break;
-			/*	case R.id.livefragmentButtonDownload:
-					// 本地存储路径
-					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-					Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-					DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
-					DownloadManager.Request request=new DownloadManager.Request(uri);
-					long downloadId=downloadManager.enqueue(request);
-					break;*/
+				case R.id.livefragmentButtonSerialMilk:
+					final SelectMilk sm=new SelectMilk(getActivity(), id);
+					new AlertDialog.Builder(getActivity()).setView(sm).setTitle("选择").setPositiveButton("发送",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								//MainActivity.instance.showToast(sm.toString());
+								MainActivity.instance.threadPool.execute(sm.getSendTask());
+								try {  
+									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+									field.setAccessible(true);
+									field.set(dialog, true);  
+								} catch (Exception e) {  
+								}
+							}
+						}).setNeutralButton("添加",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								sm.add();
+								try {  
+									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+									field.setAccessible(true);
+									field.set(dialog, false);  
+								} catch (Exception e) {  
+								}  
+							}
+						}).setNegativeButton("清空", 
+						new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface dialog, int witch) {
+								sm.clear();
+								try {  
+									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+									field.setAccessible(true);
+									field.set(dialog, false);  
+								} catch (Exception e) {  
+								}
+							}
+						}).show();
+					break;
+					/*	case R.id.livefragmentButtonDownload:
+					 // 本地存储路径
+					 final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+					 Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
+					 DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
+					 DownloadManager.Request request=new DownloadManager.Request(uri);
+					 long downloadId=downloadManager.enqueue(request);
+					 break;*/
 			}
 		}
 	};
-
 }

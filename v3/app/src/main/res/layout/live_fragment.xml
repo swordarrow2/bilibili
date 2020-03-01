@@ -93,5 +93,11 @@
 		android:text="保存直播视频"
 		android:id="@+id/livefragmentButtonDownload"/>
 
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="奶人序列"
+		android:id="@+id/livefragmentButtonSerialMilk"/>
+
 </LinearLayout>
 

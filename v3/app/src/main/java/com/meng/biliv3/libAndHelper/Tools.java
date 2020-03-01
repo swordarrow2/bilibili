@@ -252,7 +252,7 @@ public class Tools {
 						if (!obj.get("message").getAsString().equals("")) {
 							MainActivity.instance.showToast(obj.getAsJsonObject("message").getAsString());
 						} else {
-							MainActivity.instance.showToast(roomId + "已奶");
+							MainActivity.instance.showToast(roomId + "发送成功");
 						}
 						break;
 					case 1990000:

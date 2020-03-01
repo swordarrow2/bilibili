@@ -4,6 +4,7 @@ import android.content.*;
 import android.graphics.*;
 import android.net.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
@@ -13,20 +14,47 @@ import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
+import java.util.*;
 import org.jsoup.*;
+import org.xmlpull.v1.*;
 
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import java.util.zip.*;
 
 public class AvFragment extends BaseIdFragment {
 
 	private Button send,editPre,preset,zan,coin1,coin2,favorite,findSender;
 	private EditText et;
-	private TextView info;
+	private TextView info,danmakuSender;
 	private Spinner selectAccount;
 	private VideoInfoBean videoInfo;
 	private ImageView ivPreview;
 	private Bitmap preview;
+	private ArrayList<DanmakuBean> danmakuList=null;
+	public class DanmakuBean {
+		/*	1.29800, 为弹幕播放起始时间 （在视频中出现的时间，单位是秒）
+
+		 第二个参数是弹幕的模式1..3 滚动弹幕 4底端弹幕 5顶端弹幕 6.逆向弹幕 7精准定位 8高级弹幕 
+
+		 第三个参数是字号， 12非常小,16特小,18小,25中,36大,45很大,64特别大 
+		 第四个参数是字体的颜色以HTML颜色的十进制为准 
+		 第五个参数是Unix格式的时间戳。基准时间为 1970-1-1 08:00:00 
+		 第六个参数是弹幕池 0普通池 1字幕池 2特殊池【目前特殊池为高级弹幕专用】 
+		 第七个参数是发送者的ID，用于“屏蔽此弹幕的发送者”功能 
+		 第八个参数是弹幕在弹幕数据库中rowID 用于“历史弹幕”功能。
+		 */
+		public int uid=-1;
+		public float time;
+		public int mode;
+		public int fontSize;
+		public int color;
+		public long timeStamp;
+		public int danmakuPool;
+		public long userHash;
+		public long databaseId;
+		public String msg;
+	}
 
 	public AvFragment(String type, int liveId) {
 		this.type = type;
@@ -46,17 +74,16 @@ public class AvFragment extends BaseIdFragment {
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
 		findSender = (Button) view.findViewById(R.id.avfragmentButtonGetDanmakuSender);
-		findSender.setVisibility(View.GONE);
+		//findSender.setVisibility(View.GONE);
 		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
 		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
 		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
-		favorite = (Button) view.findViewById(R.id.av_fragmentButton_favorite);	
-
+		favorite = (Button) view.findViewById(R.id.av_fragmentButton_favorite);
+		danmakuSender = (TextView) view.findViewById(R.id.av_fragmentTextView_sender);
 		et = (EditText) view.findViewById(R.id.av_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.av_fragmentSpinner);
-
 		preset.setOnClickListener(onclick);
 		zan.setOnClickListener(onclick);
 		coin1.setOnClickListener(onclick);
@@ -157,14 +184,13 @@ public class AvFragment extends BaseIdFragment {
 					sendBili((String) selectAccount.getSelectedItem(), Favorite, "");
 					break;
 				case R.id.avfragmentButtonGetDanmakuSender:
+					p1.setVisibility(View.GONE);
+					MainActivity.instance.showToast("开始连接");
 					MainActivity.instance.threadPool.execute(new Runnable(){
 
 							@Override
 							public void run() {
-								try {
-									boom();
-								} catch (IOException e) {}
-								MainActivity.instance.showToast("bomb");
+								boom2();
 							}
 						});
 					break;
@@ -172,91 +198,170 @@ public class AvFragment extends BaseIdFragment {
 		}
 	};
 
-	private void boom() throws IOException {
-		/*	int cid=videoInfo.data.pages.get(0).cid;
-		 Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
-		 FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
-		 out.write(response.bodyAsBytes());           
-		 out.close();
-		 try {
-		 InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
-		 XmlPullParser xp = Xml.newPullParser();
-		 ArrayList<String> list=new ArrayList<>();
-		 xp.setInput(is, "utf-8");
-		 //获取当前节点的事件类型，通过事件类型的判断，我们可以知道当前节点是什么节点，从而确定我们应该做什么操作
-		 //解析是一行一行的解析的，
-		 int type = xp.getEventType();
-		 //	MainActivity.instance.showToast(type + "");
-		 while (type != XmlPullParser.END_DOCUMENT) {//文档结束节点
-		 switch (type) {  
-		 case XmlPullParser.START_DOCUMENT:  
-		 //	persons = new ArrayList<Person>();  
-		 break;  
-		 case XmlPullParser.START_TAG:  
-		 if ("d".equals(xp.getName())) {  
-		 String id = xp.getAttributeValue(0);  
-		 MainActivity.instance.showToast(id);
-		 }
-		 break;  
-		 case XmlPullParser.END_TAG:  
-		 if ("person".equals(parser.getName())) {  
-		 persons.add(person);  
-		 person = null;  
-		 }  
-		 break;  
-		 }  
-		 type = xp.next();
-		 }
+	private void boom2() {
+		try {
+			danmakuList = new ArrayList<>();
+			int cid=videoInfo.data.pages.get(0).cid;
+			Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
+			FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
+			out.write(response.bodyAsBytes());           
+			out.close();
+			HashSet<Long> danmakuIdSet=new HashSet<>();
+			InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
+			XmlPullParser xp = Xml.newPullParser();
+			xp.setInput(is, "utf-8");
+			int type = xp.getEventType();
+			while (type != XmlPullParser.END_DOCUMENT) {
+				if (type == XmlPullParser.START_TAG) {
+					if ("d".equals(xp.getName())) {  
+						long id = Long.parseLong(xp.getAttributeValue(0).split(",")[6], 16);  
+						danmakuIdSet.add(id);				
+						String[] d=xp.getAttributeValue(0).split(",");
+						DanmakuBean db=new DanmakuBean();
+						db.time = Float.parseFloat(d[0]);
+						db.mode = Integer.parseInt(d[1]);
+						db.fontSize = Integer.parseInt(d[2]);
+						db.color = Integer.parseInt(d[3]);
+						db.timeStamp = Long.parseLong(d[4]);
+						db.danmakuPool = Integer.parseInt(d[5]);
+						db.userHash = Long.parseLong(d[6], 16);
+						db.databaseId = Long.parseLong(d[7]);
+						db.msg = xp.nextText();
+						danmakuList.add(db);
+					}
+				}
+				type = xp.next();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
 
+		for (final DanmakuBean db:danmakuList) {
+			if (MainActivity.instance.sanaeConnect.isClosed()) {
+				MainActivity.instance.sanaeConnect.reconnect();
+			}
+			if (db.uid != -1) {
+				final int uid=db.uid;
+				final String hashS=Long.toHexString(db.userHash);
+				final String dan=db.msg;
+				MainActivity.instance.runOnUiThread(new Runnable(){
 
+						@Override
+						public void run() {
+							danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + uid + "  hash:" + hashS + " 弹幕:" + dan);
+						}
+					});
+				continue;
+			}
+			MainActivity.instance.sanaeConnect.sendHash(db);
+			while (db.uid == -1) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {}
+			}
+			for (DanmakuBean da:danmakuList) {
+				if (da.userHash == db.userHash) {
+					da.uid = db.uid;
+				}
+			}
+			final int uid=db.uid;
+			final String hashS=Long.toHexString(db.userHash);
+			final String dan=db.msg;
+			MainActivity.instance.runOnUiThread(new Runnable(){
 
-		 } catch (Exception e) {
-		 throw new RuntimeException(e.toString());
-		 }*/
+					@Override
+					public void run() {
+						danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + uid + "  hash:" + hashS + " 弹幕:" + dan);
+					}
+				});
+		}
+		MainActivity.instance.showToast("完成");
 	}
-
-
 	/*
-
-	 //1.获取cid
-	 //2.http://comment.bilibili.com/[cid].xml
-	 //3
-	 <d p="1.29800,1,25,16777215,1535026933,0,40e132dc,4133884241903620">帅气的曲风！！！！</d>
-
-	 p标签里内容，介绍
-
-	 1.29800, 为弹幕播放起始时间 （在视频中出现的时间，单位是秒）
-
-	 第二个参数是弹幕的模式1..3 滚动弹幕 4底端弹幕 5顶端弹幕 6.逆向弹幕 7精准定位 8高级弹幕 
-
-	 第三个参数是字号， 12非常小,16特小,18小,25中,36大,45很大,64特别大 
-	 第四个参数是字体的颜色以HTML颜色的十进制为准 
-	 第五个参数是Unix格式的时间戳。基准时间为 1970-1-1 08:00:00 
-	 第六个参数是弹幕池 0普通池 1字幕池 2特殊池【目前特殊池为高级弹幕专用】 
-	 第七个参数是发送者的ID，用于“屏蔽此弹幕的发送者”功能 
-	 第八个参数是弹幕在弹幕数据库中rowID 用于“历史弹幕”功能。
-
-	 //4 https://space.bilibili.com/ + uid
-	 //http://biliquery.typcn.com/api/user/hash/40e132dc
-	 //获取结果为：{"error":0,"data":[{"id":30847042}]}
-
-	 CRC32 crc32 = new CRC32();
-	 //crc32.update("30847042".getBytes());
-	 long v=Long.parseLong("40e132dc", 16);
-	 for (int i=10000000;i < 80000000;++i) {
-	 crc32.update(String.valueOf(i).getBytes());
-	 if (crc32.getValue() == v) {
-	 System.out.println("uid:" + i);
-	 break;
+	 private void boom() throws IOException {
+	 //AV44286340
+	 danmakuList = new ArrayList<>();
+	 int cid=videoInfo.data.pages.get(0).cid;
+	 Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
+	 FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
+	 out.write(response.bodyAsBytes());           
+	 out.close();
+	 final HashSet<Long> danmakuIdSet=new HashSet<>();
+	 try {
+	 InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
+	 XmlPullParser xp = Xml.newPullParser();
+	 xp.setInput(is, "utf-8");
+	 int type = xp.getEventType();
+	 while (type != XmlPullParser.END_DOCUMENT) {
+	 if (type == XmlPullParser.START_TAG) {
+	 if ("d".equals(xp.getName())) {  
+	 long id = Long.parseLong(xp.getAttributeValue(0).split(",")[6], 16);  
+	 danmakuIdSet.add(id);				
+	 String[] d=xp.getAttributeValue(0).split(",");
+	 DanmakuBean db=new DanmakuBean();
+	 db.time = Float.parseFloat(d[0]);
+	 db.mode = Integer.parseInt(d[1]);
+	 db.fontSize = Integer.parseInt(d[2]);
+	 db.color = Integer.parseInt(d[3]);
+	 db.timeStamp = Long.parseLong(d[4]);
+	 db.danmakuPool = Integer.parseInt(d[5]);
+	 db.userHash = Long.parseLong(d[6], 16);
+	 db.databaseId = Long.parseLong(d[7]);
+	 db.msg = xp.nextText();
+	 danmakuList.add(db);
 	 }
-	 if (i % 1000000 == 0) {
-	 System.out.println(i);
+	 }
+	 type = xp.next();
+	 }
+	 } catch (Exception e) {
+	 throw new RuntimeException(e.toString());
+	 }
+	 //MainActivity.instance.showToast(danmakuIdSet.toString());
+	 final CRC32 crc32=new CRC32();
+	 final int[] to={0,0};
+	 while (danmakuIdSet.size() > 0) {
+	 to[1] += 4;
+	 if (to[0] % 1000000 == 0) {
+	 MainActivity.instance.runOnUiThread(new Runnable(){
+
+	 @Override
+	 public void run() {
+	 progressbar.setProgress((int)(((float)to[0] * 100) / 400000000));
+	 progress.setText("当前位置:" + to[0] + " 剩余:" + danmakuIdSet.size());
+	 }
+	 });
+
+	 }
+	 crc32.update(String.valueOf(to[0]).getBytes());
+	 final long value = crc32.getValue();
+	 if (danmakuIdSet.contains(value)) {
+	 for (final DanmakuBean db:danmakuList) {
+	 if (db.userHash == value) {
+	 danmakuIdSet.remove(value);
+	 db.uid = to[0];
+	 MainActivity.instance.runOnUiThread(new Runnable(){
+
+	 @Override
+	 public void run() {
+	 danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + db.uid + "  hash:" + Long.toHexString(value) + " 弹幕:" + db.msg);
+	 }
+	 });
+	 }
+	 }
 	 }
 	 crc32.reset();
+	 ++to[0];
 	 }
+	 MainActivity.instance.runOnUiThread(new Runnable(){
 
-
+	 @Override
+	 public void run() {
+	 danmakuSender.setText(danmakuSender.getText() + "\nsize:" + to[1]);
+	 }
+	 });
+	 }
 	 */
+
 
 //	private void sendFavorite() {
 //		final String sel=(String) selectAccount.getSelectedItem();

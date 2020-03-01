@@ -27,6 +27,7 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 
 import com.meng.biliv3.R;
+import java.util.zip.*;
 
 
 public class MainActivity extends Activity {
@@ -61,6 +62,7 @@ public class MainActivity extends Activity {
 	public Map<String, String> liveHead = new HashMap<>();
     public Map<String, String> mainHead = new HashMap<>();
 
+	public SanaeConnect sanaeConnect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,8 +126,22 @@ public class MainActivity extends Activity {
             }
         }
 		try {
-			new SanaeConnect().connect();
+			sanaeConnect = new SanaeConnect();
+			sanaeConnect.connect();
+			sanaeConnect.sendUpdate();
 		} catch (Exception e) {}
+	/*	threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",loginAccounts.get(0).cookie);
+					JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
+					JsonArray fja=fjobj.get("list").getAsJsonArray();
+					long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+
+					showToast(add_media_id+"");
+				}
+			});*/
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new Runnable(){
@@ -171,7 +187,19 @@ public class MainActivity extends Activity {
 				}
 			});
 	}
-
+	public static byte[] readFile(int offset) {
+        RandomAccessFile randomAccessFile;
+		byte[] data=new byte[4];
+        try {
+            randomAccessFile = new RandomAccessFile(Environment.getExternalStorageDirectory() + "/hash.dat", "r");
+            randomAccessFile.seek(offset);
+            randomAccessFile.readFully(data);
+            randomAccessFile.close();
+        } catch (Exception e) {
+            throw new RuntimeException("bgm read failed");
+        }
+        return data;
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

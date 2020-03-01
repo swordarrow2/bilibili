@@ -2,6 +2,7 @@ package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.content.*;
+import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
@@ -14,7 +15,7 @@ import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import android.os.*;
+import org.jsoup.*;
 
 public class BaseIdFragment extends Fragment {
 
@@ -67,6 +68,7 @@ public class BaseIdFragment extends Fragment {
 		}
 		spList.add("每次选择");
 		spList.add("主账号");
+		spList.add("全部");
 		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
 			spList.add(ai.name);
 		}
@@ -99,6 +101,19 @@ public class BaseIdFragment extends Fragment {
 						}
 					}
 				}).show();
+		} else if (sel.equals("全部")) {
+			MainActivity.instance.threadPool.execute(new Runnable(){
+
+					@Override
+					public void run() {
+						for (AccountInfo ac:MainActivity.instance.loginAccounts) {
+							opSwitch(ac, opValue, msg);
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {}
+						}
+					}
+				});
 		} else {
 			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))): MainActivity.instance.getAccount(sel), opValue, msg);
 		}
@@ -119,7 +134,7 @@ public class BaseIdFragment extends Fragment {
 									@Override
 									public void run() {
 										final EditText editText = new EditText(getActivity());
-										new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("输入辣条数(" + ai.name + ")").setView(editText).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 												@Override
 												public void onClick(DialogInterface dialog, int which) {
 													MainActivity.instance.threadPool.execute(new Runnable(){
@@ -173,17 +188,17 @@ public class BaseIdFragment extends Fragment {
 		final long uid=liveToMainInfo.get("uid").getAsLong();
 		final GiftBag liveBag = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 		if (liveBag.data.list.size() == 0) {
-			MainActivity.instance.showToast("包裹中什么也没有");
+			//	MainActivity.instance.showToast("包裹中什么也没有");
 		}
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-
 					ListView listView=new ListView(getActivity());
+					new AlertDialog.Builder(getActivity()).setView(listView).setTitle("选择(" + ai.name + ")").show();
 					final GiftAdapter giftAdapter = new GiftAdapter(getActivity(), liveBag.data.list);
 					listView.setAdapter(giftAdapter);
 					int ii=getStripCount(liveBag.data.list);
-					MainActivity.instance.showToast("共有" + ii + "辣条");
+					//	MainActivity.instance.showToast("共有" + ii + "辣条");
 					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 							@Override
 							public void onItemClick(final AdapterView<?> parent, View view, final int p, long itemid) {
@@ -195,42 +210,38 @@ public class BaseIdFragment extends Fragment {
 											MainActivity.instance.threadPool.execute(new Runnable() {
 													@Override
 													public void run() {
-														try {
-															int num=Integer.parseInt(editText.getText().toString());
-															if (num > getStripCount(liveBag.data.list)) {
-																MainActivity.instance.showToast("辣条不足");	
-																return;
-															}
-															for (GiftBag.ListItem i:liveBag.data.list) {
-																if (i.gift_name.equals("辣条")) {
-																	if (num > i.gift_num) {
-																		sendHotStrip(ai.uid, uid, id, i.gift_num, ai.cookie, i);
-																		num -= i.gift_num;
-																		i.gift_num = 0;
-																	} else {
-																		sendHotStrip(ai.uid, uid, id, num, ai.cookie, i);											
-																		i.gift_num -= num;
-																		break;	
-																	}
-																}
-															}
-															if (getStripCount(liveBag.data.list) == 0) {
-																MainActivity.instance.showToast("已送出全部礼物🎁");
-															}
-															for (int i=0;i < liveBag.data.list.size();++i) {
-																if (liveBag.data.list.get(i).gift_name.equals("辣条") && liveBag.data.list.get(i).gift_num == 0) {
-																	liveBag.data.list.remove(i);
-																}
-															}										
-															getActivity().runOnUiThread(new Runnable() {
-																	@Override
-																	public void run() {
-																		giftAdapter.notifyDataSetChanged();
-																	}
-																});
-														} catch (IOException e) {
-															e.printStackTrace();
+														int num=Integer.parseInt(editText.getText().toString());
+														if (num > getStripCount(liveBag.data.list)) {
+															MainActivity.instance.showToast("辣条不足");	
+															return;
 														}
+														for (GiftBag.ListItem i:liveBag.data.list) {
+															if (i.gift_name.equals("辣条")) {
+																if (num > i.gift_num) {
+																	sendHotStrip(ai.uid, uid, id, i.gift_num, ai.cookie, i);
+																	num -= i.gift_num;
+																	i.gift_num = 0;
+																} else {
+																	sendHotStrip(ai.uid, uid, id, num, ai.cookie, i);											
+																	i.gift_num -= num;
+																	break;	
+																}
+															}
+														}
+														if (getStripCount(liveBag.data.list) == 0) {
+															MainActivity.instance.showToast("已送出全部礼物🎁");
+														}
+														for (int i=0;i < liveBag.data.list.size();++i) {
+															if (liveBag.data.list.get(i).gift_name.equals("辣条") && liveBag.data.list.get(i).gift_num == 0) {
+																liveBag.data.list.remove(i);
+															}
+														}										
+														getActivity().runOnUiThread(new Runnable() {
+																@Override
+																public void run() {
+																	giftAdapter.notifyDataSetChanged();
+																}
+															});
 													}
 												});
 										}
@@ -244,21 +255,17 @@ public class BaseIdFragment extends Fragment {
 								MainActivity.instance.threadPool.execute(new Runnable() {
 										@Override
 										public void run() {
-											try {
-												sendHotStrip(ai.uid, uid, id, liveBag.data.list.get(p3).gift_num, ai.cookie, liveBag.data.list.get(p3));
-												liveBag.data.list.remove(p3);
-												if (liveBag.data.list.size() == 0) {
-													MainActivity.instance.showToast("已送出全部礼物🎁");
-												}
-												getActivity().runOnUiThread(new Runnable() {
-														@Override
-														public void run() {
-															giftAdapter.notifyDataSetChanged();
-														}
-													});
-											} catch (IOException e) {
-												e.printStackTrace();
+											sendHotStrip(ai.uid, uid, id, liveBag.data.list.get(p3).gift_num, ai.cookie, liveBag.data.list.get(p3));
+											liveBag.data.list.remove(p3);
+											if (liveBag.data.list.size() == 0) {
+												MainActivity.instance.showToast("已送出全部礼物🎁");
 											}
+											getActivity().runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														giftAdapter.notifyDataSetChanged();
+													}
+												});
 										}
 									});
 								return true;
@@ -278,63 +285,43 @@ public class BaseIdFragment extends Fragment {
 		return ii;
 	}
 
-	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) throws IOException {
-        URL postUrl = new URL("https://api.live.bilibili.com/gift/v2/live/bag_send");
-        String content = "";//要发出的数据
-        // 打开连接
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        // 设置是否向connection输出，因为这个是post请求，参数要放在http正文内，因此需要设为true
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestMethod("POST");
-        //	 Post请求不能使用缓存
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("Host", "api.live.bilibili.com");
-        connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-        connection.setRequestProperty("Origin", "https://live.bilibili.com");
-        connection.setRequestProperty("User-Agent", MainActivity.instance.userAgent);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        connection.setRequestProperty("Referer", "https://live.bilibili.com/" + roomID);
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
-        connection.setRequestProperty("cookie", cookie);
-        content = "uid=" + uid +
-			"&gift_id=" + liveBagDataList.gift_id +
-			"&ruid=" + ruid +
-			"&gift_num=" + num +
-			"&bag_id=" + liveBagDataList.bag_id +
-			"&platform=pc" +
-			"&biz_code=live" +
-			"&biz_id=" + roomID +
-			"&rnd=" + (System.currentTimeMillis() / 1000) +
-			"&storm_beat_id=0" +
-			"&metadata=" +
-			"&price=0" +
-			"&csrf_token=" + Tools.Network.cookieToMap(cookie).get("bili_jct") +
-			"&csrf=" + Tools.Network.cookieToMap(cookie).get("bili_jct") +
-			"&visit_id=";
-        connection.setRequestProperty("Content-Length", String.valueOf(content.length()));
-        // 连接,从postUrl.openConnection()至此的配置必须要在 connect之前完成
-        // 要注意的是connection.getOutputStream会隐含的进行 connect
-        connection.connect();
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        StringBuilder s = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            s.append(line);
+	public static void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
+		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
+		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+		connection.userAgent(MainActivity.instance.userAgent)
+			.headers(MainActivity.instance.liveHead)
+			.ignoreContentType(true)
+			.referrer("https://live.bilibili.com/" + roomID)
+			.cookies(Tools.Network.cookieToMap(cookie))
+			.method(Connection.Method.POST)
+			.data("uid", String.valueOf(uid))
+			.data("gift_id", String.valueOf(liveBagDataList.gift_id))
+			.data("ruid", String.valueOf(ruid))
+			.data("gift_num", String.valueOf(num))
+			.data("bag_id", String.valueOf(liveBagDataList.bag_id))
+			.data("platform", "pc")
+			.data("biz_code", "live")
+			.data("biz_id", String.valueOf(roomID))
+			.data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
+			.data("storm_beat_id", "0")
+			.data("metadata", "")
+			.data("price", "0")
+			.data("csrf_token", csrf)
+			.data("csrf", csrf)
+			.data("visit_id", "");	
+		Connection.Response response=null;
+		try {
+			response = connection.execute();
+		} catch (IOException e) {
+			MainActivity.instance.showToast("连接出错");
+			return;
 		}
-        String ss = s.toString();
-        JsonParser parser = new JsonParser();
-        JsonObject obj = parser.parse(ss).getAsJsonObject();
-        MainActivity.instance.showToast(obj.get("msg").getAsString());
-        reader.close();
-        connection.disconnect();
+		if (response.statusCode() != 200) {
+			MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+		}
+		JsonParser parser = new JsonParser();
+		JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+		MainActivity.instance.showToast(obj.get("message").getAsString());
 	}
 
 	private void saveConfig() {

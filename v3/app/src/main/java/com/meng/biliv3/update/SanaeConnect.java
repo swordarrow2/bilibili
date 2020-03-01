@@ -12,15 +12,21 @@ import java.net.*;
 import java.nio.*;
 import org.java_websocket.client.*;
 import org.java_websocket.handshake.*;
+import com.meng.biliv3.fragment.*;
 
 public class SanaeConnect extends WebSocketClient {
 
+	private AvFragment.DanmakuBean afdb;
 	public SanaeConnect() throws Exception {
 		super(new URI("ws://123.207.65.93:9234"));
 	}
 
 	@Override
 	public void onOpen(ServerHandshake p1) {
+
+	}
+
+	public void sendUpdate() {
 		try {
 			PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
 			CheckNewBean cnb=new CheckNewBean();
@@ -30,6 +36,13 @@ public class SanaeConnect extends WebSocketClient {
 		} catch (PackageManager.NameNotFoundException e) {
 
 		}
+	}
+
+	public void sendHash(AvFragment.DanmakuBean afdb) {
+		this.afdb = afdb;
+		BotDataPack toSend=BotDataPack.encode(BotDataPack.getIdFromHash);
+		toSend.write((int)afdb.userHash);
+		send(toSend.getData());
 	}
 
 	@Override
@@ -72,6 +85,9 @@ public class SanaeConnect extends WebSocketClient {
 			MainActivity.instance.showToast("文件已保存至" + f.getAbsolutePath());
 		} else if (bdp.getOpCode() == BotDataPack.opTextNotify) {
 			MainActivity.instance.showToast(bdp.readString());
+		} else if (bdp.getOpCode() == BotDataPack.getIdFromHash) {
+			afdb.uid = bdp.readInt();
+		//	MainActivity.instance.showToast("获取到的:"+afdb.uid);
 		}
 		super.onMessage(bytes);
 	}

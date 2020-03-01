@@ -139,6 +139,44 @@ public class Tools {
 			JsonObject obj2 = parser.parse(res2.body()).getAsJsonObject();
 			MainActivity.instance.showToast(obj2.get("message").getAsString());
 		}
+		
+		public static void sendFavorite(int count, int AID, String cookie) {
+			
+			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
+			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
+			//rid=55340268&type=2&add_media_ids=101411121&del_media_ids=&jsonp=jsonp&csrf=14f4956b04e6775a3a32ca47a30b5d54
+			/*String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",cookie);
+			JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
+			JsonArray fja=fjobj.get("list").getAsJsonArray();
+			long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+			
+			*/
+			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
+			connection.userAgent(MainActivity.instance.userAgent)
+                .headers(MainActivity.instance.mainHead)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/video/av" + AID)
+                .cookies(Tools.Network.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("rid", String.valueOf(AID))
+                .data("multiply", String.valueOf(count))
+                .data("select_like", "0")
+                .data("cross_domain", "true")
+                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			Connection.Response response=null;
+			try {
+				response = connection.execute();
+			} catch (IOException e) {
+				MainActivity.instance.showToast("连接出错");
+				return;
+			}
+			if (response.statusCode() != 200) {
+				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+			}
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+			MainActivity.instance.showToast(obj.get("message").getAsString());
+		}
 
 		public static void sendCoin(int count, int AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");

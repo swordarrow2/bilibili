@@ -27,7 +27,8 @@ public class BotDataPack {
 	public static final int opCrashLog = 54;
 
 	public static final int sendToMaster = 56;
-
+	public static final int getIdFromHash = 57;
+	
 
 	public static BotDataPack encode(int opCode) {
 		return new BotDataPack(opCode);

@@ -1,0 +1,36 @@
+{
+    "code": 0,
+    "data": {
+        "count": 1,
+        "list": [
+            {
+                "attr": 0,
+                "cnt_info": {
+                    "coin": 0,
+                    "collect": 0,
+                    "danmaku": 0,
+                    "play": 0,
+                    "reply": 0,
+                    "share": 0,
+                    "thumb_down": 0,
+                    "thumb_up": 0
+                },
+                "cover": "",
+                "cover_type": 0,
+                "ctime": 1481787029,
+                "fav_state": 1,
+                "fid": 1014111,
+                "id": 101411121,
+                "intro": "",
+                "like_state": 0,
+                "media_count": 26,
+                "mid": 64483321,
+                "mtime": 1554453826,
+                "state": 0,
+                "title": "默认收藏夹",
+                "type": 11
+            }
+        ]
+    },
+    "message": "success"
+}

@@ -5,7 +5,6 @@ import android.view.*;
 import android.widget.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
@@ -47,13 +46,13 @@ public class MainListAdapter extends BaseAdapter {
             holder.ivHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));
         } else {
             if (MainActivity.onWifi) {
-                MainActivity.instance.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(accountInfo.uid), DownloadImageRunnable.BilibiliUser));
+                MainActivity.instance.threadPool.execute(new DownloadImageRunnable(holder.ivHead, accountInfo.uid, DownloadImageRunnable.BilibiliUser));
             } else {
                 holder.ivHead.setImageResource(R.drawable.stat_sys_download_anim0);
                 holder.ivHead.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							MainActivity.instance.threadPool.execute(new DownloadImageRunnable(activity, holder.ivHead, String.valueOf(accountInfo.uid), DownloadImageRunnable.BilibiliUser));
+							MainActivity.instance.threadPool.execute(new DownloadImageRunnable(holder.ivHead, accountInfo.uid, DownloadImageRunnable.BilibiliUser));
 						}
 					});
             }

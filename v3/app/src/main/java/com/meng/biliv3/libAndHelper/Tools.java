@@ -6,7 +6,6 @@ import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.live.*;
-import com.meng.biliv3.fragment.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
@@ -14,7 +13,6 @@ import java.security.*;
 import java.text.*;
 import java.util.*;
 import org.jsoup.*;
-import android.os.*;
 
 public class Tools {
 
@@ -140,7 +138,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj2.get("message").getAsString());
 		}
 		
-		public static void sendFavorite(int count, int AID, String cookie) {
+		public static void sendFavorite(int count, long AID, String cookie) {
 			
 			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
 			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
@@ -178,7 +176,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendCoin(int count, int AID, String cookie) {
+		public static void sendCoin(int count, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(MainActivity.instance.mainHead)
@@ -206,7 +204,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendVideoJudge(String msg, int AID, String cookie) {
+		public static void sendVideoJudge(String msg, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(MainActivity.instance.mainHead)
@@ -234,7 +232,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendLike(int AID, String cookie) {
+		public static void sendLike(long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/archive/like");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(MainActivity.instance.mainHead)

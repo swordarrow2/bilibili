@@ -3,9 +3,9 @@ package com.meng.biliv3.javaBean;
 public class BilibiliUserInfo {
     public int code;
     public String message;
-    public bilibiliPersonInfoData data = new bilibiliPersonInfoData();
+    public Data data;
 
-    public class bilibiliPersonInfoData {
+    public class Data {
         public long mid;
         public String name;
         public String sex;
@@ -19,7 +19,7 @@ public class BilibiliUserInfo {
         public String birthday;
         public float coins;
         public Official official;
-        public Vip vip = new Vip();
+        public Vip vip;
         public boolean is_followed;
         public String top_photo;
         public Theme theme;
@@ -39,5 +39,4 @@ public class BilibiliUserInfo {
         public int status;
         public int theme_type;
     }
-
 }

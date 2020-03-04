@@ -33,7 +33,7 @@ public class BaseIdFragment extends Fragment {
 	protected static final int Coin2=7;
 	protected static final int Favorite=8;
 
-	protected int id;
+	protected long id;
 	protected String type;
 
 	protected static ArrayAdapter<String> sencencesAdapter=null;

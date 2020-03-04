@@ -8,9 +8,7 @@ import android.widget.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javaBean.*;
-import com.meng.biliv3.libAndHelper.*;
 import java.io.*;
 
 public class UserInfoHeaderView extends LinearLayout {
@@ -78,7 +76,7 @@ public class UserInfoHeaderView extends LinearLayout {
 			Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
 			ivHead.setImageBitmap(b);
 		} else {
-			MainActivity.instance.threadPool.execute(new DownloadImageRunnable(MainActivity.instance, ivHead, String.valueOf(ai.uid), DownloadImageRunnable.BilibiliUser));
+			MainActivity.instance.threadPool.execute(new DownloadImageRunnable(ivHead, ai.uid, DownloadImageRunnable.BilibiliUser));
 		}
 		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override

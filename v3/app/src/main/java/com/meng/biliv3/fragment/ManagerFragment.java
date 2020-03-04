@@ -31,11 +31,7 @@ public class ManagerFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-					Intent intent = new Intent(getActivity(), InfoActivity.class);
-					intent.putExtra("bid", String.valueOf(MainActivity.instance.loginAccounts.get(position).uid));
-					intent.putExtra("pos", position);
-					intent.putExtra("cookie", MainActivity.instance.loginAccounts.get(position).cookie);
-					startActivity(intent);
+					MainActivity.instance.showFragment(UidFragment.class, BaseIdFragment.typeUID, MainActivity.instance.loginAccounts.get(position).uid);
 				}
 			});
         list.setOnItemLongClickListener(new OnItemLongClickListener() {

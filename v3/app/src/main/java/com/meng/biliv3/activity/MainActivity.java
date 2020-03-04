@@ -25,9 +25,9 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
+import org.java_websocket.client.*;
 
 import com.meng.biliv3.R;
-import java.util.zip.*;
 
 
 public class MainActivity extends Activity {
@@ -63,6 +63,8 @@ public class MainActivity extends Activity {
     public Map<String, String> mainHead = new HashMap<>();
 
 	public SanaeConnect sanaeConnect;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,21 +129,42 @@ public class MainActivity extends Activity {
         }
 		try {
 			sanaeConnect = new SanaeConnect();
+			sanaeConnect.addOnOpenAction(new WebSocketOnOpenAction(){
+
+					@Override
+					public int useTimes() {
+						return 1;
+					}
+
+					@Override
+					public void action(WebSocketClient wsc) {
+						try {
+							PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
+							CheckNewBean cnb=new CheckNewBean();
+							cnb.packageName = packageInfo.packageName;
+							cnb.nowVersionCode = packageInfo.versionCode;
+							wsc.send(new Gson().toJson(cnb));
+						} catch (PackageManager.NameNotFoundException e) {
+							MainActivity.instance.showToast(e.toString());
+						}
+					}
+				});
 			sanaeConnect.connect();
-			sanaeConnect.sendUpdate();
-		} catch (Exception e) {}
-	/*	threadPool.execute(new Runnable(){
+		} catch (Exception e) {
+			showToast(e.toString());
+		}
+		/*	threadPool.execute(new Runnable(){
 
-				@Override
-				public void run() {
-					String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",loginAccounts.get(0).cookie);
-					JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
-					JsonArray fja=fjobj.get("list").getAsJsonArray();
-					long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+		 @Override
+		 public void run() {
+		 String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",loginAccounts.get(0).cookie);
+		 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
+		 JsonArray fja=fjobj.get("list").getAsJsonArray();
+		 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
 
-					showToast(add_media_id+"");
-				}
-			});*/
+		 showToast(add_media_id+"");
+		 }
+		 });*/
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new Runnable(){
@@ -187,19 +210,7 @@ public class MainActivity extends Activity {
 				}
 			});
 	}
-	public static byte[] readFile(int offset) {
-        RandomAccessFile randomAccessFile;
-		byte[] data=new byte[4];
-        try {
-            randomAccessFile = new RandomAccessFile(Environment.getExternalStorageDirectory() + "/hash.dat", "r");
-            randomAccessFile.seek(offset);
-            randomAccessFile.readFully(data);
-            randomAccessFile.close();
-        } catch (Exception e) {
-            throw new RuntimeException("bgm read failed");
-        }
-        return data;
-    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -296,9 +307,6 @@ public class MainActivity extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (view instanceof TextView) {
                 switch (((TextView) view).getText().toString()) {
-//                    case "首页(大概)":
-//                        showFragment("Main");
-//                        break;
 					case "输入ID":
 						final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
 						final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
@@ -311,12 +319,12 @@ public class MainActivity extends Activity {
 								public void onClick(DialogInterface dialog, int which) {
 									String content = et.getText().toString();
 									RadioButton uid,av,live;
-									//	uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
+									uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
 									av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
 									live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
-									/*	if (uid.isChecked()) {
-									 newIDFragment(UidFragment.class, UID , getId(content));
-									 } else*/ if (av.isChecked()) {
+									if (uid.isChecked()) {
+										showFragment(UidFragment.class, BaseIdFragment.typeUID , getId(content));
+									} else if (av.isChecked()) {
 										showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
 									} else if (live.isChecked()) {
 										showFragment(LiveFragment.class, BaseIdFragment.typeLive , getId(content));
@@ -327,9 +335,6 @@ public class MainActivity extends Activity {
 					case "管理账号":
 						showFragment(ManagerFragment.class, AccountManager);
 						break;
-						/* case "信息":
-						 showFragment("人员信息");
-						 break;*/
                     case "设置":
                         showFragment(SettingsFragment.class, Settings);
                         break;
@@ -401,13 +406,13 @@ public class MainActivity extends Activity {
         transaction.commit();
 	}
 
-	public <T extends Fragment> void showFragment(Class<T> c, String type, int id) {
+	public <T extends Fragment> void showFragment(Class<T> c, String type, long id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		Fragment frag = fragments.get(type + id);
 		if (frag == null) {
 			try {
 				Class<?> cls = Class.forName(c.getName());
-				Constructor con = cls.getConstructor(String.class, int.class);
+				Constructor con = cls.getConstructor(String.class, long.class);
 				frag = (Fragment) con.newInstance(type, id);
 				fragments.put(type + id, frag);
 				recentAdapter.add(type + id);
@@ -582,4 +587,3 @@ public class MainActivity extends Activity {
 			});
     }
 }
-

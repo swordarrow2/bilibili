@@ -39,7 +39,7 @@ public class BilibiliMyInfo {
     }
 
     public class Nameplate {
-        public int nid;
+        public long nid;
         public String name;
         public String image;
         public String image_small;

@@ -1,6 +1,6 @@
 package com.meng.biliv3.javaBean;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class HourRank {
     public int code;
@@ -21,10 +21,10 @@ public class HourRank {
     }
 
     public class HourRankDataList {
-        public int id;
+        public long id;
         public int score;
         public int rank;
-        public int uid;
+        public long uid;
         public String uname;
         public String face;
         public int prescore;
@@ -47,16 +47,16 @@ public class HourRank {
     }
 
     public class BestAssist {
-        public int uid;
+        public long uid;
         public String face;
         public String uname;
     }
 
     public class HourRankInfoOwn {
-        public int id;
+        public long id;
         public int score;
         public String rank;
-        public int uid;
+        public long uid;
         public String uname;
         public String face;
         public String cover;

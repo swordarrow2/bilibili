@@ -1,6 +1,6 @@
 package com.meng.biliv3.javaBean;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class LivePartList {
     public int code;
@@ -9,7 +9,7 @@ public class LivePartList {
     public ArrayList<DataListItem> data;
 
     public class DataListItem {
-        public int id;
+        public long id;
         public String name;
         public ArrayList<ListItemInListItem> list;
     }

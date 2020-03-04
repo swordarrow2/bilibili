@@ -4,7 +4,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
-	
+
 	<ImageView
 		android:layout_width="fill_parent"
 		android:layout_height="200dp"
@@ -106,13 +106,10 @@
 		android:text="从弹幕查找发送者"
 		android:id="@+id/avfragmentButtonGetDanmakuSender"/>
 
-	<TextView
-		android:id="@+id/av_fragmentTextView_sender"
-		android:focusable="true"
-		android:longClickable="true"
-		android:textIsSelectable="true"
-		android:layout_height="fill_parent"
-		android:layout_width="match_parent"/>
+	<ListView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:id="@+id/av_fragmentListView1"/>
 
 </LinearLayout>
 

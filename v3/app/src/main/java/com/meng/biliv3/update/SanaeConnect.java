@@ -13,36 +13,53 @@ import java.nio.*;
 import org.java_websocket.client.*;
 import org.java_websocket.handshake.*;
 import com.meng.biliv3.fragment.*;
+import java.util.*;
+import java.nio.channels.*;
 
 public class SanaeConnect extends WebSocketClient {
 
-	private AvFragment.DanmakuBean afdb;
+	private HashSet<WebSocketMessageAction> messageAction = new HashSet<>();
+	private HashSet<WebSocketOnOpenAction> onOpenAction = new HashSet<>();
 	public SanaeConnect() throws Exception {
 		super(new URI("ws://123.207.65.93:9234"));
 	}
 
 	@Override
 	public void onOpen(ServerHandshake p1) {
+		MainActivity.instance.threadPool.execute(new Runnable(){
 
-	}
-
-	public void sendUpdate() {
-		try {
-			PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
-			CheckNewBean cnb=new CheckNewBean();
-			cnb.packageName = packageInfo.packageName;
-			cnb.nowVersionCode = packageInfo.versionCode;
-			send(new Gson().toJson(cnb));
-		} catch (PackageManager.NameNotFoundException e) {
-
+				@Override
+				public void run() {
+					while (true) {
+						try {
+							Thread.sleep(30000);
+						} catch (InterruptedException e) {}
+						try {
+							send("");
+						} catch (Exception e) {
+							if (isClosed()) {
+								reconnect();
+							}
+						}
+					}
+				}
+			});
+		Iterator<WebSocketOnOpenAction> iterator=onOpenAction.iterator();
+		while (iterator.hasNext()) {
+			WebSocketOnOpenAction wma=iterator.next();
+			wma.action(this);
+			if (wma.useTimes() == 1) {
+				iterator.remove();
+			}
 		}
 	}
 
-	public void sendHash(AvFragment.DanmakuBean afdb) {
-		this.afdb = afdb;
-		BotDataPack toSend=BotDataPack.encode(BotDataPack.getIdFromHash);
-		toSend.write((int)afdb.userHash);
-		send(toSend.getData());
+	public void addMessageAction(WebSocketMessageAction wma) {
+		messageAction.add(wma);
+	}
+
+	public void addOnOpenAction(WebSocketOnOpenAction wma) {
+		onOpenAction.add(wma);
 	}
 
 	@Override
@@ -79,6 +96,22 @@ public class SanaeConnect extends WebSocketClient {
 	@Override
 	public void onMessage(ByteBuffer bytes) {
 		BotDataPack bdp=BotDataPack.decode(bytes.array());
+
+		//MainActivity.instance.showToast("收到数据" + bdp.getOpCode() + " 长度" + bytes.array().length);
+		Iterator<WebSocketMessageAction> iterator=messageAction.iterator();
+		while (iterator.hasNext()) {
+			WebSocketMessageAction wma=iterator.next();
+			if (wma.forOpCode() == bdp.getOpCode()) {
+				BotDataPack sendBdp=wma.onMessage(bdp);
+				if (sendBdp != null) {
+					send(sendBdp.getData());
+				}
+				if (wma.useTimes() == 1) {
+					iterator.remove();
+				}
+			}
+		}
+
 		if (bdp.getOpCode() == BotDataPack.opGetApp) {
 			File f=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".apk");
 			bdp.readFile(f);
@@ -86,15 +119,15 @@ public class SanaeConnect extends WebSocketClient {
 		} else if (bdp.getOpCode() == BotDataPack.opTextNotify) {
 			MainActivity.instance.showToast(bdp.readString());
 		} else if (bdp.getOpCode() == BotDataPack.getIdFromHash) {
-			afdb.uid = bdp.readInt();
-		//	MainActivity.instance.showToast("获取到的:"+afdb.uid);
+			//	afdb.uid = bdp.readInt();
+			//	MainActivity.instance.showToast("获取到的:"+afdb.uid);
 		}
 		super.onMessage(bytes);
 	}
 
 	@Override
 	public void onClose(int p1, String p2, boolean p3) {
-		// TODO: Implement this method
+
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class LiveFragment extends BaseIdFragment {
 	private Spinner selectAccount;
 
 	private JsonObject liveInfo;
-	public LiveFragment(String type, int liveId) {
+	public LiveFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
 	}

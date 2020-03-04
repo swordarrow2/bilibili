@@ -1,4 +1,5 @@
 package com.meng.biliv3.fragment;
+
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
@@ -11,8 +12,10 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.update.*;
 import java.io.*;
 import java.util.*;
 import org.jsoup.*;
@@ -20,43 +23,21 @@ import org.xmlpull.v1.*;
 
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import java.util.zip.*;
 
 public class AvFragment extends BaseIdFragment {
 
 	private Button send,editPre,preset,zan,coin1,coin2,favorite,findSender;
 	private EditText et;
-	private TextView info,danmakuSender;
+	private TextView info;
 	private Spinner selectAccount;
 	private VideoInfoBean videoInfo;
 	private ImageView ivPreview;
 	private Bitmap preview;
 	private ArrayList<DanmakuBean> danmakuList=null;
-	public class DanmakuBean {
-		/*	1.29800, 为弹幕播放起始时间 （在视频中出现的时间，单位是秒）
 
-		 第二个参数是弹幕的模式1..3 滚动弹幕 4底端弹幕 5顶端弹幕 6.逆向弹幕 7精准定位 8高级弹幕 
-
-		 第三个参数是字号， 12非常小,16特小,18小,25中,36大,45很大,64特别大 
-		 第四个参数是字体的颜色以HTML颜色的十进制为准 
-		 第五个参数是Unix格式的时间戳。基准时间为 1970-1-1 08:00:00 
-		 第六个参数是弹幕池 0普通池 1字幕池 2特殊池【目前特殊池为高级弹幕专用】 
-		 第七个参数是发送者的ID，用于“屏蔽此弹幕的发送者”功能 
-		 第八个参数是弹幕在弹幕数据库中rowID 用于“历史弹幕”功能。
-		 */
-		public int uid=-1;
-		public float time;
-		public int mode;
-		public int fontSize;
-		public int color;
-		public long timeStamp;
-		public int danmakuPool;
-		public long userHash;
-		public long databaseId;
-		public String msg;
-	}
-
-	public AvFragment(String type, int liveId) {
+	private SenderAdapter senderAdapter;
+	private ListView lv;
+	public AvFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
 	}
@@ -69,17 +50,15 @@ public class AvFragment extends BaseIdFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		lv = (ListView) view.findViewById(R.id.av_fragmentListView1);
 		send = (Button) view.findViewById(R.id.av_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
 		findSender = (Button) view.findViewById(R.id.avfragmentButtonGetDanmakuSender);
-		//findSender.setVisibility(View.GONE);
 		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
 		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
 		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
 		favorite = (Button) view.findViewById(R.id.av_fragmentButton_favorite);
-		danmakuSender = (TextView) view.findViewById(R.id.av_fragmentTextView_sender);
 		et = (EditText) view.findViewById(R.id.av_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
@@ -93,6 +72,18 @@ public class AvFragment extends BaseIdFragment {
 		//editPre.setOnClickListener(onclick);
 		findSender.setOnClickListener(onclick);
 		selectAccount.setAdapter(spinnerAccountAdapter);
+		lv.setOnItemClickListener(new OnItemClickListener(){
+
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+					DanmakuBean db=(DanmakuBean) p1.getItemAtPosition(p3);
+					if (db.uid == -1) {
+						MainActivity.instance.showToast("请等待获取id完成");
+						return;
+					}
+					MainActivity.instance.showFragment(UidFragment.class, BaseIdFragment.typeUID , db.uid);
+				}
+			});
 		ivPreview.setOnLongClickListener(new OnLongClickListener(){
 
 				@Override
@@ -235,47 +226,63 @@ public class AvFragment extends BaseIdFragment {
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
+		senderAdapter = new SenderAdapter(MainActivity.instance, danmakuList);
+		getActivity().runOnUiThread(new Runnable(){
 
-		for (final DanmakuBean db:danmakuList) {
-			if (MainActivity.instance.sanaeConnect.isClosed()) {
-				MainActivity.instance.sanaeConnect.reconnect();
-			}
-			if (db.uid != -1) {
-				final int uid=db.uid;
-				final String hashS=Long.toHexString(db.userHash);
-				final String dan=db.msg;
-				MainActivity.instance.runOnUiThread(new Runnable(){
-
-						@Override
-						public void run() {
-							danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + uid + "  hash:" + hashS + " 弹幕:" + dan);
-						}
-					});
-				continue;
-			}
-			MainActivity.instance.sanaeConnect.sendHash(db);
-			while (db.uid == -1) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {}
-			}
-			for (DanmakuBean da:danmakuList) {
-				if (da.userHash == db.userHash) {
-					da.uid = db.uid;
+				@Override
+				public void run() {
+					lv.setAdapter(senderAdapter);
 				}
-			}
-			final int uid=db.uid;
-			final String hashS=Long.toHexString(db.userHash);
-			final String dan=db.msg;
-			MainActivity.instance.runOnUiThread(new Runnable(){
+			});
+		MainActivity.instance.sanaeConnect.addMessageAction(new WebSocketMessageAction(){
 
-					@Override
-					public void run() {
-						danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + uid + "  hash:" + hashS + " 弹幕:" + dan);
+				@Override
+				public int useTimes() {
+					return 1;
+				}
+
+				@Override
+				public int forOpCode() {
+					return BotDataPack.getIdFromHash;
+				}
+
+				@Override
+				public BotDataPack onMessage(BotDataPack rec) {
+					try {
+						HashMap<Integer,Integer> result=new HashMap<>();
+						while (rec.hasNext()) {
+							result.put(rec.readInt(), rec.readInt());
+						}
+						for (DanmakuBean db:danmakuList) {
+							if (result.get((int)db.userHash) == null) {
+								db.uid = -1;
+							} else {
+								db.uid = result.get((int)db.userHash);
+							}
+						}
+						MainActivity.instance.showToast("完成");
+						MainActivity.instance.runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									senderAdapter.notifyDataSetChanged();
+								}
+							});
+					} catch (Exception e) {
+						MainActivity.instance.showToast(e.toString());
 					}
-				});
+					return null;
+				}
+			});
+		BotDataPack toSend=BotDataPack.encode(BotDataPack.getIdFromHash);
+		HashSet<Long> is=new HashSet<>();
+		for (DanmakuBean db:danmakuList) {
+			is.add(db.userHash);
 		}
-		MainActivity.instance.showToast("完成");
+		for (long l:is) {
+			toSend.write((int)l);
+		}
+		MainActivity.instance.sanaeConnect.send(toSend.getData());
 	}
 	/*
 	 private void boom() throws IOException {

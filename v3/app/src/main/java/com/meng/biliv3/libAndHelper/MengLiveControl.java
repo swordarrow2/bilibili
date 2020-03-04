@@ -64,8 +64,7 @@ public class MengLiveControl extends LinearLayout {
 								@Override
 								public void run() {
 									autoCompleteTextView.setAdapter(new PartListAdapter((Activity) context, itemInListItem));
-									MainActivity.instance.showToast("分区服务器连接成功");
-								}
+														}
 							});         
 					} catch (Exception e) {
 						MainActivity.instance.showToast(e.toString());

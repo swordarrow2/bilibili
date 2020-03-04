@@ -1,6 +1,5 @@
 package com.meng.biliv3.libAndHelper;
 
-import android.app.*;
 import android.graphics.*;
 import android.widget.*;
 import com.google.gson.*;
@@ -16,12 +15,11 @@ public class DownloadImageRunnable implements Runnable {
     public static final int BilibiliUser=2;
     private ImageView imageView;
     private int headType;
-    private String id = "";
+    private long id;
     private File imageFile;
-    private Activity activity;
 
-    public DownloadImageRunnable(Activity context, ImageView imageView, String id, int headType) {
-        this.activity = context;
+
+    public DownloadImageRunnable(ImageView imageView, long id, int headType) {
         this.imageView = imageView;
         this.headType = headType;
         this.id = id;
@@ -58,7 +56,7 @@ public class DownloadImageRunnable implements Runnable {
         }
     }
 
-    private String getBilibiliHeadUrl(String uid) {
+    private String getBilibiliHeadUrl(long uid) {
         try {
             URL url = new URL("https://api.bilibili.com/x/space/acc/info?mid=" + uid + "&jsonp=jsonp");
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -91,13 +89,14 @@ public class DownloadImageRunnable implements Runnable {
             }
             is.close();
             connection.disconnect();
-            activity.runOnUiThread(new Runnable() {
+			final Bitmap bmp=BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+            MainActivity.instance.runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
-                    imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
-                }
-            });
+					@Override
+					public void run() {
+						imageView.setImageBitmap(bmp);
+					}
+				});
         } catch (IOException e) {
             e.printStackTrace();
         }

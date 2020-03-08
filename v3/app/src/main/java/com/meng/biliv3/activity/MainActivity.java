@@ -17,7 +17,7 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javaBean.*;
-import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.libs.*;
 import com.meng.biliv3.materialDesign.*;
 import com.meng.biliv3.update.*;
 import java.io.*;

@@ -1,4 +1,4 @@
-package com.meng.biliv3.libAndHelper;
+package com.meng.biliv3.libs;
 
 import android.content.*;
 import android.util.*;

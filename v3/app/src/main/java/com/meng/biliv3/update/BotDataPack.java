@@ -1,6 +1,6 @@
 package com.meng.biliv3.update;
 
-import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
 

@@ -5,7 +5,7 @@ import android.content.pm.*;
 import android.os.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.libs.*;
 import com.meng.biliv3.update.*;
 import java.io.*;
 import java.net.*;

@@ -7,7 +7,7 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
-import com.meng.biliv3.libAndHelper.*;
+import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
 
@@ -44,11 +44,7 @@ public class UidFragment extends BaseIdFragment {
 
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-					ClipboardManager clipboardManager = (ClipboardManager) MainActivity.instance.getSystemService(Context.CLIPBOARD_SERVICE);
-					String s=(String) p1.getItemAtPosition(p3);
-					ClipData clipData = ClipData.newPlainText("text", s.substring(s.indexOf(":") + 1));
-					clipboardManager.setPrimaryClip(clipData);
-					MainActivity.instance.showToast("已复制到剪贴板");
+					Tools.AndroidContent.copyToClipboard((String)p1.getItemAtPosition(p3));
 				}
 			});
 		MainActivity.instance.threadPool.execute(new Runnable(){
@@ -126,6 +122,9 @@ public class UidFragment extends BaseIdFragment {
 									adapter.notifyDataSetChanged();
 								}
 							});
+						if (containsID(id)) {
+							addData("cookie", MainActivity.instance.getAccount(id).cookie);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

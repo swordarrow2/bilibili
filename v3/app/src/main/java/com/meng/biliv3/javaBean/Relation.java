@@ -7,10 +7,10 @@ public class Relation {
 	public Data data;
 
 	public class Data {
-		public int mid=0;
-		public int following=0;
-		public int whisper=0;
-		public int follower=0;
-		public int black=0;
+		public int mid;
+		public int following;
+		public int whisper;
+		public int follower;
+		public int black;
 	}
 }

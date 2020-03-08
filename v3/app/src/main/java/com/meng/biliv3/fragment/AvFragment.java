@@ -30,13 +30,14 @@ public class AvFragment extends BaseIdFragment {
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
-	private VideoInfoBean videoInfo;
+	private VideoInfo videoInfo;
 	private ImageView ivPreview;
 	private Bitmap preview;
 	private ArrayList<DanmakuBean> danmakuList=null;
 
 	private SenderAdapter senderAdapter;
 	private ListView lv;
+	
 	public AvFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
@@ -99,7 +100,7 @@ public class AvFragment extends BaseIdFragment {
 
 				@Override
 				public void run() {
-					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfoBean.class);	
+					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
 					if (videoInfo.code != 0) {
 						MainActivity.instance.showToast(videoInfo.message);
 						return;

@@ -86,7 +86,7 @@ public class UserInfoHeaderView extends LinearLayout {
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					UserSpaceToLive sjb = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UserSpaceToLive.class);
+					UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UidToLiveRoom.class);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {

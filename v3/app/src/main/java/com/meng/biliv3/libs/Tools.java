@@ -34,7 +34,27 @@ public class Tools {
 			intentOne.putExtra("pos", posInAccountList);
 			MainActivity.instance.startService(intentOne);
 		}
+		
+		public static String getMyInfo(String cookie){
+			return Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
+		}
 
+		public static String getUserInfo(long id){
+			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie);
+		}
+		
+		public static String getLiveRoomInfo(long uid){
+			return Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+uid);
+		}
+		
+		public static String getRelation(long uid){
+			return Tools.Network.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp");
+		}
+		
+		public static String getUpstat(long uid){
+			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
+		}
+		
 		public static void sendArticalJudge(long cvId, String msg, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
@@ -68,7 +88,7 @@ public class Tools {
 		public static void startLive(long roomID, String partID, String cookie) throws IOException {
 			if (partID == null) {
 				partID = "235";
-				MainActivity.instance.showToast("没有发现这个分区，已自动选择\"其他分区\"");
+				MainActivity.instance.showToast("没有发现这个分区，已自动选择\"单机-其他分区\"");
 			}
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/startLive");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
@@ -88,8 +108,8 @@ public class Tools {
 				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 			}
 			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			//   MainActivity.instence.showToast(obj.get("message").getAsString());
+			//JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+			// MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
 		public static void stopLive(int roomID, String cookie) throws IOException {

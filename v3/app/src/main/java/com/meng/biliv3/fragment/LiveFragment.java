@@ -27,6 +27,7 @@ public class LiveFragment extends BaseIdFragment {
 	private Spinner selectAccount;
 
 	private JsonObject liveInfo;
+	
 	public LiveFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
@@ -79,7 +80,7 @@ public class LiveFragment extends BaseIdFragment {
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final SpaceToLiveJavaBean sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), SpaceToLiveJavaBean.class);
+					final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
                     if (sjb.data.liveStatus != 1) {
 						getActivity().runOnUiThread(new Runnable(){
 

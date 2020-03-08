@@ -5,17 +5,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <AutoCompleteTextView
-        android:id="@+id/part"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:completionThreshold="1"
-        android:hint="@string/part" />
-
     <EditText
         android:id="@+id/et_new_name"
+		android:background="@null"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:hint="@string/new_room_name" />
 
     <Button

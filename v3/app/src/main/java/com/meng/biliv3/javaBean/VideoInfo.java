@@ -1,7 +1,7 @@
 package com.meng.biliv3.javaBean;
 import java.util.*;
 
-public class VideoInfoBean {
+public class VideoInfo {
 	public int code; 
 	public String message;
 	public int ttl;

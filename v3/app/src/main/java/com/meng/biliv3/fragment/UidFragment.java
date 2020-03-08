@@ -53,7 +53,7 @@ public class UidFragment extends BaseIdFragment {
 				public void run() {
 					try {
 						if (containsID(id)) {
-							final BilibiliMyInfo info = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", MainActivity.instance.getAccount(id).cookie), BilibiliMyInfo.class);
+							final BilibiliMyInfo info = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getMyInfo(MainActivity.instance.getAccount(id).cookie), BilibiliMyInfo.class);
 							addData("ID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -75,7 +75,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						} else {
-							final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp"), BilibiliUserInfo.class);
+							final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getUserInfo(id), BilibiliUserInfo.class);
 							addData("UID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -93,41 +93,37 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						SpaceToLiveJavaBean sjb = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + id), SpaceToLiveJavaBean.class);
+						UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getLiveRoomInfo(id), UidToLiveRoom.class);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");
 						addData("房间号", sjb.data.roomid);
-						getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									adapter.notifyDataSetChanged();
-								}
-							});
-						Relation r = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + id + "&jsonp=jsonp"), Relation.class);
+						notifyList();
+						Relation r = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getRelation(id), Relation.class);
 						addData("粉丝", r.data.follower);
 						addData("关注", r.data.following);
-						getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									adapter.notifyDataSetChanged();
-								}
-							});
-						Upstat u = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + id + "&jsonp=jsonp"), Upstat.class);
+						//addData("黑名单", r.data.black);
+						notifyList();
+						Upstat u = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getUpstat(id), Upstat.class);
 						addData("播放量", u.data.archive.view);
 						addData("阅读量", u.data.article.view);
-						getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									adapter.notifyDataSetChanged();
-								}
-							});
+						notifyList();
 						if (containsID(id)) {
 							addData("cookie", MainActivity.instance.getAccount(id).cookie);
+							notifyList();
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}
+
+				private void notifyList() {
+					getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								adapter.notifyDataSetChanged();
+							}
+						});
 				}
 			});
 	}
@@ -144,8 +140,4 @@ public class UidFragment extends BaseIdFragment {
 		}
 		return false;
 	}
-
-	/*private void addData(String title,Number content){
-	 dataSet.add(title+":"+content);
-	 }*/
 }

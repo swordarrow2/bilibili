@@ -1,12 +1,12 @@
 package com.meng.biliv3.javaBean;
 
-public class UserSpaceToLive {
-    public int code;
+public class UidToLiveRoom {
+	public int code;
     public String msg;
     public String message;
-    public SpaceToLiveData data;
+    public Data data = new Data();
 
-    public class SpaceToLiveData {
+    public class Data {
         public int roomStatus;
         public int roundStatus;
         public int liveStatus;

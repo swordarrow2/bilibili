@@ -15,9 +15,25 @@ import java.util.*;
 import org.jsoup.*;
 
 public class Tools {
-
+	public static Map<String, String> liveHead = new HashMap<>();
+    public static Map<String, String> mainHead = new HashMap<>();
+	
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
+	static{
+		liveHead.put("Host", "api.live.bilibili.com");
+        liveHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        liveHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        liveHead.put("Connection", "keep-alive");
+        liveHead.put("Origin", "https://live.bilibili.com");
+
+        mainHead.put("Host", "api.bilibili.com");
+        mainHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        mainHead.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        mainHead.put("Connection", "keep-alive");
+        mainHead.put("Origin", "https://www.bilibili.com");
+	}
+	
 	public static class AndroidContent {
 
 		public static void copyToClipboard(String s) {
@@ -59,13 +75,13 @@ public class Tools {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.liveHead)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/")
                 .cookies(Tools.Network.cookieToMap(cookie))
                 .method(Connection.Method.POST)
                 .data("oid", String.valueOf(cvId))
-                .data("type", "12")
+                .data("type", "12")//似乎是固定12 目前还没发现不是12的
                 .data("message", msg)
                 .data("plat", "1")
                 .data("jsonp", "jsonp")
@@ -93,7 +109,7 @@ public class Tools {
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/startLive");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent)
-			    .headers(MainActivity.instance.liveHead)
+			    .headers(liveHead)
 			    .ignoreContentType(true)
 			    .referrer("https://link.bilibili.com/p/center/index")
 			    .cookies(Tools.Network.cookieToMap(cookie))
@@ -116,7 +132,7 @@ public class Tools {
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/stopLive");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent).
-				headers(MainActivity.instance.liveHead).
+				headers(liveHead).
 				ignoreContentType(true).
 				referrer("https://link.bilibili.com/p/center/index").
 				cookies(Tools.Network.cookieToMap(cookie)).
@@ -137,7 +153,7 @@ public class Tools {
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/update");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 		    connection.userAgent(MainActivity.instance.userAgent)
-			    .headers(MainActivity.instance.liveHead)
+			    .headers(liveHead)
 			    .ignoreContentType(true)
 			    .referrer("https://link.bilibili.com/p/center/index")
 			    .cookies(Tools.Network.cookieToMap(cookie))
@@ -158,7 +174,7 @@ public class Tools {
 		public static int sendLiveSign(String cookie) {
 			Connection connection = Jsoup.connect("https://api.live.bilibili.com/sign/doSign");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.liveHead)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://live.bilibili.com/" + new Random().nextInt() % 9721949)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -181,7 +197,7 @@ public class Tools {
 			Connection connection = Jsoup.connect("http://api.live.bilibili.com/gift/v2/gift/send");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.liveHead)
+                .headers(liveHead)
                 .ignoreContentType(true)
                 .referrer("https://live.bilibili.com/" + roomID)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -219,7 +235,7 @@ public class Tools {
 		public static void followUser(String cookie, long UID) {
 			Connection conn1 = Jsoup.connect("https://api.bilibili.com/x/relation/modify?cross_domain=true");
 			conn1.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -244,7 +260,7 @@ public class Tools {
 			//MainActivity.instence.showToast(obj1.get("message").getAsString());
 			Connection conn2 = Jsoup.connect("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true");
 			conn2.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -267,6 +283,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj2.get("message").getAsString());
 		}
 
+		//收藏,未完成
 		public static void sendFavorite(int count, long AID, String cookie) {
 
 			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
@@ -280,7 +297,7 @@ public class Tools {
 			 */
 			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -308,7 +325,7 @@ public class Tools {
 		public static void sendCoin(int count, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -336,7 +353,7 @@ public class Tools {
 		public static void sendVideoJudge(String msg, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -364,7 +381,7 @@ public class Tools {
 		public static void sendLike(long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/archive/like");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(MainActivity.instance.mainHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/video/av" + AID)
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -393,7 +410,7 @@ public class Tools {
 				Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
 				String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			    connection.userAgent(MainActivity.instance.userAgent)
-				    .headers(MainActivity.instance.liveHead)
+				    .headers(liveHead)
 				    .ignoreContentType(true)
 				    .referrer("https://live.bilibili.com/" + roomId)
 				    .cookies(Tools.Network.cookieToMap(cookie))

@@ -289,7 +289,7 @@ public class BaseIdFragment extends Fragment {
 		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
 		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 		connection.userAgent(MainActivity.instance.userAgent)
-			.headers(MainActivity.instance.liveHead)
+			.headers(Tools.liveHead)
 			.ignoreContentType(true)
 			.referrer("https://live.bilibili.com/" + roomID)
 			.cookies(Tools.Network.cookieToMap(cookie))

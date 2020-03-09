@@ -66,8 +66,6 @@ public class MengLiveControl extends LinearLayout {
 								m2.setText(rtmp.get("code").getAsString());
 								m1.setTextAppearance(android.R.style.TextAppearance_Medium);
 								m2.setTextAppearance(android.R.style.TextAppearance_Medium);
-								//m1.setSingleLine(true);
-								//m2.setSingleLine(true);
 								m1.setOnClickListener(onclick);
 								m2.setOnClickListener(onclick);
 								((Activity) context).runOnUiThread(new Runnable() {

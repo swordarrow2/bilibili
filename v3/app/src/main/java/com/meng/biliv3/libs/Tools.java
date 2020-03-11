@@ -6,6 +6,7 @@ import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.live.*;
+import com.meng.biliv3.javaBean.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
@@ -17,7 +18,7 @@ import org.jsoup.*;
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
     public static Map<String, String> mainHead = new HashMap<>();
-	
+
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	static{
@@ -33,7 +34,7 @@ public class Tools {
         mainHead.put("Connection", "keep-alive");
         mainHead.put("Origin", "https://www.bilibili.com");
 	}
-	
+
 	public static class AndroidContent {
 
 		public static void copyToClipboard(String s) {
@@ -45,37 +46,41 @@ public class Tools {
 
 	public static class BilibiliTool {
 
+		public static String getCvInfo(long cvId) {
+			return Tools.Network.getSourceCode("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp");
+		}
+
 		public static void startWatchLive(int posInAccountList) {
 			Intent intentOne = new Intent(MainActivity.instance, GuaJiService.class);
 			intentOne.putExtra("pos", posInAccountList);
 			MainActivity.instance.startService(intentOne);
 		}
-		
-		public static String getMyInfo(String cookie){
+
+		public static String getMyInfo(String cookie) {
 			return Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
 		}
 
-		public static String getUserInfo(long id){
+		public static String getUserInfo(long id) {
 			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie);
 		}
-		
-		public static String getLiveRoomInfo(long uid){
-			return Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+uid);
+
+		public static String getLiveRoomInfo(long uid) {
+			return Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid);
 		}
-		
-		public static String getRelation(long uid){
+
+		public static String getRelation(long uid) {
 			return Tools.Network.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp");
 		}
-		
-		public static String getUpstat(long uid){
+
+		public static String getUpstat(long uid) {
 			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
 		}
-		
+
 		public static void sendArticalJudge(long cvId, String msg, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(liveHead)
+                .headers(mainHead)
                 .ignoreContentType(true)
                 .referrer("https://www.bilibili.com/")
                 .cookies(Tools.Network.cookieToMap(cookie))
@@ -89,8 +94,8 @@ public class Tools {
 			Connection.Response response=null;
 			try {
 				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
+			} catch (Exception e) {
+				MainActivity.instance.showToast("连接出错:" + e.toString());
 				return;
 			}
 			if (response.statusCode() != 200) {
@@ -322,7 +327,35 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendCoin(int count, long AID, String cookie) {
+		public static void sendCvCoin(int count, long CvId, String cookie) {
+			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
+			connection.userAgent(MainActivity.instance.userAgent)
+                .headers(mainHead)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/read/cv" + CvId)
+                .cookies(Tools.Network.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("aid", String.valueOf(CvId))
+                .data("multiply", String.valueOf(count))
+			    .data("upid", String.valueOf(MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getCvInfo(CvId), CvInfo.class).data.mid))
+                .data("avtype", "2")
+                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			Connection.Response response=null;
+			try {
+				response = connection.execute();
+			} catch (IOException e) {
+				MainActivity.instance.showToast("连接出错");
+				return;
+			}
+			if (response.statusCode() != 200) {
+				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+			}
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+			MainActivity.instance.showToast(obj.get("message").getAsString());
+		}
+
+		public static void sendAvCoin(int count, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(mainHead)
@@ -378,7 +411,34 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendLike(long AID, String cookie) {
+		public static void sendCvLike(long cvID, String cookie) {
+			Connection connection = Jsoup.connect("https://api.bilibili.com/x/article/like");
+			connection.userAgent(MainActivity.instance.userAgent)
+                .headers(mainHead)
+                .ignoreContentType(true)
+                .referrer("https://www.bilibili.com/read/cv" + cvID)
+                .cookies(Tools.Network.cookieToMap(cookie))
+                .method(Connection.Method.POST)
+                .data("id", String.valueOf(cvID))
+                .data("type", "1")
+			    .data("jsonp", "jsonp")
+                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			Connection.Response response=null;
+			try {
+				response = connection.execute();
+			} catch (IOException e) {
+				MainActivity.instance.showToast("连接出错:" + e.toString());
+				return;
+			}
+			if (response.statusCode() != 200) {
+				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+			}
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+			MainActivity.instance.showToast(obj.get("message").getAsString());
+		}
+
+		public static void sendAvLike(long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/archive/like");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(mainHead)

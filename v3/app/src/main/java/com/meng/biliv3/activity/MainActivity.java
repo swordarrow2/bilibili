@@ -304,16 +304,19 @@ public class MainActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									String content = et.getText().toString();
-									RadioButton uid,av,live;
+									RadioButton uid,av,live,cv;
 									uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
 									av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
 									live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
+									cv = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_cv);
 									if (uid.isChecked()) {
 										showFragment(UidFragment.class, BaseIdFragment.typeUID , getId(content));
 									} else if (av.isChecked()) {
 										showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
 									} else if (live.isChecked()) {
 										showFragment(LiveFragment.class, BaseIdFragment.typeLive , getId(content));
+									} else if (cv.isChecked()) {
+										showFragment(CvFragment.class, BaseIdFragment.typeCv , getId(content));
 									}
 								}
 							}).show();

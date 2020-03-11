@@ -22,16 +22,22 @@ public class BaseIdFragment extends Fragment {
 	public static final String typeUID = "uid";
 	public static final String typeAv = "av";
 	public static final String typeLive = "lv";
+	public static final String typeCv = "cv";
 
 	protected static final int SendDanmaku=0;
 	protected static final int Silver=1;
 	protected static final int Pack=2;
 	protected static final int Sign=3;
-	protected static final int SendJudge=4;
-	protected static final int Zan=5;
-	protected static final int Coin1=6;
-	protected static final int Coin2=7;
+	protected static final int SendVideoJudge=4;
+	protected static final int LikeVideo=5;
+	protected static final int VideoCoin1=6;
+	protected static final int VideoCoin2=7;
 	protected static final int Favorite=8;
+	protected static final int SendCvJudge=9;
+	protected static final int CvCoin1=10;
+	protected static final int CvCoin2=11;
+	protected static final int LikeArtical=12;
+
 
 	protected long id;
 	protected String type;
@@ -163,20 +169,32 @@ public class BaseIdFragment extends Fragment {
 						case Sign:
 							Tools.BilibiliTool.sendLiveSign(ai.cookie);
 							break;
-						case SendJudge:
+						case SendVideoJudge:
 							Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
 							break;
-						case Zan:
-							Tools.BilibiliTool.sendLike(id, ai.cookie);
+						case LikeVideo:
+							Tools.BilibiliTool.sendAvLike(id, ai.cookie);
 							break;
-						case Coin1:
-							Tools.BilibiliTool.sendCoin(1, id, ai.cookie);
+						case VideoCoin1:
+							Tools.BilibiliTool.sendAvCoin(1, id, ai.cookie);
 							break;
-						case Coin2:
-							Tools.BilibiliTool.sendCoin(2, id, ai.cookie);
+						case VideoCoin2:
+							Tools.BilibiliTool.sendAvCoin(2, id, ai.cookie);
 							break;
 						case Favorite:
 							MainActivity.instance.showToast("未填坑");
+							break;
+						case SendCvJudge:
+							Tools.BilibiliTool.sendArticalJudge(id, msg, ai.cookie);
+							break;
+						case CvCoin1:
+							Tools.BilibiliTool.sendCvCoin(1, id, ai.cookie);
+							break;
+						case CvCoin2:
+							Tools.BilibiliTool.sendCvCoin(2, id, ai.cookie);
+							break;
+						case LikeArtical:
+							Tools.BilibiliTool.sendCvLike(id, ai.cookie);
 							break;
 					}
 				}

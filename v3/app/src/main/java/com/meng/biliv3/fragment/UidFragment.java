@@ -70,7 +70,7 @@ public class UidFragment extends BaseIdFragment {
 							getActivity().runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										MainActivity.instance.renameFragment(typeUID + id, info.data.name);
+										MainActivity.instance.renameFragment(type + id, info.data.name);
 										adapter.notifyDataSetChanged();				
 									}
 								});
@@ -88,7 +88,7 @@ public class UidFragment extends BaseIdFragment {
 							getActivity().runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										MainActivity.instance.renameFragment(typeUID + id, info.data.name);
+										MainActivity.instance.renameFragment(type + id, info.data.name);
 										adapter.notifyDataSetChanged();				
 									}
 								});

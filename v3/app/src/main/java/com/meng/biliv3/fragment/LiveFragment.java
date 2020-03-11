@@ -87,7 +87,7 @@ public class LiveFragment extends BaseIdFragment {
 								@Override
 								public void run() {
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n未直播");
-									MainActivity.instance.renameFragment(typeLive + id, uname + "的直播间");
+									MainActivity.instance.renameFragment(type + id, uname + "的直播间");
 								}
 							});
 						return;
@@ -101,7 +101,7 @@ public class LiveFragment extends BaseIdFragment {
 									//videoView.start();  
 									videoView.requestFocus();
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
-									MainActivity.instance.renameFragment(typeLive + id, uname + "的直播间");
+									MainActivity.instance.renameFragment(type + id, uname + "的直播间");
 								}
 							});
 					}

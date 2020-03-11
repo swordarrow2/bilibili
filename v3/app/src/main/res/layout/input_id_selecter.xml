@@ -47,6 +47,13 @@
 			android:layout_weight="1"
 			android:checked="true"
 			android:text="直播间"/>
+		
+		<RadioButton
+			android:id="@+id/input_id_selecterRadioButton_cv"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="专栏"/>
 
 	</RadioGroup>
 

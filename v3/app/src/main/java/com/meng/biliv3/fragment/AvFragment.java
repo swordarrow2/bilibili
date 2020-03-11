@@ -110,7 +110,7 @@ public class AvFragment extends BaseIdFragment {
 							@Override
 							public void run() {
 								info.setText(videoInfo.toString());
-								MainActivity.instance.renameFragment(typeAv + id, videoInfo.data.title);
+								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
 							}
 						});
 					try {
@@ -155,22 +155,22 @@ public class AvFragment extends BaseIdFragment {
 
 							@Override
 							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								sendBili((String) selectAccount.getSelectedItem(), SendJudge, (String)p1.getAdapter().getItem(p3));
+								sendBili((String) selectAccount.getSelectedItem(), SendVideoJudge, (String)p1.getAdapter().getItem(p3));
 							}
 						});
 					new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
 					break;
 				case R.id.av_fragmentButton_send:
-					sendBili((String) selectAccount.getSelectedItem(), SendJudge, et.getText().toString());
+					sendBili((String) selectAccount.getSelectedItem(), SendVideoJudge, et.getText().toString());
 					break;
 				case R.id.av_fragmentButton_zan:
-					sendBili((String) selectAccount.getSelectedItem(), Zan, "");
+					sendBili((String) selectAccount.getSelectedItem(), LikeVideo, "");
 					break;
 				case R.id.av_fragmentButton_coin1:
-					sendBili((String) selectAccount.getSelectedItem(), Coin1, "");
+					sendBili((String) selectAccount.getSelectedItem(), VideoCoin1, "");
 					break;
 				case R.id.av_fragmentButton_coin2:
-					sendBili((String) selectAccount.getSelectedItem(), Coin2, "");
+					sendBili((String) selectAccount.getSelectedItem(), VideoCoin2, "");
 					break;
 				case R.id.av_fragmentButton_favorite:
 					sendBili((String) selectAccount.getSelectedItem(), Favorite, "");

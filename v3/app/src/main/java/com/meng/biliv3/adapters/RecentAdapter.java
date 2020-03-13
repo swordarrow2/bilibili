@@ -1,61 +1,94 @@
 package com.meng.biliv3.adapters;
 
+import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
+import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.fragment.*;
+import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.libs.*;
+import java.io.*;
 import java.util.*;
 
 public class RecentAdapter extends BaseAdapter {
-    private ArrayList<String> names = new ArrayList<>();
 
-	public void add(String s) {
-		names.add(0, s);
+    private ArrayList<Recent> recents = new ArrayList<>();
+
+	private String jsonPath;
+
+	public RecentAdapter() {
+		jsonPath = MainActivity.instance.getFilesDir() + "/recent.json";
+		File f = new File(jsonPath);
+        if (!f.exists()) {
+            saveConfig();
+		}
+		recents = MainActivity.instance.gson.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<Recent>>(){}.getType());
+		if (recents == null) {
+			recents = new ArrayList<>();
+		}
+	}
+
+	public void add(String type, long id, String name) {
+		for (int i=0;i < recents.size();++i) {
+			Recent r=recents.get(i);
+			if (r.id == id && r.type.equals(type)) {
+				return;
+			}
+		}
+		recents.add(0, new Recent(type, id, name));
 		notifyDataSetChanged();
+		saveConfig();
 	}
 
 	public void rename(String origin, String newName) {
-		for (int i=0;i < names.size();++i) {
-			if (names.get(i).equals(origin)) {
-				names.remove(i);
-				names.add(0, newName);
+		for (int i=0;i < recents.size();++i) {
+			Recent r=recents.get(i);
+			if (r.name.equals(origin)) {
+				recents.remove(i);
+				r.name = newName;
+				recents.add(0, r);
 				break;
 			}
 		}
 		notifyDataSetChanged();
+		saveConfig();
 	}
 
 	public void toFirst(String name) {
-		for (int i=0;i < names.size();++i) {
-			if (names.get(i).equals(name)) {
-				names.add(0, names.remove(i));
+		for (int i=0;i < recents.size();++i) {
+			if (recents.get(i).name.equals(name)) {
+				recents.add(0, recents.remove(i));
 				break;
 			}
 		}
 		notifyDataSetChanged();
+		saveConfig();
 	}
 
 	public void remove(String id) {
-		for (int i=0;i < names.size();++i) {
-			if (names.get(i).equals(id)) {
-				names.remove(i);
+		for (int i=0;i < recents.size();++i) {
+			if (recents.get(i).name.equals(id)) {
+				recents.remove(i);
 				break;
 			}
 		}
 		notifyDataSetChanged();
+		saveConfig();
 	}
 
     public int getCount() {
-        return names.size();
+        return recents.size();
     }
 
     public Object getItem(int position) {
-        return names.get(position);
+        return recents.get(position);
     }
 
     public long getItemId(int position) {
-        return names.get(position).hashCode();
+        return recents.get(position).hashCode();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -69,15 +102,34 @@ public class RecentAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final String s = names.get(position);
+        final String s = recents.get(position).name;
         holder.tvName.setText(s);
 		holder.tvName.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View p1) {
-					toFirst(names.get(position));
-					MainActivity.instance.showFragment(holder.tvName.getText().toString());
-					//names.add(0, names.remove(position));
+					Recent r = recents.get(position);
+					toFirst(r.name);		
+					switch (r.type) {
+						case BaseIdFragment.typeAv:
+							MainActivity.instance.showFragment(AvFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeCv:
+							MainActivity.instance.showFragment(CvFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeLive:
+							MainActivity.instance.showFragment(LiveFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeUID:
+							MainActivity.instance.showFragment(UidFragment.class, r.type, r.id);
+							break;
+						case "管理账号":
+							MainActivity.instance.showFragment(ManagerFragment.class, MainActivity.AccountManager);
+							break;
+						case "设置":
+							MainActivity.instance.showFragment(SettingsFragment.class, MainActivity.Settings);
+							break;
+					}
 				}
 			});
 		holder.close.setOnClickListener(new OnClickListener(){
@@ -93,6 +145,21 @@ public class RecentAdapter extends BaseAdapter {
     private class ViewHolder {
         private TextView tvName;
         private ImageButton close;
+    }
+
+	private void saveConfig() {
+        try {
+            FileOutputStream fos = null;
+            OutputStreamWriter writer = null;
+            File file = new File(jsonPath);
+            fos = new FileOutputStream(file);
+            writer = new OutputStreamWriter(fos, "utf-8");
+            writer.write(MainActivity.instance.gson.toJson(recents));
+            writer.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

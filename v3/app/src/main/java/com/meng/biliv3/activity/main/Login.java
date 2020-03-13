@@ -47,6 +47,8 @@ public class Login extends Activity {
                         account.cookie = cookieStr;
                         account.name = bilibiliPersonInfo.data.name;
 						account.uid=bilibiliPersonInfo.data.mid;
+						account.setCookieExceed(false);
+						account.setSigned(false);
                         int i,j;
                         for (i = 0,j= MainActivity.instance.loginAccounts.size();i<j; ++i) {
                             if (MainActivity.instance.loginAccounts.get(i).uid == account.uid) {

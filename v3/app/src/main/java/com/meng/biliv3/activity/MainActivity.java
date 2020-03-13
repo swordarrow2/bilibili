@@ -384,7 +384,7 @@ public class MainActivity extends Activity {
 				Class<?> cls = Class.forName(c.getName());
 				frag = (Fragment) cls.newInstance();
 				fragments.put(type, frag);
-				recentAdapter.add(type);
+				recentAdapter.add(type, 0, type);
 				transaction.add(R.id.main_activityLinearLayout, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());
@@ -404,7 +404,7 @@ public class MainActivity extends Activity {
 				Constructor con = cls.getConstructor(String.class, long.class);
 				frag = (Fragment) con.newInstance(type, id);
 				fragments.put(type + id, frag);
-				recentAdapter.add(type + id);
+				recentAdapter.add(type , id, type + id);
 				transaction.add(R.id.main_activityLinearLayout, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());
@@ -535,7 +535,7 @@ public class MainActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-		saveConfig2();
+		//	saveConfig2();
     }
 
 	public void saveConfig2() {

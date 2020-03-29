@@ -26,13 +26,13 @@ public class UserInfoHeaderView extends LinearLayout {
         tvBMain = (TextView) findViewById(R.id.textView2);
 		tvBLive = (TextView) findViewById(R.id.textView3);
 
-		final String mainUID = SharedPreferenceHelper.getValue("mainAccount", "");
-        if (mainUID.equals("")) {
+		long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
+		if (mainUID == -1) {
 			tvName.setVisibility(View.VISIBLE);
 			tvName.setText("点击SJF设置主账号");
 			ivHead.setImageResource(R.drawable.ic_launcher);
 		} else {
-			getInfo(MainActivity.instance.getAccount(Integer.parseInt(mainUID)));
+			getInfo(MainActivity.instance.getAccount(mainUID));
         }
 		ivHead.setOnClickListener(new OnClickListener(){
 
@@ -56,7 +56,7 @@ public class UserInfoHeaderView extends LinearLayout {
 									return;
 								}
 								getInfo(ai);
-								SharedPreferenceHelper.putValue("mainAccount", String.valueOf(ai.uid));
+								MainActivity.instance.sjfSettings.setMainAccount(ai.uid);
 							}
 						}).show();
 				}

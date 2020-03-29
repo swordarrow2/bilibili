@@ -50,12 +50,12 @@ public class Tools {
 			return Tools.Network.getSourceCode("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp");
 		}
 
-		public static void startWatchLive(int posInAccountList) {
+		/*public static void startWatchLive(int posInAccountList) {
 			Intent intentOne = new Intent(MainActivity.instance, GuaJiService.class);
 			intentOne.putExtra("pos", posInAccountList);
 			MainActivity.instance.startService(intentOne);
 		}
-
+*/
 		public static String getMyInfo(String cookie) {
 			return Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
 		}

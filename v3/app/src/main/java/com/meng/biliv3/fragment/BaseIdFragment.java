@@ -121,7 +121,7 @@ public class BaseIdFragment extends Fragment {
 					}
 				});
 		} else {
-			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))): MainActivity.instance.getAccount(sel), opValue, msg);
+			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(MainActivity.instance.sjfSettings.getMainAccount()): MainActivity.instance.getAccount(sel), opValue, msg);
 		}
 	}
 

@@ -1,20 +1,15 @@
 package com.meng.biliv3.update;
 import android.app.*;
 import android.content.*;
-import android.content.pm.*;
 import android.os.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.libs.*;
-import com.meng.biliv3.update.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
+import java.util.*;
 import org.java_websocket.client.*;
 import org.java_websocket.handshake.*;
-import com.meng.biliv3.fragment.*;
-import java.util.*;
-import java.nio.channels.*;
 
 public class SanaeConnect extends WebSocketClient {
 
@@ -66,7 +61,7 @@ public class SanaeConnect extends WebSocketClient {
 	public void onMessage(String p1) {
 		if (!p1.equals("")) {
 			final SoftwareInfo esi=new Gson().fromJson(p1, SoftwareInfo.class);
-			if (!SharedPreferenceHelper.getValue("newVersion", "0.0.0").equals(esi.infoList.get(esi.infoList.size() - 1).versionName)) {	
+			if (!MainActivity.instance.sjfSettings.getVersion().equals(esi.infoList.get(esi.infoList.size() - 1).versionName)) {	
 				MainActivity.instance.runOnUiThread(new Runnable(){
 
 						@Override
@@ -84,7 +79,7 @@ public class SanaeConnect extends WebSocketClient {
 								.setNegativeButton("忽略本次更新", new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										SharedPreferenceHelper.putValue("newVersion", esi.infoList.get(esi.infoList.size() - 1).versionName);
+										MainActivity.instance.sjfSettings.setVersion(esi.infoList.get(esi.infoList.size() - 1).versionName);
 									}
 								}).show();
 						}
@@ -118,9 +113,6 @@ public class SanaeConnect extends WebSocketClient {
 			MainActivity.instance.showToast("文件已保存至" + f.getAbsolutePath());
 		} else if (bdp.getOpCode() == BotDataPack.opTextNotify) {
 			MainActivity.instance.showToast(bdp.readString());
-		} else if (bdp.getOpCode() == BotDataPack.getIdFromHash) {
-			//	afdb.uid = bdp.readInt();
-			//	MainActivity.instance.showToast("获取到的:"+afdb.uid);
 		}
 		super.onMessage(bytes);
 	}

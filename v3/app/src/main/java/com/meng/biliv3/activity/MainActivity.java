@@ -60,17 +60,16 @@ public class MainActivity extends Activity {
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	public SanaeConnect sanaeConnect;
-
+	public SJFSettings sjfSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
         instance = this;
 		ExceptionCatcher.getInstance().init(getApplicationContext());
-        SharedPreferenceHelper.init(getApplicationContext(), "settings");
-        DataBaseHelper.init(getBaseContext());
+        sjfSettings = new SJFSettings(this);
+		//  DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
@@ -87,7 +86,7 @@ public class MainActivity extends Activity {
 			loginAccounts = new ArrayList<>();
 		}
         mainAccountAdapter = new MainListAdapter(this);
-        if (SharedPreferenceHelper.getBoolean("opendraw", true)) {
+        if (sjfSettings.getOpenDrawer()) {
             mDrawerLayout.openDrawer(mDrawerList);
         } else {
             mDrawerLayout.closeDrawer(mDrawerList);
@@ -238,7 +237,7 @@ public class MainActivity extends Activity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-															"输入ID", "管理账号", "设置", "退出"
+															"输入ID", "管理账号","AVBV转换", "设置", "退出"
 														}));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
@@ -312,7 +311,11 @@ public class MainActivity extends Activity {
 									if (uid.isChecked()) {
 										showFragment(UidFragment.class, BaseIdFragment.typeUID , getId(content));
 									} else if (av.isChecked()) {
-										showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
+										if (content.startsWith("BV")) {
+											showFragment(AvFragment.class, BaseIdFragment.typeAv , AvBvConverter.decode(content));
+										} else {
+											showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
+										}
 									} else if (live.isChecked()) {
 										showFragment(LiveFragment.class, BaseIdFragment.typeLive , getId(content));
 									} else if (cv.isChecked()) {
@@ -324,11 +327,14 @@ public class MainActivity extends Activity {
 					case "管理账号":
 						showFragment(ManagerFragment.class, AccountManager);
 						break;
+					case "AVBV转换":
+						showFragment(AvBvConvertFragment.class, "AVBV转换");
+						break;
                     case "设置":
                         showFragment(SettingsFragment.class, Settings);
                         break;
                     case "退出":
-                        if (SharedPreferenceHelper.getBoolean("exit", false)) {
+                        if (sjfSettings.getExit0()) {
                             System.exit(0);
                         } else {
                             finish();
@@ -361,10 +367,7 @@ public class MainActivity extends Activity {
         lvRecent = (ListView) findViewById(R.id.right_list);
     }
 
-	/*public <T extends Fragment> T getFragment(String id, Class<T> c) {
-	 return (T)fragments.get(id);
-	 }
-	 */
+
 	public void showFragment(String id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		Fragment frag = fragments.get(id);
@@ -470,12 +473,12 @@ public class MainActivity extends Activity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    public void doVibrate(long time) {
-        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        if (vibrator != null) {
-            vibrator.vibrate(time);
-        }
-    }
+	/*  public void doVibrate(long time) {
+	 Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+	 if (vibrator != null) {
+	 vibrator.vibrate(time);
+	 }
+	 }*/
 
     public String getCookie(long bid) {
         for (AccountInfo l : loginAccounts) {

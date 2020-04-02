@@ -34,28 +34,40 @@ public class AvFragment extends BaseIdFragment {
 	private ImageView ivPreview;
 	private Bitmap preview;
 	private ArrayList<DanmakuBean> danmakuList=null;
-
+	private Spinner part;
 	private SenderAdapter senderAdapter;
 	private ListView lv;
-	
+
 	public AvFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.av_fragment, container, false);
-	}
+	public TabHost tab;
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		lv = (ListView) view.findViewById(R.id.av_fragmentListView1);
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.tab_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // TODO: Implement this method
+        super.onViewCreated(view, savedInstanceState);
+        tab = (TabHost) view.findViewById(android.R.id.tabhost);
+		tab.setup();
+        LayoutInflater layoutInflater=LayoutInflater.from(getActivity()); 
+		layoutInflater.inflate(R.layout.av_fragment, tab.getTabContentView()); 
+		layoutInflater.inflate(R.layout.av_fragment2, tab.getTabContentView());
+		tab.addTab(tab.newTabSpec("tab1").setIndicator("视频" , null).setContent(R.id.av_fragmentLinearLayout));
+        tab.addTab(tab.newTabSpec("tab2").setIndicator("弹幕" , null).setContent(R.id.av_fragment2LinearLayout));
+		lv = (ListView) view.findViewById(R.id.av_fragment2_ListView1);
 		send = (Button) view.findViewById(R.id.av_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
-		findSender = (Button) view.findViewById(R.id.avfragmentButtonGetDanmakuSender);
+		findSender = (Button) view.findViewById(R.id.av_fragment2_ButtonGetDanmakuSender);
 		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
 		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
 		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
@@ -64,6 +76,7 @@ public class AvFragment extends BaseIdFragment {
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.av_fragmentSpinner);
+		part = (Spinner) view.findViewById(R.id.av_fragment2Spinner);
 		preset.setOnClickListener(onclick);
 		zan.setOnClickListener(onclick);
 		coin1.setOnClickListener(onclick);
@@ -111,6 +124,11 @@ public class AvFragment extends BaseIdFragment {
 							public void run() {
 								info.setText(videoInfo.toString());
 								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
+								ArrayList<String> as=new ArrayList<>();
+								for (int i = 0;i < videoInfo.data.pages.size();++i) {
+									as.add("page" + (i + 1));
+								}
+								part.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, as));
 							}
 						});
 					try {
@@ -175,7 +193,7 @@ public class AvFragment extends BaseIdFragment {
 				case R.id.av_fragmentButton_favorite:
 					sendBili((String) selectAccount.getSelectedItem(), Favorite, "");
 					break;
-				case R.id.avfragmentButtonGetDanmakuSender:
+				case R.id.av_fragment2_ButtonGetDanmakuSender:
 					p1.setVisibility(View.GONE);
 					MainActivity.instance.showToast("开始连接");
 					MainActivity.instance.threadPool.execute(new Runnable(){
@@ -193,7 +211,7 @@ public class AvFragment extends BaseIdFragment {
 	private void boom2() {
 		try {
 			danmakuList = new ArrayList<>();
-			int cid=videoInfo.data.pages.get(0).cid;
+			int cid=videoInfo.data.pages.get(Integer.parseInt(((String)part.getSelectedItem()).replace("page", "")) - 1).cid;
 			Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
 			FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
 			out.write(response.bodyAsBytes());           
@@ -285,139 +303,4 @@ public class AvFragment extends BaseIdFragment {
 		}
 		MainActivity.instance.sanaeConnect.send(toSend.getData());
 	}
-	/*
-	 private void boom() throws IOException {
-	 //AV44286340
-	 danmakuList = new ArrayList<>();
-	 int cid=videoInfo.data.pages.get(0).cid;
-	 Connection.Response response = Jsoup.connect("http://comment.bilibili.com/" + cid + ".xml").ignoreContentType(true).execute();
-	 FileOutputStream out = (new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml")));
-	 out.write(response.bodyAsBytes());           
-	 out.close();
-	 final HashSet<Long> danmakuIdSet=new HashSet<>();
-	 try {
-	 InputStream is=new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + cid + ".xml"));
-	 XmlPullParser xp = Xml.newPullParser();
-	 xp.setInput(is, "utf-8");
-	 int type = xp.getEventType();
-	 while (type != XmlPullParser.END_DOCUMENT) {
-	 if (type == XmlPullParser.START_TAG) {
-	 if ("d".equals(xp.getName())) {  
-	 long id = Long.parseLong(xp.getAttributeValue(0).split(",")[6], 16);  
-	 danmakuIdSet.add(id);				
-	 String[] d=xp.getAttributeValue(0).split(",");
-	 DanmakuBean db=new DanmakuBean();
-	 db.time = Float.parseFloat(d[0]);
-	 db.mode = Integer.parseInt(d[1]);
-	 db.fontSize = Integer.parseInt(d[2]);
-	 db.color = Integer.parseInt(d[3]);
-	 db.timeStamp = Long.parseLong(d[4]);
-	 db.danmakuPool = Integer.parseInt(d[5]);
-	 db.userHash = Long.parseLong(d[6], 16);
-	 db.databaseId = Long.parseLong(d[7]);
-	 db.msg = xp.nextText();
-	 danmakuList.add(db);
-	 }
-	 }
-	 type = xp.next();
-	 }
-	 } catch (Exception e) {
-	 throw new RuntimeException(e.toString());
-	 }
-	 //MainActivity.instance.showToast(danmakuIdSet.toString());
-	 final CRC32 crc32=new CRC32();
-	 final int[] to={0,0};
-	 while (danmakuIdSet.size() > 0) {
-	 to[1] += 4;
-	 if (to[0] % 1000000 == 0) {
-	 MainActivity.instance.runOnUiThread(new Runnable(){
-
-	 @Override
-	 public void run() {
-	 progressbar.setProgress((int)(((float)to[0] * 100) / 400000000));
-	 progress.setText("当前位置:" + to[0] + " 剩余:" + danmakuIdSet.size());
-	 }
-	 });
-
-	 }
-	 crc32.update(String.valueOf(to[0]).getBytes());
-	 final long value = crc32.getValue();
-	 if (danmakuIdSet.contains(value)) {
-	 for (final DanmakuBean db:danmakuList) {
-	 if (db.userHash == value) {
-	 danmakuIdSet.remove(value);
-	 db.uid = to[0];
-	 MainActivity.instance.runOnUiThread(new Runnable(){
-
-	 @Override
-	 public void run() {
-	 danmakuSender.setText(danmakuSender.getText() + "\n用户id:" + db.uid + "  hash:" + Long.toHexString(value) + " 弹幕:" + db.msg);
-	 }
-	 });
-	 }
-	 }
-	 }
-	 crc32.reset();
-	 ++to[0];
-	 }
-	 MainActivity.instance.runOnUiThread(new Runnable(){
-
-	 @Override
-	 public void run() {
-	 danmakuSender.setText(danmakuSender.getText() + "\nsize:" + to[1]);
-	 }
-	 });
-	 }
-	 */
-
-
-//	private void sendFavorite() {
-//		final String sel=(String) selectAccount.getSelectedItem();
-//		if (sel.equals("每次选择")) {
-//			String items[] = new String[MainActivity.instance.loginAccounts.size()];
-//			for (int i=0;i < items.length;++i) {
-//				items[i] = MainActivity.instance.loginAccounts.get(i).name;
-//			}
-//			final boolean checkedItems[] = new boolean[items.length];
-//			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-//						checkedItems[which] = isChecked;
-//					}
-//				})
-//				.setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						for (int i = 0; i < checkedItems.length; i++) {
-//							if (checkedItems[i]) {
-//								final AccountInfo ai=MainActivity.instance.loginAccounts.get(i);
-//								MainActivity.instance.threadPool.execute(new Runnable(){
-//
-//										@Override
-//										public void run() {
-//											Tools.BilibiliTool.send(ai.cookie, id);
-//										}
-//									});
-//							}
-//						}
-//					}
-//				}).show();
-//		} else if (sel.equals("主账号")) {
-//			MainActivity.instance.threadPool.execute(new Runnable(){
-//
-//					@Override
-//					public void run() {
-//						Tools.BilibiliTool.sendLike(MainActivity.instance.getAccount(Integer.parseInt(SharedPreferenceHelper.getValue("mainAccount", ""))).cookie, id);
-//					}
-//				});
-//		} else {
-//			MainActivity.instance.threadPool.execute(new Runnable(){
-//
-//					@Override
-//					public void run() {
-//						Tools.BilibiliTool.sendLike(MainActivity.instance.getAccount(sel).cookie, id);
-//					}
-//				});
-//		}
-//	}
 }

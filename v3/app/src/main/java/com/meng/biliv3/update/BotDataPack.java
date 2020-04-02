@@ -28,7 +28,7 @@ public class BotDataPack {
 
 	public static final int sendToMaster = 56;
 	public static final int getIdFromHash = 57;
-	
+	public static final int cookie = 58;
 
 	public static BotDataPack encode(int opCode) {
 		return new BotDataPack(opCode);

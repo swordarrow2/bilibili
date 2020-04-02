@@ -8,9 +8,9 @@ android {
     defaultConfig {
         applicationId "com.meng.biliv3"
         minSdkVersion 19
-        targetSdkVersion 24
-        versionCode 27
-        versionName "1.2.4"
+        targetSdkVersion 25
+        versionCode 29
+        versionName "1.2.7"
     }
     buildTypes {
         release {

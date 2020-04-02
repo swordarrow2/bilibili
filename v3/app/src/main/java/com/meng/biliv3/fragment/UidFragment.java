@@ -44,6 +44,9 @@ public class UidFragment extends BaseIdFragment {
 
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+					if (p3 == 0) {
+						return;
+					}
 					Tools.AndroidContent.copyToClipboard((String)p1.getItemAtPosition(p3));
 				}
 			});

@@ -3,6 +3,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
+	android:id="@+id/av_fragmentLinearLayout"
 	android:orientation="vertical">
 
 	<ImageView
@@ -99,17 +100,6 @@
 		</LinearLayout>
 
 	</LinearLayout>
-
-	<Button
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="从弹幕查找发送者"
-		android:id="@+id/avfragmentButtonGetDanmakuSender"/>
-
-	<ListView
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:id="@+id/av_fragmentListView1"/>
 
 </LinearLayout>
 

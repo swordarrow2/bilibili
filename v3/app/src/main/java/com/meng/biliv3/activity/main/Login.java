@@ -22,57 +22,96 @@ public class Login extends Activity {
         setContentView(webView);
         webView.getSettings().setUserAgentString(MainActivity.instance.userAgent);
         webView.getSettings().setJavaScriptEnabled(true);
+		webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setBuiltInZoomControls(true);
         clearWebViewCache();
         webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					view.loadUrl(url);
+					return true;
+				}
 
-            @Override
-            public void onPageFinished(WebView view, final String url) {
-                super.onPageFinished(view, url);
-                if (!url.equals("https://www.bilibili.com/")) {
-                    return;
-                }
-                CookieManager cookieManager = CookieManager.getInstance();
-                final String cookieStr = cookieManager.getCookie(url) == null ? "null" : cookieManager.getCookie(url);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-						BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
-                        AccountInfo account = new AccountInfo();
-                        account.cookie = cookieStr;
-                        account.name = bilibiliPersonInfo.data.name;
-						account.uid=bilibiliPersonInfo.data.mid;
-						account.setCookieExceed(false);
-						account.setSigned(false);
-                        int i,j;
-                        for (i = 0,j= MainActivity.instance.loginAccounts.size();i<j; ++i) {
-                            if (MainActivity.instance.loginAccounts.get(i).uid == account.uid) {
-                                break;
-                            }
-                        }
-                        if (i != MainActivity.instance.loginAccounts.size()) {
-                            MainActivity.instance.loginAccounts.set(i, account);
-                        } else {
-                            MainActivity.instance.loginAccounts.add(account);
-                        }
-                        MainActivity.instance.saveConfig();
-                        runOnUiThread(new Runnable() {
+				@Override
+				public void onPageFinished(WebView view, final String url) {
+					super.onPageFinished(view, url);
+					if (url.equals("https://passport.bilibili.com/login")) {
+						MainActivity.instance.showToast(url);
 
-                            @Override
-                            public void run() {
-                                MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
-                                finish();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+						AccountInfo aci=MainActivity.instance.loginAccounts.get(getIntent().getIntExtra("pos", -1));
+						if (aci.phone != 0 && aci.password != null) {
+
+
+						String js1 = "javascript:function dispatchInput(dom, st) {var evt = new InputEvent('input', {inputType: 'insertText',data: st,dataTransfer: null,isComposing: false});dom.value = st;dom.dispatchEvent(evt);}";
+							String js2 = "javascript:dispatchInput(document.getElementById('login-username'),\""+aci.phone+"\")";
+							String js3 = "javascript:dispatchInput(document.getElementById('login-passwd'),\""+aci.password+"\")";
+							String js5 = "javascript:document.getElementsByClassName('btn-login')[0].click();";
+							String js4="javascript:alert(\"如果有一天我告诉你说：“张小月啊，现在你可以回来了吧！”，你会答应我吗？\");";
+							view.evaluateJavascript(js1, new ValueCallback<String>() {
+									@Override
+									public void onReceiveValue(String s) {
+
+									}
+								});
+							view.evaluateJavascript(js2, new ValueCallback<String>() {
+									@Override
+									public void onReceiveValue(String s) {
+
+									}
+								});
+							view.evaluateJavascript(js3, new ValueCallback<String>() {
+									@Override
+									public void onReceiveValue(String s) {
+
+									}
+								});
+							view.evaluateJavascript(js5, new ValueCallback<String>() {
+									@Override
+									public void onReceiveValue(String s) {
+
+									}
+								});
+						}
+					}
+					if (!url.equals("https://www.bilibili.com/")) {
+						return;
+					}
+					CookieManager cookieManager = CookieManager.getInstance();
+					final String cookieStr = cookieManager.getCookie(url) == null ? "null" : cookieManager.getCookie(url);
+					new Thread(new Runnable() {
+							@Override
+							public void run() {
+								BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
+								AccountInfo account = MainActivity.instance.loginAccounts.get(getIntent().getIntExtra("pos", -1));
+								account.cookie = cookieStr;
+								account.name = bilibiliPersonInfo.data.name;
+								account.uid = bilibiliPersonInfo.data.mid;
+								account.setCookieExceed(false);
+								account.setSigned(false);
+								int i,j;
+								for (i = 0,j = MainActivity.instance.loginAccounts.size();i < j; ++i) {
+									if (MainActivity.instance.loginAccounts.get(i).uid == account.uid) {
+										break;
+									}
+								}
+								if (i != MainActivity.instance.loginAccounts.size()) {
+									MainActivity.instance.loginAccounts.set(i, account);
+								} else {
+									MainActivity.instance.loginAccounts.add(account);
+								}
+								MainActivity.instance.saveConfig();
+								runOnUiThread(new Runnable() {
+
+										@Override
+										public void run() {
+											MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+											finish();
+										}
+									});
+							}
+						}).start();
+				}
+			});
         String loginUrl = "https://passport.bilibili.com/login";
         webView.loadUrl(loginUrl);
     }

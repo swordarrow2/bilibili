@@ -28,6 +28,7 @@
 		android:layout_gravity="left|center"/>
 
 	<Button
+		android:focusable="false"
 		android:layout_weight="4"
 		android:id="@+id/account_adapterButton_upload"
 		android:layout_width="0dp"

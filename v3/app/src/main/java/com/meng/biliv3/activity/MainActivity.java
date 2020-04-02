@@ -538,7 +538,7 @@ public class MainActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-		//	saveConfig2();
+			saveConfig2();
     }
 
 	public void saveConfig2() {

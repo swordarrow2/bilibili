@@ -622,10 +622,10 @@ public class HttpConnection implements Connection {
                     return execute(req, res);
                 }
                 if ((status < 200 || status >= 400) && !req.ignoreHttpErrors())
-					throw new HttpStatusException("HTTP error fetching URL", status, req.url().toString());
+					throw new IOException("HTTP error fetching URL" + status + req.url().toString());
                 String contentType = res.contentType();
                 if (contentType != null && !req.ignoreContentType() && !contentType.startsWith("text/"))
-                    throw new UnsupportedMimeTypeException("Unhandled content type. Must be text/*, application/xml, or application/*+xml", contentType, req.url().toString());
+                    throw new RuntimeException("Unhandled content type. Must be text/*, application/xml, or application/*+xml" + contentType + req.url().toString());
                 res.charset = DataUtil.getCharsetFromContentType(res.contentType);
                 if (conn.getContentLength() != 0 && req.method() != HEAD) {
                     res.bodyStream = null;

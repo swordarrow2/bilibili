@@ -1,9 +1,10 @@
 package com.meng.biliv3.libs;
 
 import android.content.*;
+import android.content.res.*;
+import android.graphics.*;
 import android.net.*;
 import com.google.gson.*;
-import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.live.*;
 import com.meng.biliv3.javaBean.*;
@@ -42,6 +43,22 @@ public class Tools {
 			((ClipboardManager)MainActivity.instance.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(clipData);
 			MainActivity.instance.showToast("已复制到剪贴板");
 		}
+
+		public static byte[] readAssets(String fileName) {
+			byte[] buffer = null;
+			try {
+				InputStream in =MainActivity.instance.getResources().getAssets().open(fileName);
+				int lenght = in.available();
+				buffer = new byte[lenght];
+				in.read(buffer);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return buffer;
+		}
+		public static String readAssetsString(String fileName) {
+			return new String(readAssets(fileName));
+		}
 	}
 
 	public static class BilibiliTool {
@@ -51,11 +68,11 @@ public class Tools {
 		}
 
 		/*public static void startWatchLive(int posInAccountList) {
-			Intent intentOne = new Intent(MainActivity.instance, GuaJiService.class);
-			intentOne.putExtra("pos", posInAccountList);
-			MainActivity.instance.startService(intentOne);
-		}
-*/
+		 Intent intentOne = new Intent(MainActivity.instance, GuaJiService.class);
+		 intentOne.putExtra("pos", posInAccountList);
+		 MainActivity.instance.startService(intentOne);
+		 }
+		 */
 		public static String getMyInfo(String cookie) {
 			return Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
 		}

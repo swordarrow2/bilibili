@@ -13,6 +13,7 @@ import org.jsoup.parser.*;
 
 import static org.jsoup.Connection.Method.HEAD;
 import static org.jsoup.internal.Normalizer.lowerCase;
+import com.meng.biliv3.activity.*;
 
 public class HttpConnection implements Connection {
     public static final String CONTENT_ENCODING = "Content-Encoding";
@@ -672,8 +673,8 @@ public class HttpConnection implements Connection {
 			if (byteData == null) {
 				try {
                     byteData = DataUtil.readToByteBuffer(bodyStream, req.maxBodySize());
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
+                } catch (Exception e) {
+					MainActivity.instance.showToast(e.toString());
                 } finally {
                     inputStreamRead = true;
                     safeClose();

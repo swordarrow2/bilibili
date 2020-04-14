@@ -111,9 +111,4 @@ public class AvBvConverter {
 		}
 		return sb.toString();
 	}
-
-	public static void main(String[] args) {
-		System.out.println(decode("BV1FE411A7Xd"));
-		System.out.println(encode(97809031l));
-	}
 }

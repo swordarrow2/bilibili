@@ -9,6 +9,14 @@ public class SJFSettings {
 		sp = c.getSharedPreferences("settings", 0);
 	}
 
+	public String getTheme() {
+		return sp.getString("theme", "Holo");
+	}
+
+	public void setTheme(String v) {
+		putString("theme", v);
+	}
+
 	public String getVersion() {
 		return sp.getString("newVersion", "0.0.0");
 	}

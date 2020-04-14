@@ -87,7 +87,7 @@ public class MainListAdapter extends BaseAdapter {
 				}
 			});
 		holder.tvName.setText(accountInfo.name);
-		holder.tvName.setTextColor(accountInfo.isCookieExceed() ?Color.RED: Color.BLACK);
+		holder.tvName.setTextColor(accountInfo.isCookieExceed() ?Color.RED: MainActivity.instance.colorManager.getColorText());
 		File bilibiliImageFile = new File(MainActivity.instance.mainDic + "bilibili/" + accountInfo.uid + ".jpg");
         if (bilibiliImageFile.exists()) {
             holder.ivHead.setImageBitmap(BitmapFactory.decodeFile(bilibiliImageFile.getAbsolutePath()));

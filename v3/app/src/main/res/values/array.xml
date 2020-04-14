@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="color_list">
+        <item>Holo</item>
+		<item>Holo light</item>
+        <item>MD</item>
+		<item>MD dark</item>
+    </string-array>
+</resources>
+

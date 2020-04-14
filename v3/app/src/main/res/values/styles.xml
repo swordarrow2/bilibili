@@ -4,17 +4,16 @@
     <style name="AppThemeLight" parent="android:style/Theme.Material.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBarLight</item>
     </style>
-
-    <style name="AppThemeDark" parent="android:style/Theme.Material">
-        <item name="android:actionBarStyle">@style/ActionBarDark</item>
-    </style>
-
-    <style name="ActionBarLight" parent="android:Widget.ActionBar">
+	<style name="ActionBarLight" parent="android:Widget.ActionBar">
         <item name="android:background">@color/actionBarLight</item>
         <item name="android:icon">@android:color/transparent</item>
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
     </style>
-
+	
+	
+    <style name="AppThemeDark" parent="android:style/Theme.Material">
+        <item name="android:actionBarStyle">@style/ActionBarDark</item>
+    </style>
     <style name="ActionBarDark" parent="android:Widget.ActionBar">
         <item name="android:background">@color/actionBarDark</item>
         <item name="android:icon">@android:color/transparent</item>
@@ -25,6 +24,19 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">18sp</item>
     </style>
+	
+	<style name="AppThemeHoloL" parent="android:style/Theme.Holo.Light">
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowShowWallpaper">true</item>
+		<item name="android:windowBackground">@color/windowBackgroundL</item>
+		<item name="android:colorForeground">#80ffffff</item>
+	</style>
+	
+	<style name="AppThemeHolo" parent="android:style/Theme.Holo.Wallpaper">
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowBackground">@color/windowBackground</item>
+		<item name="android:colorForeground">#80000000</item>
+	</style>
 
 </resources>
 

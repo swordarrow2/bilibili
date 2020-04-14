@@ -2,6 +2,7 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
+	 
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,7 +23,7 @@
         android:layout_width="@dimen/navdrawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#eeeeee"
+
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
@@ -33,7 +34,7 @@
         android:layout_width="220dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="#eeeeee"
+
         android:gravity="center_horizontal">
 		
 		<ListView
@@ -41,7 +42,7 @@
             android:layout_width="@dimen/navdrawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="#eeeeee"
+            
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"

@@ -3,6 +3,14 @@
     <CheckBoxPreference
         android:key="opendraw"
         android:title="启动时打开滑动菜单" />
+	<ListPreference
+		android:dialogTitle="选择颜色"
+		android:entries="@array/color_list"
+		android:entryValues="@array/color_list"
+		android:defaultValue="Holo"
+		android:key="theme"
+		android:summary="重启生效"
+		android:title="主题" />
     <CheckBoxPreference
         android:key="exit"
         android:summaryOff="使用finish"

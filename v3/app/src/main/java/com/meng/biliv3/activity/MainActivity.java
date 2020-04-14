@@ -61,19 +61,25 @@ public class MainActivity extends Activity {
 
 	public SanaeConnect sanaeConnect;
 	public SJFSettings sjfSettings;
+	public ColorManager colorManager;
 
+	private int themeId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instance = this;
 		ExceptionCatcher.getInstance().init(getApplicationContext());
-        sjfSettings = new SJFSettings(this);
 		//  DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
         findViews();
+		colorManager = new ColorManager(themeId);
+		colorManager.doRun(this);
+		mDrawerList.setBackgroundColor(colorManager.getColorBackground());
+		rightDrawer.setBackgroundColor(colorManager.getColorBackground());
+
         setListener();
         jsonPath = getApplicationContext().getFilesDir() + "/account.json";
         File f = new File(jsonPath);
@@ -92,19 +98,14 @@ public class MainActivity extends Activity {
             mDrawerLayout.closeDrawer(mDrawerList);
         }
         mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
-        File ff = new File(mainDic + "group/");
-        if (!ff.exists()) {
-            ff.mkdirs();
-        }
-        File f2 = new File(mainDic + "user/");
-        if (!f2.exists()) {
-            f2.mkdirs();
-        }
-        File f3 = new File(mainDic + "bilibili/");
-        if (!f3.exists()) {
-            f3.mkdirs();
-        }
-        File f4 = new File(mainDic + ".nomedia");
+
+		for (String s:new String[]{"group/","user/","bilibili/"}) {
+			File ff = new File(mainDic + s);
+			if (!ff.exists()) {
+				ff.mkdirs();
+			}
+		}
+	    File f4 = new File(mainDic + ".nomedia");
         if (!f4.exists()) {
             try {
                 f4.createNewFile();
@@ -125,10 +126,7 @@ public class MainActivity extends Activity {
 					public void action(WebSocketClient wsc) {
 						try {
 							PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
-							CheckNewBean cnb=new CheckNewBean();
-							cnb.packageName = packageInfo.packageName;
-							cnb.nowVersionCode = packageInfo.versionCode;
-							wsc.send(new Gson().toJson(cnb));
+							wsc.send(new Gson().toJson(new CheckNewBean(packageInfo.packageName, packageInfo.versionCode)));
 						} catch (PackageManager.NameNotFoundException e) {
 							MainActivity.instance.showToast(e.toString());
 						}
@@ -138,18 +136,7 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			showToast(e.toString());
 		}
-		/*	threadPool.execute(new Runnable(){
 
-		 @Override
-		 public void run() {
-		 String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",loginAccounts.get(0).cookie);
-		 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
-		 JsonArray fja=fjobj.get("list").getAsJsonArray();
-		 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
-
-		 showToast(add_media_id+"");
-		 }
-		 });*/
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new Runnable(){
@@ -217,6 +204,7 @@ public class MainActivity extends Activity {
                 return false;
             }
         };
+
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.open, R.string.close) {
 
             public void onDrawerClosed(View view) {
@@ -236,9 +224,10 @@ public class MainActivity extends Activity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-															"输入ID", "管理账号","AVBV转换", "设置", "退出"
-														}));
+        mDrawerList.setAdapter(
+			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
+										 "输入ID", "管理账号","AVBV转换", "设置", "退出"
+									 }));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
 		lvRecent.addHeaderView(tvMemory);
@@ -285,6 +274,29 @@ public class MainActivity extends Activity {
 			});
         mDrawerList.setOnItemClickListener(itemClickListener);
         lvRecent.setOnItemClickListener(itemClickListener);
+	}
+
+	@Override
+	public void setTheme(int resid) {
+		themeId = resid;
+		sjfSettings = new SJFSettings(this);
+		switch (sjfSettings.getTheme()) {
+            case "Holo":
+				super.setTheme(themeId = R.style.AppThemeHolo);
+				break;
+            case "MD":
+				super.setTheme(themeId = R.style.AppThemeLight);
+				break;
+			case "MD dark":
+				super.setTheme(themeId = R.style.AppThemeDark);
+				break;
+			case "Holo light":
+				super.setTheme(themeId = R.style.AppThemeHoloL);
+				break;
+            default:
+				super.setTheme(themeId = R.style.AppThemeHolo);
+				break;
+		}
 	}
 
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
@@ -434,7 +446,7 @@ public class MainActivity extends Activity {
 
 	public void removeFragment(String id) {
 		if (!fragments.containsKey(id)) {
-			throw new RuntimeException("no such key");
+			//throw new RuntimeException("no such key:"+id);
 		}
 		Fragment f = fragments.get(id);
 		Iterator<Map.Entry<String,Fragment>> iterator = fragments.entrySet().iterator();
@@ -538,7 +550,7 @@ public class MainActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-			saveConfig2();
+		saveConfig2();
     }
 
 	public void saveConfig2() {

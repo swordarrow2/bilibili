@@ -135,6 +135,10 @@ public class HttpConnection implements Connection {
         return this;
     }
 
+	public Connection data(String key, long value) {
+		data(key, String.valueOf(value));
+		return this;
+	}
 
     public Connection data(String key, String value) {
         req.data(KeyVal.create(key, value));

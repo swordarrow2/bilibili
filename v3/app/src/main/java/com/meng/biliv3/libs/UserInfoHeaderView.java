@@ -25,7 +25,7 @@ public class UserInfoHeaderView extends LinearLayout {
         tvName = (TextView) findViewById(R.id.textView1);
         tvBMain = (TextView) findViewById(R.id.textView2);
 		tvBLive = (TextView) findViewById(R.id.textView3);
-
+		setBackgroundColor(MainActivity.instance.colorManager.getColorDrawerHeader());
 		long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 		if (mainUID == -1) {
 			tvName.setVisibility(View.VISIBLE);

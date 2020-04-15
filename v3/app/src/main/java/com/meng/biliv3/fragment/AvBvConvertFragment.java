@@ -15,7 +15,7 @@ import com.meng.biliv3.fragment.*;
 import android.view.View.OnClickListener;
 import com.meng.biliv3.libs.*;
 
-public class AvBvConvertFragment extends Fragment {
+public class AvBvConvertFragment extends Fragment implements View.OnClickListener {
 
 	private Button btnAv,btnBv;
 	private EditText etAv,etBv;
@@ -32,31 +32,27 @@ public class AvBvConvertFragment extends Fragment {
 		btnBv = (Button) view.findViewById(R.id.av_bvButtonbv);
 		etAv = (EditText) view.findViewById(R.id.av_bvEditTextav);
 		etBv = (EditText) view.findViewById(R.id.av_bvEditTextbv);
-		btnAv.setOnClickListener(onclick);
-		btnBv.setOnClickListener(onclick);
+		btnAv.setOnClickListener(this);
+		btnBv.setOnClickListener(this);
     }
 
-	private OnClickListener onclick=new OnClickListener(){
-
-		@Override
-		public void onClick(View p1) {
-			switch (p1.getId()) {
-				case R.id.av_bvButtonav:
-					try {
-						etBv.setText(AvBvConverter.encode(Long.parseLong(etAv.getText().toString())));
-					} catch (Exception e) {
-						MainActivity.instance.showToast("请输入数字");
-					}
-					break;
-				case R.id.av_bvButtonbv:
-					try {
-						etAv.setText(String.valueOf(AvBvConverter.decode(etBv.getText().toString())));
-					} catch (Exception e) {
-						MainActivity.instance.showToast("请输入BV号");
-					}
-					break;
-			}
+	@Override
+	public void onClick(View p1) {
+		switch (p1.getId()) {
+			case R.id.av_bvButtonav:
+				try {
+					etBv.setText(AvBvConverter.encode(Long.parseLong(etAv.getText().toString())));
+				} catch (Exception e) {
+					MainActivity.instance.showToast("请输入数字");
+				}
+				break;
+			case R.id.av_bvButtonbv:
+				try {
+					etAv.setText(String.valueOf(AvBvConverter.decode(etBv.getText().toString())));
+				} catch (Exception e) {
+					MainActivity.instance.showToast("请输入BV号");
+				}
+				break;
 		}
-
-	};
+	}
 }

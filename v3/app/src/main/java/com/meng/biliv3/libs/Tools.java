@@ -1,9 +1,11 @@
 package com.meng.biliv3.libs;
 
+import android.annotation.*;
 import android.content.*;
-import android.content.res.*;
-import android.graphics.*;
+import android.database.*;
 import android.net.*;
+import android.os.*;
+import android.provider.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.live.*;
@@ -59,6 +61,79 @@ public class Tools {
 		public static String readAssetsString(String fileName) {
 			return new String(readAssets(fileName));
 		}
+
+		@TargetApi(Build.VERSION_CODES.KITKAT)
+		public static String absolutePathFromUri(final Context context, final Uri uri) {
+			final boolean isKitKat=Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+			if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+				if (isExternalStorageDocument(uri)) {
+					final String docId=DocumentsContract.getDocumentId(uri);
+					final String[] split=docId.split(":");
+					final String type=split[0];
+					if ("primary".equalsIgnoreCase(type)) {
+						return Environment.getExternalStorageDirectory() + "/" + split[1];
+					}
+				} else if (isDownloadsDocument(uri)) {
+					final String id=DocumentsContract.getDocumentId(uri);
+					final Uri contentUri=ContentUris.withAppendedId(
+						Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+					return getDataColumn(context, contentUri, null, null);
+				} else if (isMediaDocument(uri)) {
+					final String docId=DocumentsContract.getDocumentId(uri);
+					final String[] split=docId.split(":");
+					final String type=split[0];
+					Uri contentUri=null;
+					if ("image".equals(type)) {
+						contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+					} else if ("video".equals(type)) {
+						contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+					} else if ("audio".equals(type)) {
+						contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+					}
+					final String selection="_id=?";
+					final String[] selectionArgs=new String[]{
+						split[1]
+					};
+					return getDataColumn(context, contentUri, selection, selectionArgs);
+				}
+			} else if ("content".equalsIgnoreCase(uri.getScheme())) {
+				return getDataColumn(context, uri, null, null);
+			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+				return uri.getPath();
+			}
+			return null;
+		}
+
+		private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+			Cursor cursor=null;
+			final String column="_data";
+			final String[] projection={
+				column
+			};
+			try {
+				cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					return cursor.getString(cursor.getColumnIndexOrThrow(column));
+				}
+			} finally {
+				if (cursor != null) {
+					cursor.close();
+				}
+			}
+			return null;
+		}
+
+		private static boolean isExternalStorageDocument(Uri uri) {
+			return "com.android.externalstorage.documents".equals(uri.getAuthority());
+		}
+
+		private static boolean isDownloadsDocument(Uri uri) {
+			return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+		}
+
+		private static boolean isMediaDocument(Uri uri) {
+			return "com.android.providers.media.documents".equals(uri.getAuthority());
+		}
 	}
 
 	public static class BilibiliTool {
@@ -93,47 +168,73 @@ public class Tools {
 			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
 		}
 
-		public static String sendDynamic(String content, File pic) {
-			try {
-				FileInputStream fInputStream = new FileInputStream(pic);
-				Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/api/v1/drawImage/upload").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie))
-					.data("file_up", pic.getName(), fInputStream)
-					.data("biz", "draw")
-					.data("category", "daily")
+		public static String sendDynamic(String content, String cookie) {
+            try {
+				Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(cookie))
+					.data("dynamic_id", 0)
+					.data("type", 4)
+					.data("rid", 0)
+					.data("content", content)
+					.data("extension", "{\"from\":{\"emoji_type\":1}}")
+					.data("at_uids", "")
+					.data("ctrl", "[]")
+					.data("csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"))
 					.execute();
-				MainActivity.instance.showToast(response.body());
-				if (response.statusCode() != 200) {
-					return null;
-				} 
-				JsonObject jo=new JsonParser().parse(response.body()).getAsJsonObject();
-				if (jo.get("code").getAsInt() == 0) {
-					JsonObject jobj=jo.get("data").getAsJsonObject();
-					String url=jobj.get("image_url").getAsString();
-					Connection.Response cr=Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw").cookies(Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie)).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true)
-						.data("biz", "3")
-						.data("category", "3")
-						.data("type", "0")
-						.data("pictures", "[{\"img_src\":\"" + url + "\",\"img_width\":" + jobj.get("image_width").getAsInt() + ",\"img_height\":" + jobj.get("image_height").getAsInt() + ",\"img_size\":" + (pic.length() / 1024.0f) + "}]")
-						.data("title", "")
-						.data("tags", "")
-						.data("description", "图片发送测试")
-						.data("content", "图片发送测试")
-						.data("setting", "{\"copy_forbidden\":0,\"cachedTime\":0}")
-						.data("from", "create.dynamic.web")
-						.data("extension", "{\"from\":{\"emoji_type\":1}}")
-						.data("at_uids", "")
-						.data("at_control", "[]")
-						.data("csrf_token", Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie).get("bili_jct")) 
+                return response.body();
+            } catch (Exception e) {
+                return null;
+			}
+        }
+
+		public static String sendDynamic(String content, String cookie, ArrayList<File> pics) {
+			HashSet<UploadPicResult> bset=new HashSet<>(); 
+			try {
+				for (File pic:pics) {
+					Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/api/v1/drawImage/upload").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(cookie))
+						.data("file_up", pic.getName(), new FileInputStream(pic))
+						.data("biz", "draw")
+						.data("category", "daily")
 						.execute();
-					return cr.body();
-				}
+					if (response.statusCode() != 200) {
+						return null;
+					} 
+					JsonObject jo=new JsonParser().parse(response.body()).getAsJsonObject();
+					if (jo.get("code").getAsInt() == 0) {
+						JsonObject jobj=jo.get("data").getAsJsonObject();
+						UploadPicResult upr=new UploadPicResult();
+						upr.img_src = jobj.get("image_url").getAsString();
+						upr.img_width = jobj.get("image_width").getAsInt();
+						upr.img_height = jobj.get("image_height").getAsInt();
+						upr.img_size = pic.length() / 1024.0f;
+						bset.add(upr);
+					} else {
+						return null;
+					}
+				}				
+				Connection.Response cr=Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw").cookies(Tools.Network.cookieToMap(cookie)).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true)
+					.data("biz", 3)
+					.data("category", 3)
+					.data("type", 0)
+					.data("pictures", new Gson().toJson(bset))
+					.data("title", "")
+					.data("tags", "")
+					.data("description", "")
+					.data("content", content)
+					.data("setting", "{\"copy_forbidden\":0,\"cachedTime\":0}")
+					.data("from", "create.dynamic.web")
+					.data("extension", "{\"from\":{\"emoji_type\":1}}")
+					.data("at_uids", "")
+					.data("at_control", "[]")
+					.data("csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct")) 
+					.execute();
+				pics.clear();
+				return cr.body();
 			} catch (Exception e) {
 				return null;
 			}
-			return null;
 		}
 
-		public static void sendArticalJudge(long cvId, String msg, String cookie) {
+		public static void sendArticalJudge(long cvId, String comtent, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			connection.userAgent(MainActivity.instance.userAgent)
@@ -144,7 +245,7 @@ public class Tools {
                 .method(Connection.Method.POST)
                 .data("oid", String.valueOf(cvId))
                 .data("type", "12")//似乎是固定12 目前还没发现不是12的
-                .data("message", msg)
+                .data("message", comtent)
                 .data("plat", "1")
                 .data("jsonp", "jsonp")
                 .data("csrf", csrf);
@@ -440,7 +541,7 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendVideoJudge(String msg, long AID, String cookie) {
+		public static void sendVideoJudge(String comtent, long AID, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			connection.userAgent(MainActivity.instance.userAgent)
                 .headers(mainHead)
@@ -450,7 +551,7 @@ public class Tools {
                 .method(Connection.Method.POST)
                 .data("oid", String.valueOf(AID))
                 .data("type", "1")
-                .data("message", msg)
+                .data("message", comtent)
                 .data("jsonp", "jsonp")
                 .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 			Connection.Response response=null;
@@ -521,10 +622,10 @@ public class Tools {
 			MainActivity.instance.showToast(obj.get("message").getAsString());
 		}
 
-		public static void sendLiveDanmaku(String msg, String cookie, long roomId) {
+		public static void sendLiveDanmaku(String comtent, String cookie, long roomId) {
 			Connection.Response response = null;
 			try {
-				Connection connection = Jsoup.connect("http://api.live.bilibili.com/msg/send");
+				Connection connection = Jsoup.connect("http://api.live.bilibili.com/comtent/send");
 				String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 			    connection.userAgent(MainActivity.instance.userAgent)
 				    .headers(liveHead)
@@ -534,7 +635,7 @@ public class Tools {
 				    .method(Connection.Method.POST)
 				    .data("color", "16777215")
 				    .data("fontsize", "25")
-				    .data("msg", msg)
+				    .data("comtent", comtent)
 				    .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
 				    .data("roomid", String.valueOf(roomId))
 				    .data("bubble", "0")

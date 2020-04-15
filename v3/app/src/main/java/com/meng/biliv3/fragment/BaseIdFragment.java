@@ -2,6 +2,8 @@ package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -13,7 +15,6 @@ import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import org.jsoup.*;
 
@@ -37,7 +38,6 @@ public class BaseIdFragment extends Fragment {
 	protected static final int CvCoin1=10;
 	protected static final int CvCoin2=11;
 	protected static final int LikeArtical=12;
-
 
 	protected long id;
 	protected String type;
@@ -66,6 +66,17 @@ public class BaseIdFragment extends Fragment {
 		}
 	}
 
+	protected void saveBitmap(String bitName, Bitmap mBitmap) throws Exception {
+		File f = new File(Environment.getExternalStorageDirectory() + "/pictures/" + bitName + ".png");
+		f.createNewFile();
+		FileOutputStream fOut = null;
+		fOut = new FileOutputStream(f);
+		mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+		fOut.flush();
+		fOut.close();
+		getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(f)));
+	}
+	
 	public static void createSpinnerList() {
 		if (spList == null) {
 			spList = new ArrayList<>();

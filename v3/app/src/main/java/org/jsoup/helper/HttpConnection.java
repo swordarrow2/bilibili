@@ -11,9 +11,7 @@ import org.jsoup.*;
 import org.jsoup.internal.*;
 import org.jsoup.parser.*;
 
-import static org.jsoup.Connection.Method.HEAD;
 import static org.jsoup.internal.Normalizer.lowerCase;
-import com.meng.biliv3.activity.*;
 
 public class HttpConnection implements Connection {
     public static final String CONTENT_ENCODING = "Content-Encoding";
@@ -632,7 +630,7 @@ public class HttpConnection implements Connection {
                 if (contentType != null && !req.ignoreContentType() && !contentType.startsWith("text/"))
                     throw new RuntimeException("Unhandled content type. Must be text/*, application/xml, or application/*+xml" + contentType + req.url().toString());
                 res.charset = DataUtil.getCharsetFromContentType(res.contentType);
-                if (conn.getContentLength() != 0 && req.method() != HEAD) {
+                if (conn.getContentLength() != 0 && req.method() != Connection.Method.HEAD) {
                     res.bodyStream = null;
                     res.bodyStream = conn.getErrorStream() != null ? conn.getErrorStream() : conn.getInputStream();
                     if (res.hasHeaderWithValue(CONTENT_ENCODING, "gzip")) {
@@ -678,7 +676,7 @@ public class HttpConnection implements Connection {
 				try {
                     byteData = DataUtil.readToByteBuffer(bodyStream, req.maxBodySize());
                 } catch (Exception e) {
-					MainActivity.instance.showToast(e.toString());
+
                 } finally {
                     inputStreamRead = true;
                     safeClose();

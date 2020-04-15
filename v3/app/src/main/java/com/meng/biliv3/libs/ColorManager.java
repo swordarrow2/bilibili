@@ -4,6 +4,7 @@ import android.app.*;
 import android.content.res.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import android.graphics.*;
 
 public class ColorManager {
 	private final int colorBackground;
@@ -45,9 +46,19 @@ public class ColorManager {
 	}
 
 	public void doRun(Activity a) {
-		//if (themeId == R.style.AppThemeHolo) {
 		ActionBar ab=a.getActionBar();
 		ab.setDisplayOptions(ab.getDisplayOptions() ^ ActionBar.DISPLAY_HOME_AS_UP);
-		//	}
+		switch (themeId) {
+            case R.style.AppThemeHolo:
+            case R.style.AppThemeHoloL:
+				a.getWindow().setStatusBarColor(Color.TRANSPARENT);
+				break;
+			case R.style.AppThemeDark:
+
+				break;
+			case R.style.AppThemeLight:
+
+				break;
+		}
 	}
 }

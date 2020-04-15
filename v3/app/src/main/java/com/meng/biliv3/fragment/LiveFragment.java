@@ -2,7 +2,6 @@ package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.content.*;
-import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
@@ -17,17 +16,15 @@ import java.lang.reflect.*;
 
 import android.view.View.OnClickListener;
 
-public class LiveFragment extends BaseIdFragment {
+public class LiveFragment extends BaseIdFragment implements OnClickListener {
 
-	private Uri uri;
-	private VideoView videoView;
 	private Button send,editPre,preset,silver,pack,download,milk;
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
 
 	private JsonObject liveInfo;
-	
+
 	public LiveFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
@@ -47,19 +44,17 @@ public class LiveFragment extends BaseIdFragment {
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.live_fragmentButton_preset);
 		et = (EditText) view.findViewById(R.id.live_fragmentEditText_danmaku);
-		videoView = (VideoView) view.findViewById(R.id.live_fragmentVideoView);  
 		info = (TextView) view.findViewById(R.id.live_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.live_fragmentSpinner);
 		milk = (Button) view.findViewById(R.id.livefragmentButtonSerialMilk);
 		download = (Button) view.findViewById(R.id.livefragmentButtonDownload);
-		download.setOnClickListener(onclick);
-		videoView.setMediaController(new MediaController(getActivity()));
-		preset.setOnClickListener(onclick);
-		send.setOnClickListener(onclick);
-		silver.setOnClickListener(onclick);
-		pack.setOnClickListener(onclick);
+		download.setOnClickListener(this);
+		preset.setOnClickListener(this);
+		send.setOnClickListener(this);
+		silver.setOnClickListener(this);
+		pack.setOnClickListener(this);
 		//editPre.setOnClickListener(onclick);
-		milk.setOnClickListener(onclick);
+		milk.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
@@ -96,10 +91,7 @@ public class LiveFragment extends BaseIdFragment {
 
 								@Override
 								public void run() {
-									uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-									videoView.setVideoURI(uri);  
-									//videoView.start();  
-									videoView.requestFocus();
+									//	uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
 									MainActivity.instance.renameFragment(type + id, uname + "的直播间");
 								}
@@ -120,83 +112,79 @@ public class LiveFragment extends BaseIdFragment {
 				}
 			});
 	}
+	@Override
+	public void onClick(final View p1) {
+		switch (p1.getId()) {
+			case R.id.live_fragmentButton_preset:
+				ListView naiSentenseListview = new ListView(getActivity());
+				naiSentenseListview.setAdapter(sencencesAdapter);
+				naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
 
-	private OnClickListener onclick=new OnClickListener(){
-
-		@Override
-		public void onClick(final View p1) {
-			switch (p1.getId()) {
-				case R.id.live_fragmentButton_preset:
-					ListView naiSentenseListview = new ListView(getActivity());
-					naiSentenseListview.setAdapter(sencencesAdapter);
-					naiSentenseListview.setOnItemClickListener(new OnItemClickListener() {
-
-							@Override
-							public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-								sendBili((String) selectAccount.getSelectedItem(), SendDanmaku, (String)p1.getAdapter().getItem(p3));
+						@Override
+						public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+							sendBili((String) selectAccount.getSelectedItem(), SendDanmaku, (String)p1.getAdapter().getItem(p3));
+						}
+					});
+				new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
+				break;
+			case R.id.live_fragmentButton_send:
+				sendBili((String) selectAccount.getSelectedItem(), SendDanmaku, et.getText().toString());
+				break;
+			case R.id.live_fragmentButton_pack:
+				sendBili((String) selectAccount.getSelectedItem(), Pack, "");
+				break;
+			case R.id.live_fragmentButton_silver:
+				sendBili((String) selectAccount.getSelectedItem(), Silver, "");
+				break;
+			case R.id.livefragmentButtonSerialMilk:
+				final SelectMilk sm=new SelectMilk(getActivity(), id);
+				new AlertDialog.Builder(getActivity()).setView(sm).setTitle("选择").setPositiveButton("发送",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							//MainActivity.instance.showToast(sm.toString());
+							MainActivity.instance.threadPool.execute(sm.getSendTask());
+							try {  
+								Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+								field.setAccessible(true);
+								field.set(dialog, true);  
+							} catch (Exception e) {  
 							}
-						});
-					new AlertDialog.Builder(getActivity()).setView(naiSentenseListview).setTitle("选择预设语句").setNegativeButton("返回", null).show();
-					break;
-				case R.id.live_fragmentButton_send:
-					sendBili((String) selectAccount.getSelectedItem(), SendDanmaku, et.getText().toString());
-					break;
-				case R.id.live_fragmentButton_pack:
-					sendBili((String) selectAccount.getSelectedItem(), Pack, "");
-					break;
-				case R.id.live_fragmentButton_silver:
-					sendBili((String) selectAccount.getSelectedItem(), Silver, "");
-					break;
-				case R.id.livefragmentButtonSerialMilk:
-					final SelectMilk sm=new SelectMilk(getActivity(), id);
-					new AlertDialog.Builder(getActivity()).setView(sm).setTitle("选择").setPositiveButton("发送",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								//MainActivity.instance.showToast(sm.toString());
-								MainActivity.instance.threadPool.execute(sm.getSendTask());
-								try {  
-									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
-									field.setAccessible(true);
-									field.set(dialog, true);  
-								} catch (Exception e) {  
-								}
+						}
+					}).setNeutralButton("添加",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							sm.add();
+							try {  
+								Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+								field.setAccessible(true);
+								field.set(dialog, false);  
+							} catch (Exception e) {  
+							}  
+						}
+					}).setNegativeButton("清空", 
+					new DialogInterface.OnClickListener(){
+						@Override
+						public void onClick(DialogInterface dialog, int witch) {
+							sm.clear();
+							try {  
+								Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
+								field.setAccessible(true);
+								field.set(dialog, false);  
+							} catch (Exception e) {  
 							}
-						}).setNeutralButton("添加",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								sm.add();
-								try {  
-									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
-									field.setAccessible(true);
-									field.set(dialog, false);  
-								} catch (Exception e) {  
-								}  
-							}
-						}).setNegativeButton("清空", 
-						new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface dialog, int witch) {
-								sm.clear();
-								try {  
-									Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");  
-									field.setAccessible(true);
-									field.set(dialog, false);  
-								} catch (Exception e) {  
-								}
-							}
-						}).show();
-					break;
-					/*	case R.id.livefragmentButtonDownload:
-					 // 本地存储路径
-					 final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-					 Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-					 DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
-					 DownloadManager.Request request=new DownloadManager.Request(uri);
-					 long downloadId=downloadManager.enqueue(request);
-					 break;*/
-			}
+						}
+					}).show();
+				break;
+				/*	case R.id.livefragmentButtonDownload:
+				 // 本地存储路径
+				 final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+				 Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
+				 DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
+				 DownloadManager.Request request=new DownloadManager.Request(uri);
+				 long downloadId=downloadManager.enqueue(request);
+				 break;*/
 		}
-	};
+	}
 }

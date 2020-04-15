@@ -93,6 +93,46 @@ public class Tools {
 			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
 		}
 
+		public static String sendDynamic(String content, File pic) {
+			try {
+				FileInputStream fInputStream = new FileInputStream(pic);
+				Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/api/v1/drawImage/upload").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie))
+					.data("file_up", pic.getName(), fInputStream)
+					.data("biz", "draw")
+					.data("category", "daily")
+					.execute();
+				MainActivity.instance.showToast(response.body());
+				if (response.statusCode() != 200) {
+					return null;
+				} 
+				JsonObject jo=new JsonParser().parse(response.body()).getAsJsonObject();
+				if (jo.get("code").getAsInt() == 0) {
+					JsonObject jobj=jo.get("data").getAsJsonObject();
+					String url=jobj.get("image_url").getAsString();
+					Connection.Response cr=Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw").cookies(Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie)).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true)
+						.data("biz", "3")
+						.data("category", "3")
+						.data("type", "0")
+						.data("pictures", "[{\"img_src\":\"" + url + "\",\"img_width\":" + jobj.get("image_width").getAsInt() + ",\"img_height\":" + jobj.get("image_height").getAsInt() + ",\"img_size\":" + (pic.length() / 1024.0f) + "}]")
+						.data("title", "")
+						.data("tags", "")
+						.data("description", "图片发送测试")
+						.data("content", "图片发送测试")
+						.data("setting", "{\"copy_forbidden\":0,\"cachedTime\":0}")
+						.data("from", "create.dynamic.web")
+						.data("extension", "{\"from\":{\"emoji_type\":1}}")
+						.data("at_uids", "")
+						.data("at_control", "[]")
+						.data("csrf_token", Tools.Network.cookieToMap(MainActivity.instance.loginAccounts.get(0).cookie).get("bili_jct")) 
+						.execute();
+					return cr.body();
+				}
+			} catch (Exception e) {
+				return null;
+			}
+			return null;
+		}
+
 		public static void sendArticalJudge(long cvId, String msg, String cookie) {
 			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
@@ -552,20 +592,7 @@ public class Tools {
 				}
 			}
 		}
-		public static String getFromAssets(String fileName) {
-			try {
-				InputStreamReader inputReader = new InputStreamReader(MainActivity.instance.getResources().getAssets().open(fileName));
-				BufferedReader bufReader = new BufferedReader(inputReader);
-				String line = "";
-				StringBuilder Result = new StringBuilder();
-				while ((line = bufReader.readLine()) != null)
-					Result.append(line);
-				return Result.toString();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return "";
-		}
+
 		public static void fileCopy(String src, String des) {
 			try {
 				BufferedInputStream bis = null;
@@ -585,12 +612,10 @@ public class Tools {
 		public static String readString(String fileName) {
 			return readString(new File(fileName));
 		}
+
 		public static String readString(File f) {
-			String s = "{}";
+			String s = "";
 			try {      
-				if (!f.exists()) {
-					f.createNewFile();
-				}
 				long filelength = f.length();
 				byte[] filecontent = new byte[(int) filelength];
 				FileInputStream in = new FileInputStream(f);
@@ -601,6 +626,23 @@ public class Tools {
 				e.printStackTrace();
 			}
 			return s;
+		}
+
+		public static byte[] readBytes(File f) {
+			byte[] filecontent=null;
+			try {
+				long filelength = f.length();
+				filecontent = new byte[(int) filelength];
+				FileInputStream in = new FileInputStream(f);
+				in.read(filecontent);
+				in.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return filecontent;
+		}
+		public static byte[] readBytes(String path) {
+			return readBytes(new File(path));
 		}
 	}
 

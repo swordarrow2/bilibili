@@ -5,15 +5,12 @@ import android.content.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
-import android.widget.AdapterView.*;
+import android.widget.ExpandableListView.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
-import java.io.*;
-import java.util.*;
-import android.widget.ExpandableListView.*;
 
 public class MengLiveControl extends LinearLayout {
 
@@ -51,15 +48,11 @@ public class MengLiveControl extends LinearLayout {
 							public void run() {
 								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 								String cookie = MainActivity.instance.getCookie(mainUID);
-								final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
-								String streamJson = Tools.Network.getSourceCode("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
+								final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+								String streamJson = Tools.Network.httpGet("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
 								JsonParser parser = new JsonParser();
 								JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();
-								try {
-									Tools.BilibiliTool.startLive(sjb.data.roomid, partID, cookie);
-								} catch (IOException e) {
-									MainActivity.instance.showToast(e.toString());
-								}
+								Tools.BilibiliTool.startLive(sjb.data.roomid, partID, cookie);
 								m1 = new TextView(context);
 								m2 = new TextView(context);
 								m1.setText(rtmp.get("addr").getAsString());
@@ -106,7 +99,7 @@ public class MengLiveControl extends LinearLayout {
 				@Override
 				public void run() {
 					try {
-						final LivePart livePartList = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Area/getList"), LivePart.class);
+						final LivePart livePartList = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Area/getList"), LivePart.class);
 						((Activity) context).runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
@@ -119,8 +112,8 @@ public class MengLiveControl extends LinearLayout {
 					}
 					long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 					if (mainUID != -1) {
-						final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
-						String streamJson = Tools.Network.getSourceCode("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, MainActivity.instance.getCookie(mainUID), "https://link.bilibili.com/p/center/index");
+						final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+						String streamJson = Tools.Network.httpGet("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, MainActivity.instance.getCookie(mainUID), "https://link.bilibili.com/p/center/index");
 						JsonParser parser = new JsonParser();
 						final JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();				
 						((Activity) context).runOnUiThread(new Runnable() {
@@ -160,12 +153,8 @@ public class MengLiveControl extends LinearLayout {
 								public void run() {
 									long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 									String cookie = MainActivity.instance.getCookie(mainUID);
-									UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
-									try {
-										Tools.BilibiliTool.stopLive(sjb.data.roomid, cookie);
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
+									UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+									Tools.BilibiliTool.stopLive(sjb.data.roomid, cookie);
 									((Activity) context).runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
@@ -194,12 +183,8 @@ public class MengLiveControl extends LinearLayout {
 							public void run() {
 								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 								String cookie = MainActivity.instance.getCookie(mainUID);
-								UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
-								try {
-									Tools.BilibiliTool.renameLive(sjb.data.roomid, name, cookie);
-								} catch (IOException e) {
-									MainActivity.instance.showToast(e.toString());
-								}
+								UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+								Tools.BilibiliTool.renameLive(sjb.data.roomid, name, cookie);
 							}
 						});
 				}

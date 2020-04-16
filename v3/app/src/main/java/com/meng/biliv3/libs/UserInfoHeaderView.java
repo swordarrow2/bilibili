@@ -81,12 +81,12 @@ public class UserInfoHeaderView extends LinearLayout {
 		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), BilibiliUserInfo.class);
+					final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), BilibiliUserInfo.class);
 					if (info.code != 0) {
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UidToLiveRoom.class);
+					UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UidToLiveRoom.class);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -97,7 +97,7 @@ public class UserInfoHeaderView extends LinearLayout {
 							}
 						});
 					try {
-						String json = Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
+						String json = Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
 						JsonObject obj = new JsonParser().parse(json).getAsJsonObject();
 						final JsonObject obj2=obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
 						MainActivity.instance.runOnUiThread(new Runnable() {

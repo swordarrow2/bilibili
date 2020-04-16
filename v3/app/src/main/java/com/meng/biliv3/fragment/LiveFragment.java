@@ -4,7 +4,6 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.google.gson.*;
@@ -14,9 +13,7 @@ import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 import java.lang.reflect.*;
 
-import android.view.View.OnClickListener;
-
-public class LiveFragment extends BaseIdFragment implements OnClickListener {
+public class LiveFragment extends BaseIdFragment implements View.OnClickListener {
 
 	private Button send,editPre,preset,silver,pack,download,milk;
 	private EditText et;
@@ -61,7 +58,7 @@ public class LiveFragment extends BaseIdFragment implements OnClickListener {
 				@Override
 				public void run() {
 					JsonParser parser = new JsonParser();
-					liveInfo = parser.parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
+					liveInfo = parser.parse(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
 					if (liveInfo.get("code").getAsInt() == 19002003) {
 						MainActivity.instance.showToast("不存在的房间");
 						return;
@@ -69,13 +66,13 @@ public class LiveFragment extends BaseIdFragment implements OnClickListener {
 					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
 					JsonObject liveToMainInfo=null;
 					try {
-						liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+						liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 					} catch (Exception e) {
 						return;
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
+					final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
                     if (sjb.data.liveStatus != 1) {
 						getActivity().runOnUiThread(new Runnable(){
 

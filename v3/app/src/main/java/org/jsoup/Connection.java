@@ -41,6 +41,7 @@ public interface Connection {
     Connection data(Collection<KeyVal> data);
     Connection data(Map<String, String> data);
     Connection data(String... keyvals);
+	Connection data(Object... objs);
     KeyVal data(String key);
     Connection requestBody(String body);
     Connection header(String name, String value);

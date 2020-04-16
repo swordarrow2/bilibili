@@ -2,7 +2,6 @@ package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.content.*;
-import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -10,12 +9,10 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
-import java.util.*;
-import android.view.View.*;
 import java.io.*;
-import com.google.gson.*;
+import java.util.*;
 
-public class DynamicFragment extends Fragment implements OnClickListener {
+public class DynamicFragment extends Fragment implements View.OnClickListener {
 
 	public TabHost tab;
 	private Spinner selectAccount;
@@ -80,11 +77,12 @@ public class DynamicFragment extends Fragment implements OnClickListener {
 							} else {
 								result = Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, selectedPic);
 							}
-							if (new JsonParser().parse(result).getAsJsonObject().get("code").getAsInt() == 0) {
-								MainActivity.instance.showToast("发送成功");
-							} else {
-								MainActivity.instance.showToast("发送失败");
-							}
+							MainActivity.instance.showToast(result);
+//							if (new JsonParser().parse(result).getAsJsonObject().get("code").getAsInt() == 0) {
+//								MainActivity.instance.showToast("发送成功");
+//							} else {
+//								MainActivity.instance.showToast("发送失败");
+//							}
 							MainActivity.instance.runOnUiThread(new Runnable(){
 
 									@Override

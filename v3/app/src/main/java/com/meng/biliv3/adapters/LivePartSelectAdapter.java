@@ -33,7 +33,7 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 		LivePart.GroupData.PartData pd = livePart.data.get(groupPosition).list.get(childPosition);
 		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) MainActivity.instance.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.layout_children, null);
+			convertView = inflater.inflate(R.layout.live_part_select_layout_children, null);
 		}
 		TextView tv = (TextView) convertView.findViewById(R.id.layoutchildren_TextView1);
 		tv.setText(pd.name);
@@ -66,7 +66,7 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) MainActivity.instance.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.layout_parent, null);
+			convertView = inflater.inflate(R.layout.live_part_select_layout_parent, null);
 		}
 		TextView tv = (TextView) convertView.findViewById(R.id.layoutparent_TextView1);
 		tv.setText(livePart.data.get(groupPosition).name);

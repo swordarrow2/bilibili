@@ -11,6 +11,7 @@ import android.widget.AdapterView.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.activity.live.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
@@ -76,7 +77,7 @@ public class BaseIdFragment extends Fragment {
 		fOut.close();
 		getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(f)));
 	}
-	
+
 	public static void createSpinnerList() {
 		if (spList == null) {
 			spList = new ArrayList<>();
@@ -143,7 +144,35 @@ public class BaseIdFragment extends Fragment {
 				public void run() {
 					switch (opValue) {
 						case SendDanmaku:
-							Tools.BilibiliTool.sendLiveDanmaku(msg, ai.cookie, id);
+							String response=Tools.BilibiliTool.sendLiveDanmaku(msg, ai.cookie, id);
+							JsonParser parser = new JsonParser();
+							JsonObject obj = parser.parse(response).getAsJsonObject();
+							switch (obj.get("code").getAsInt()) {
+								case 0:
+									if (!obj.get("message").getAsString().equals("")) {
+										MainActivity.instance.showToast(obj.getAsJsonObject("message").getAsString());
+									} else {
+										MainActivity.instance.showToast(id + "发送成功");
+									}
+									break;
+								case 1990000:
+									if (obj.get("message").getAsString().equals("risk")) {
+										ConnectivityManager connMgr = (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+										NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+										if (wifiNetworkInfo.isConnected()) {
+											Intent intent = new Intent(MainActivity.instance, LiveWebActivity.class);
+											intent.putExtra("cookie", ai.cookie);
+											intent.putExtra("url", "https://live.bilibili.com/" + id);
+											MainActivity.instance.startActivity(intent);
+										} else {
+											MainActivity.instance.showToast("需要在官方客户端进行账号风险验证");
+										}
+									}
+									break;
+								default:
+									MainActivity.instance.showToast(response);
+									break;
+							}
 							break;
 						case Silver:
 							MainActivity.instance.runOnUiThread(new Runnable(){
@@ -161,12 +190,11 @@ public class BaseIdFragment extends Fragment {
 																String content = editText.getText().toString();
 																JsonObject liveToMainInfo=null;
 																try {
-																	liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+																	liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 																} catch (Exception e) {
 																	return;
 																}
-																long uid=liveToMainInfo.get("uid").getAsLong();
-																Tools.BilibiliTool.sendHotStrip(ai.uid, uid, id, Integer.parseInt(content), ai.cookie);
+																MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, liveToMainInfo.get("uid").getAsLong(), id, Integer.parseInt(content), ai.cookie)).getAsJsonObject().get("message").getAsString());
 															}
 														});
 												}
@@ -178,34 +206,34 @@ public class BaseIdFragment extends Fragment {
 							sendPackDialog(ai);
 							break;
 						case Sign:
-							Tools.BilibiliTool.sendLiveSign(ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case SendVideoJudge:
-							Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case LikeVideo:
-							Tools.BilibiliTool.sendAvLike(id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case VideoCoin1:
-							Tools.BilibiliTool.sendAvCoin(1, id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case VideoCoin2:
-							Tools.BilibiliTool.sendAvCoin(2, id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case Favorite:
 							MainActivity.instance.showToast("未填坑");
 							break;
 						case SendCvJudge:
-							Tools.BilibiliTool.sendArticalJudge(id, msg, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendArticalJudge(id, msg, ai.cookie)).getAsJsonObject().get("code").getAsInt() == 0 ?"发送成功": "发送失败");
 							break;
 						case CvCoin1:
-							Tools.BilibiliTool.sendCvCoin(1, id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case CvCoin2:
-							Tools.BilibiliTool.sendCvCoin(2, id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case LikeArtical:
-							Tools.BilibiliTool.sendCvLike(id, ai.cookie);
+							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 					}
 				}
@@ -213,12 +241,9 @@ public class BaseIdFragment extends Fragment {
 	}
 
 	private void sendPackDialog(final AccountInfo ai) {
-		JsonObject liveToMainInfo = new JsonParser().parse(Tools.Network.getSourceCode("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+		JsonObject liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 		final long uid=liveToMainInfo.get("uid").getAsLong();
-		final GiftBag liveBag = new Gson().fromJson(Tools.Network.getSourceCode("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
-		if (liveBag.data.list.size() == 0) {
-			//	MainActivity.instance.showToast("包裹中什么也没有");
-		}
+		final GiftBag liveBag = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -226,8 +251,6 @@ public class BaseIdFragment extends Fragment {
 					new AlertDialog.Builder(getActivity()).setView(listView).setTitle("选择(" + ai.name + ")").show();
 					final GiftAdapter giftAdapter = new GiftAdapter(getActivity(), liveBag.data.list);
 					listView.setAdapter(giftAdapter);
-					int ii=getStripCount(liveBag.data.list);
-					//	MainActivity.instance.showToast("共有" + ii + "辣条");
 					listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 							@Override
 							public void onItemClick(final AdapterView<?> parent, View view, final int p, long itemid) {
@@ -314,7 +337,7 @@ public class BaseIdFragment extends Fragment {
 		return ii;
 	}
 
-	public static void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
+	private void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
 		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
 		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 		connection.userAgent(MainActivity.instance.userAgent)

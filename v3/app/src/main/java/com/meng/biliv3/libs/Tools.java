@@ -8,7 +8,6 @@ import android.os.*;
 import android.provider.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.activity.live.*;
 import com.meng.biliv3.javaBean.*;
 import java.io.*;
 import java.net.*;
@@ -21,7 +20,7 @@ import org.jsoup.*;
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
     public static Map<String, String> mainHead = new HashMap<>();
-
+	public static String REFERER = "Referer";
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	static{
@@ -39,6 +38,26 @@ public class Tools {
 	}
 
 	public static class AndroidContent {
+
+        public static int px2dp(float pxValue) { 
+			float scale = MainActivity.instance.getResources().getDisplayMetrics().density; 
+            return(int) (pxValue / scale + 0.5f); 
+        } 
+
+        public static int dp2px(float dipValue) { 
+			float scale = MainActivity.instance.getResources().getDisplayMetrics().density; 
+            return(int) (dipValue * scale + 0.5f); 
+		} 
+
+        public static int px2sp(float pxValue) { 
+			float fontScale = MainActivity.instance.getResources().getDisplayMetrics().scaledDensity; 
+            return(int) (pxValue / fontScale + 0.5f); 
+        }
+
+		public static int sp2px(float spValue) { 
+			float fontScale = MainActivity.instance.getResources().getDisplayMetrics().scaledDensity; 
+            return(int) (spValue * fontScale + 0.5f); 
+        }
 
 		public static void copyToClipboard(String s) {
 			ClipData clipData = ClipData.newPlainText("text", s.substring(s.indexOf(":") + 1));
@@ -139,62 +158,46 @@ public class Tools {
 	public static class BilibiliTool {
 
 		public static String getCvInfo(long cvId) {
-			return Tools.Network.getSourceCode("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp");
+			return Tools.Network.httpGet("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp");
 		}
 
-		/*public static void startWatchLive(int posInAccountList) {
-		 Intent intentOne = new Intent(MainActivity.instance, GuaJiService.class);
-		 intentOne.putExtra("pos", posInAccountList);
-		 MainActivity.instance.startService(intentOne);
-		 }
-		 */
+		public static String getVideoJudge(long aid) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid);
+		}
+
+		public static String getVideoJudge(long aid, long root) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid + "&ps=10&root=" + root + "&_=" + System.currentTimeMillis());
+		}
+
 		public static String getMyInfo(String cookie) {
-			return Tools.Network.getSourceCode("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
+			return Tools.Network.httpGet("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
 		}
 
 		public static String getUserInfo(long id) {
-			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie);
+			return Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie);
 		}
 
 		public static String getLiveRoomInfo(long uid) {
-			return Tools.Network.getSourceCode("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid);
+			return Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid);
 		}
 
 		public static String getRelation(long uid) {
-			return Tools.Network.getSourceCode("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp");
+			return Tools.Network.httpGet("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp");
 		}
 
 		public static String getUpstat(long uid) {
-			return Tools.Network.getSourceCode("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
+			return Tools.Network.httpGet("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
 		}
 
 		public static String sendDynamic(String content, String cookie) {
-            try {
-				Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(cookie))
-					.data("dynamic_id", 0)
-					.data("type", 4)
-					.data("rid", 0)
-					.data("content", content)
-					.data("extension", "{\"from\":{\"emoji_type\":1}}")
-					.data("at_uids", "")
-					.data("ctrl", "[]")
-					.data("csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"))
-					.execute();
-                return response.body();
-            } catch (Exception e) {
-                return null;
-			}
-        }
+			return Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create", cookie, "dynamic_id", 0, "type", 4, "rid", 0, "content", content, "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "ctrl", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
 
 		public static String sendDynamic(String content, String cookie, ArrayList<File> pics) {
 			HashSet<UploadPicResult> bset=new HashSet<>(); 
 			try {
 				for (File pic:pics) {
-					Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/api/v1/drawImage/upload").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(cookie))
-						.data("file_up", pic.getName(), new FileInputStream(pic))
-						.data("biz", "draw")
-						.data("category", "daily")
-						.execute();
+					Connection.Response response = Jsoup.connect("https://api.vc.bilibili.com/api/v1/drawImage/upload").timeout(60000).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true).cookies(Tools.Network.cookieToMap(cookie)).data("file_up", pic.getName(), new FileInputStream(pic)).data("biz", "draw").data("category", "daily").execute();
 					if (response.statusCode() != 200) {
 						return null;
 					} 
@@ -210,474 +213,229 @@ public class Tools {
 					} else {
 						return null;
 					}
-				}				
-				Connection.Response cr=Jsoup.connect("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw").cookies(Tools.Network.cookieToMap(cookie)).method(Connection.Method.POST).userAgent(MainActivity.instance.userAgent).ignoreContentType(true)
-					.data("biz", 3)
-					.data("category", 3)
-					.data("type", 0)
-					.data("pictures", new Gson().toJson(bset))
-					.data("title", "")
-					.data("tags", "")
-					.data("description", "")
-					.data("content", content)
-					.data("setting", "{\"copy_forbidden\":0,\"cachedTime\":0}")
-					.data("from", "create.dynamic.web")
-					.data("extension", "{\"from\":{\"emoji_type\":1}}")
-					.data("at_uids", "")
-					.data("at_control", "[]")
-					.data("csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct")) 
-					.execute();
+				}
+				String result=Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw", cookie, "biz", 3, "category", 3, "type", 0, "pictures", new Gson().toJson(bset), "title", "", "tags", "", "description", "", "content", content, "setting", "{\"copy_forbidden\":0,\"cachedTime\":0}", "from", "create.dynamic.web", "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "at_control", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 				pics.clear();
-				return cr.body();
+				return result;
 			} catch (Exception e) {
 				return null;
 			}
 		}
 
-		public static void sendArticalJudge(long cvId, String comtent, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/")
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("oid", String.valueOf(cvId))
-                .data("type", "12")//似乎是固定12 目前还没发现不是12的
-                .data("message", comtent)
-                .data("plat", "1")
-                .data("jsonp", "jsonp")
-                .data("csrf", csrf);
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (Exception e) {
-				MainActivity.instance.showToast("连接出错:" + e.toString());
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+		public static String sendArticalJudge(long cvId, String msg, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, "Referer", "https://www.bilibili.com/", "type", 12, "message", msg, "plat", 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 		}
 
-		public static void startLive(long roomID, String partID, String cookie) throws IOException {
+		public static String startLive(long roomID, String partID, String cookie) {
 			if (partID == null) {
 				partID = "235";
 				MainActivity.instance.showToast("没有发现这个分区，已自动选择\"单机-其他分区\"");
 			}
-			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/startLive");
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			connection.userAgent(MainActivity.instance.userAgent)
-			    .headers(liveHead)
-			    .ignoreContentType(true)
-			    .referrer("https://link.bilibili.com/p/center/index")
-			    .cookies(Tools.Network.cookieToMap(cookie))
-			    .method(Connection.Method.POST)
-			    .data("room_id", String.valueOf(roomID))
-			    .data("platform", "pc")
-			    .data("area_v2", partID)
-			    .data("csrf_token", csrf)
-			    .data("csrf", csrf);
-			Connection.Response response = connection.execute();
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			//JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			// MainActivity.instance.showToast(obj.get("message").getAsString());
+			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/startLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "platform", "pc", "area_v2", partID, "csrf_token", csrf, "csrf", csrf);
 		}
 
-		public static void stopLive(int roomID, String cookie) throws IOException {
-			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/stopLive");
+		public static String stopLive(int roomID, String cookie) {
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			connection.userAgent(MainActivity.instance.userAgent).
-				headers(liveHead).
-				ignoreContentType(true).
-				referrer("https://link.bilibili.com/p/center/index").
-				cookies(Tools.Network.cookieToMap(cookie)).
-				method(Connection.Method.POST).
-				data("room_id", String.valueOf(roomID)).
-				data("csrf_token", csrf).
-				data("csrf", csrf);
-			Connection.Response response = connection.execute();
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/stopLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "csrf_token", csrf, "csrf", csrf);
 		}
 
-		public static void renameLive(int roomID, String newName, String cookie) throws IOException {
-			Connection connection = Jsoup.connect("https://api.live.bilibili.com/room/v1/Room/update");
+		public static String renameLive(int roomID, String newName, String cookie) {
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-		    connection.userAgent(MainActivity.instance.userAgent)
-			    .headers(liveHead)
-			    .ignoreContentType(true)
-			    .referrer("https://link.bilibili.com/p/center/index")
-			    .cookies(Tools.Network.cookieToMap(cookie))
-			    .method(Connection.Method.POST)
-			    .data("room_id", String.valueOf(roomID))
-			    .data("title", newName)
-			    .data("csrf_token", csrf)
-			    .data("csrf", csrf);
-			Connection.Response response = connection.execute();
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/update", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "title", newName, "csrf_token", csrf, "csrf", csrf);
 		}
 
-		public static int sendLiveSign(String cookie) {
-			Connection connection = Jsoup.connect("https://api.live.bilibili.com/sign/doSign");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(liveHead)
-                .ignoreContentType(true)
-                .referrer("https://live.bilibili.com/" + new Random().nextInt() % 9721949)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.GET);
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return -1;
-			}	if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			return obj.get("code").getAsInt();
+		public static String sendLiveSign(String cookie) {
+			return Tools.Network.httpGet("https://api.live.bilibili.com/sign/doSign", cookie, "https://live.bilibili.com/" + new Random().nextInt(10_000_000));
 		}
 
-		public static void sendHotStrip(long myUid, long roomMasterUid, long roomID, int count, String cookie) {
-			Connection connection = Jsoup.connect("http://api.live.bilibili.com/gift/v2/gift/send");
+		public static String sendHotStrip(long myUid, long roomMasterUid, long roomID, int count, String cookie) {
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(liveHead)
-                .ignoreContentType(true)
-                .referrer("https://live.bilibili.com/" + roomID)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("uid", String.valueOf(myUid))
-                .data("gift_id", "1")
-                .data("ruid", String.valueOf(roomMasterUid))
-                .data("gift_num", String.valueOf(count))
-                .data("coin_type", "silver")
-                .data("bag_id", "0")
-                .data("platform", "pc")
-                .data("biz_code", "live")
-                .data("biz_id", String.valueOf(roomID))
-                .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
-                .data("metadata", "")
-                .data("price", "0")
-                .data("csrf_token", csrf)
-                .data("csrf", csrf)
-                .data("visit_id", "");
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return Tools.Network.bilibiliLivePost("http://api.live.bilibili.com/gift/v2/gift/send", cookie, "Referer" , "https://live.bilibili.com/" + roomID, "uid", myUid, "gift_id", 1, "ruid", roomMasterUid, "gift_num", count, "coin_type", "silver", "bag_id", 0, "platform", "pc", "biz_code", "live", "biz_id", roomID, "rnd", System.currentTimeMillis() / 1000, "metadata", "", "price", 0, "csrf_token", csrf, "csrf", csrf, "visit_id", "");
 		}
 
-		public static void followUser(String cookie, long UID) {
-			Connection conn1 = Jsoup.connect("https://api.bilibili.com/x/relation/modify?cross_domain=true");
-			conn1.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("fid", String.valueOf(UID))
-                .data("act", "1")
-                .data("re_src", "122")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response res1=null;
-			try {
-				res1 = conn1.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
+		public static String followUser(String cookie, long UID) {
+			String firstStep=Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/modify?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fid", UID, "act", 1, "re_src", 122, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			if (new JsonParser().parse(firstStep).getAsJsonObject().get("code").getAsInt() != 0) {
+				return "关注失败";
 			}
-			if (res1.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(res1.statusCode()));
-				return;
-			}
-			JsonParser parser = new JsonParser();
-			//JsonObject obj1 = parser.parse(res1.body()).getAsJsonObject();
-			//MainActivity.instence.showToast(obj1.get("message").getAsString());
-			Connection conn2 = Jsoup.connect("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true");
-			conn2.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + new Random().nextInt() % 47957369)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("fids", String.valueOf(UID))
-                .data("tagids", "0")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response res2=null;
-			try {
-				res2 = conn2.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (res2.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(res2.statusCode()));
-				return;
-			}
-			JsonObject obj2 = parser.parse(res2.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj2.get("message").getAsString());
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fids", UID, "tagids", 0, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 		}
 
 		//收藏,未完成
-		public static void sendFavorite(int count, long AID, String cookie) {
+//		public static void sendFavorite(int count, long AID, String cookie) {
+//
+//			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
+//			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
+//			//rid=55340268&type=2&add_media_ids=101411121&del_media_ids=&jsonp=jsonp&csrf=14f4956b04e6775a3a32ca47a30b5d54
+//			/*String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",cookie);
+//			 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
+//			 JsonArray fja=fjobj.get("list").getAsJsonArray();
+//			 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+//
+//			 */
+//			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
+//			connection.userAgent(MainActivity.instance.userAgent)
+//                .headers(mainHead)
+//                .ignoreContentType(true)
+//                .referrer("https://www.bilibili.com/video/av" + AID)
+//                .cookies(Tools.Network.cookieToMap(cookie))
+//                .method(Connection.Method.POST)
+//                .data("rid", String.valueOf(AID))
+//                .data("multiply", String.valueOf(count))
+//                .data("select_like", "0")
+//                .data("cross_domain", "true")
+//                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+//			Connection.Response response=null;
+//			try {
+//				response = connection.execute();
+//			} catch (IOException e) {
+//				MainActivity.instance.showToast("连接出错");
+//				return;
+//			}
+//			if (response.statusCode() != 200) {
+//				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+//			}
+//			JsonParser parser = new JsonParser();
+//			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+//			MainActivity.instance.showToast(obj.get("message").getAsString());
+//		}
 
-			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
-			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
-			//rid=55340268&type=2&add_media_ids=101411121&del_media_ids=&jsonp=jsonp&csrf=14f4956b04e6775a3a32ca47a30b5d54
-			/*String favoriteJson=Tools.Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",cookie);
-			 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
-			 JsonArray fja=fjobj.get("list").getAsJsonArray();
-			 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+		public static String sendCvCoin(int count, long CvId, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getCvInfo(CvId), CvInfo.class).data.mid), "avtype", 2, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
 
-			 */
-			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + AID)
+		public static String sendAvCoin(int count, long AID, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "multiply", count, "select_like", 0, "cross_domain", "true", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendVideoJudge(String content, long AID, String cookie) {		
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "message", content, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendVideoJudge(String content, long AID, long rootId, long parentId, String cookie) {		
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "root", rootId, "parent", parentId, "message", content, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendLikeReply(long AID, long rpid, boolean deLike, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/action", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deLike ?0: 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendDisikeReply(long AID, long rpid, boolean deDislike, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/hate", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deDislike ?0: 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String deleteReply(long AID, long rpid, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/del", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendCvLike(long cvID, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/article/like", cookie, REFERER, "https://www.bilibili.com/read/cv" + cvID, "id", cvID, "type", 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendAvLike(long AID, String cookie) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/archive/like", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "like", 1, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+		}
+
+		public static String sendLiveDanmaku(String msg, String cookie, long roomId) {
+			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+			return Tools.Network.bilibiliLivePost("http://api.live.bilibili.com/msg/send", cookie, REFERER, "https://live.bilibili.com/" + roomId, "color", 0xffffff, "fontsize", 25, "mode", 1, "msg", msg, "rnd", System.currentTimeMillis() / 1000, "roomid", roomId, "bubble", 0, "csrf_token", csrf, "csrf", csrf);
+		}
+	}
+
+	public static class Network {
+
+		private static String bilibiliPost(String url, String cookie, Map<String,String> headers, Object... params) {
+			Connection connection = Jsoup.connect(url);
+			connection.userAgent(MainActivity.instance.userAgent);
+			if (headers != null) {
+				connection.headers(headers);
+			}
+			connection.ignoreContentType(true)
                 .cookies(Tools.Network.cookieToMap(cookie))
                 .method(Connection.Method.POST)
-                .data("rid", String.valueOf(AID))
-                .data("multiply", String.valueOf(count))
-                .data("select_like", "0")
-                .data("cross_domain", "true")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			    .data(params);
 			Connection.Response response=null;
 			try {
 				response = connection.execute();
 			} catch (IOException e) {
 				MainActivity.instance.showToast("连接出错");
-				return;
+				return null;
 			}
 			if (response.statusCode() != 200) {
 				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return response.body();
 		}
 
-		public static void sendCvCoin(int count, long CvId, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/read/cv" + CvId)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("aid", String.valueOf(CvId))
-                .data("multiply", String.valueOf(count))
-			    .data("upid", String.valueOf(MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getCvInfo(CvId), CvInfo.class).data.mid))
-                .data("avtype", "2")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+		public static String bilibiliPost(String url, String cookie, Object... params) {
+			return bilibiliPost(url, cookie, null, params);
 		}
 
-		public static void sendAvCoin(int count, long AID, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/coin/add");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + AID)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("aid", String.valueOf(AID))
-                .data("multiply", String.valueOf(count))
-                .data("select_like", "0")
-                .data("cross_domain", "true")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+		public static String bilibiliMainPost(String url, String cookie, Object... params) {
+			return bilibiliPost(url, cookie, mainHead, params);
 		}
 
-		public static void sendVideoJudge(String comtent, long AID, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/v2/reply/add");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + AID)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("oid", String.valueOf(AID))
-                .data("type", "1")
-                .data("message", comtent)
-                .data("jsonp", "jsonp")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+		public static String bilibiliLivePost(String url, String cookie, Object... params) {
+			return bilibiliPost(url, cookie, liveHead, params);
 		}
 
-		public static void sendCvLike(long cvID, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/article/like");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/read/cv" + cvID)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("id", String.valueOf(cvID))
-                .data("type", "1")
-			    .data("jsonp", "jsonp")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错:" + e.toString());
-				return;
+		public static Map<String, String> cookieToMap(String value) {
+			Map<String, String> map = new HashMap<>();
+			String[] values = value.split("; ");
+			for (String val : values) {
+				String[] vals = val.split("=");
+				if (vals.length == 2) {
+					map.put(vals[0], vals[1]);
+				} else if (vals.length == 1) {
+					map.put(vals[0], "");
+				}
 			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+			return map;
+		}
+		public static String getRealUrl(String surl) throws Exception {
+			URL url = new URL(surl);
+			URLConnection conn = url.openConnection();
+			conn.connect();
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+			String nurl = conn.getURL().toString();
+			System.out.println("realUrl" + nurl);
+			in.close();
+			return nurl;
 		}
 
-		public static void sendAvLike(long AID, String cookie) {
-			Connection connection = Jsoup.connect("https://api.bilibili.com/x/web-interface/archive/like");
-			connection.userAgent(MainActivity.instance.userAgent)
-                .headers(mainHead)
-                .ignoreContentType(true)
-                .referrer("https://www.bilibili.com/video/av" + AID)
-                .cookies(Tools.Network.cookieToMap(cookie))
-                .method(Connection.Method.POST)
-                .data("aid", String.valueOf(AID))
-                .data("like", "1")
-                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
-			Connection.Response response=null;
-			try {
-				response = connection.execute();
-			} catch (IOException e) {
-				MainActivity.instance.showToast("连接出错");
-				return;
-			}
-			if (response.statusCode() != 200) {
-				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-			}
-			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-			MainActivity.instance.showToast(obj.get("message").getAsString());
+		public static String httpGet(String url) {
+			return httpGet(url, null, null);
 		}
 
-		public static void sendLiveDanmaku(String comtent, String cookie, long roomId) {
+		public static String httpGet(String url, String cookie) {
+			return httpGet(url, cookie, null);
+		}
+
+		public static String httpGet(String url, String cookie, String refer) {
 			Connection.Response response = null;
+			Connection connection;
 			try {
-				Connection connection = Jsoup.connect("http://api.live.bilibili.com/comtent/send");
-				String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			    connection.userAgent(MainActivity.instance.userAgent)
-				    .headers(liveHead)
-				    .ignoreContentType(true)
-				    .referrer("https://live.bilibili.com/" + roomId)
-				    .cookies(Tools.Network.cookieToMap(cookie))
-				    .method(Connection.Method.POST)
-				    .data("color", "16777215")
-				    .data("fontsize", "25")
-				    .data("comtent", comtent)
-				    .data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
-				    .data("roomid", String.valueOf(roomId))
-				    .data("bubble", "0")
-				    .data("csrf_token", csrf)
-				    .data("csrf", csrf);
+				connection = Jsoup.connect(url);
+				if (cookie != null) {
+					connection.cookies(cookieToMap(cookie));
+				}
+				if (refer != null) {
+					connection.referrer(refer);
+				}
+				connection.userAgent(MainActivity.instance.userAgent);
+				connection.ignoreContentType(true).method(Connection.Method.GET);
 				response = connection.execute();
 				if (response.statusCode() != 200) {
 					MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 				}
-				JsonParser parser = new JsonParser();
-				JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-				switch (obj.get("code").getAsInt()) {
-					case 0:
-						if (!obj.get("message").getAsString().equals("")) {
-							MainActivity.instance.showToast(obj.getAsJsonObject("message").getAsString());
-						} else {
-							MainActivity.instance.showToast(roomId + "发送成功");
-						}
-						break;
-					case 1990000:
-						if (obj.get("message").getAsString().equals("risk")) {
-							ConnectivityManager connMgr = (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
-							NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-							if (wifiNetworkInfo.isConnected()) {
-								Intent intent = new Intent(MainActivity.instance, LiveWebActivity.class);
-								intent.putExtra("cookie", cookie);
-								intent.putExtra("url", "https://live.bilibili.com/" + roomId);
-								MainActivity.instance.startActivity(intent);
-							} else {
-								MainActivity.instance.showToast("需要在官方客户端进行账号风险验证");
-							}
-						}
-						break;
-					default:
-						MainActivity.instance.showToast(response.body());
-						break;
-				}
-			} catch (Exception e) {
-				if (response != null) {
-					MainActivity.instance.showToast(response.body());
-				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			if (response != null) {
+				return response.body();
+			}
+			return "";
 		}
 	}
 
@@ -810,65 +568,6 @@ public class Tools {
 		}
 	}
 
-	public static class Network {
-		public static Map<String, String> cookieToMap(String value) {
-			Map<String, String> map = new HashMap<>();
-			String[] values = value.split("; ");
-			for (String val : values) {
-				String[] vals = val.split("=");
-				if (vals.length == 2) {
-					map.put(vals[0], vals[1]);
-				} else if (vals.length == 1) {
-					map.put(vals[0], "");
-				}
-			}
-			return map;
-		}
-		public static String getRealUrl(String surl) throws Exception {
-			URL url = new URL(surl);
-			URLConnection conn = url.openConnection();
-			conn.connect();
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
-			String nurl = conn.getURL().toString();
-			System.out.println("realUrl" + nurl);
-			in.close();
-			return nurl;
-		}
-		public static String getSourceCode(String url) {
-			return getSourceCode(url, null, null);
-		}
-
-		public static String getSourceCode(String url, String cookie) {
-			return getSourceCode(url, cookie, null);
-		}
-
-		public static String getSourceCode(String url, String cookie, String refer) {
-			Connection.Response response = null;
-			Connection connection;
-			try {
-				connection = Jsoup.connect(url);
-				if (cookie != null) {
-					connection.cookies(cookieToMap(cookie));
-				}
-				if (refer != null) {
-					connection.referrer(refer);
-				}
-				connection.userAgent(MainActivity.instance.userAgent);
-				connection.ignoreContentType(true).method(Connection.Method.GET);
-				response = connection.execute();
-				if (response.statusCode() != 200) {
-					MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			if (response != null) {
-				return response.body();
-			}
-			return "";
-		}
-	}
-
 	public static class Time {
 		public static String getTime() {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -901,7 +600,7 @@ public class Tools {
 		}
 	}
 
-	public static class BitConverterlittleEndian {
+	public static class BitConverterLE {
 		public static byte[] getBytes(short s) {
 			byte[] bs=new byte[2];
 			bs[0] = (byte) ((s >> 0) & 0xff);

@@ -1,12 +1,6 @@
 package com.meng.biliv3.update;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.update.*;
-import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.util.*;

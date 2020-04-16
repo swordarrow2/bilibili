@@ -40,9 +40,9 @@ public class BotDataPack {
 
 	private BotDataPack(int opCode) {
 		//length(4) version(2) opCode(4)
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(0));
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes((short)1));
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(opCode));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(0));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes((short)1));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(opCode));
 	}   
 
 	private BotDataPack(byte[] pack) {
@@ -55,7 +55,7 @@ public class BotDataPack {
 		for (int i=0;i < data.size();++i) {
 			retData[i] = data.get(i);
 		}
-		byte[] len=Tools.BitConverterlittleEndian.getBytes(retData.length);
+		byte[] len=Tools.BitConverterLE.getBytes(retData.length);
 		retData[0] = len[0];
 		retData[1] = len[1];
 		retData[2] = len[2];
@@ -65,15 +65,15 @@ public class BotDataPack {
 	}
 
 	public int getLength() {
-		return Tools.BitConverterlittleEndian.toInt(dataArray, 0);
+		return Tools.BitConverterLE.toInt(dataArray, 0);
 	}  
 
 	public short getVersion() {
-		return Tools.BitConverterlittleEndian.toShort(dataArray, 4);
+		return Tools.BitConverterLE.toShort(dataArray, 4);
 	}
 
 	public int getOpCode() {
-		return Tools.BitConverterlittleEndian.toShort(dataArray, 6);
+		return Tools.BitConverterLE.toShort(dataArray, 6);
 	}
 
 	private BotDataPack writeByteDataIntoArray(byte... bs) {
@@ -92,37 +92,37 @@ public class BotDataPack {
 
 	public BotDataPack write(short s) {
 		writeByteDataIntoArray(typeShort);
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(s));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(s));
 		return this;
 	}
 
 	public BotDataPack write(int i) {
 		writeByteDataIntoArray(typeInt);
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(i));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(i));
 		return this;
 	}
 
 	public BotDataPack write(long l) {
 		writeByteDataIntoArray(typeLong);
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(l));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(l));
 		return this;
 	}
 
 	public BotDataPack write(float f) {
 		writeByteDataIntoArray(typeFloat);
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(f));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(f));
 		return this;
 	}
 
 	public BotDataPack write(double d) {
 		writeByteDataIntoArray(typeDouble);
-		writeByteDataIntoArray(Tools.BitConverterlittleEndian.getBytes(d));
+		writeByteDataIntoArray(Tools.BitConverterLE.getBytes(d));
 		return this;
 	}
 
 	public BotDataPack write(String s) {
 		writeByteDataIntoArray(typeString);
-		byte[] stringBytes = Tools.BitConverterlittleEndian.getBytes(s);
+		byte[] stringBytes = Tools.BitConverterLE.getBytes(s);
 		write(stringBytes.length);
 		writeByteDataIntoArray(stringBytes);
 		return this;
@@ -173,7 +173,7 @@ public class BotDataPack {
 
 	public short readShort() {
 		if (dataArray[dataPointer++] == typeShort) {
-			short s = Tools.BitConverterlittleEndian.toShort(dataArray, dataPointer);
+			short s = Tools.BitConverterLE.toShort(dataArray, dataPointer);
 			dataPointer += 2;
 			return s;
 		}
@@ -182,7 +182,7 @@ public class BotDataPack {
 
 	public int readInt() {
 		if (dataArray[dataPointer++] == typeInt) {
-			int i= Tools.BitConverterlittleEndian.toInt(dataArray, dataPointer);
+			int i= Tools.BitConverterLE.toInt(dataArray, dataPointer);
 			dataPointer += 4;
 			return i;
 		}
@@ -191,7 +191,7 @@ public class BotDataPack {
 
 	public long readLong() {
 		if (dataArray[dataPointer++] == typeLong) {
-			long l= Tools.BitConverterlittleEndian.toLong(dataArray, dataPointer);
+			long l= Tools.BitConverterLE.toLong(dataArray, dataPointer);
 			dataPointer += 8;
 			return l;
 		}
@@ -200,7 +200,7 @@ public class BotDataPack {
 
 	public float readFloat() {
 		if (dataArray[dataPointer++] == typeFloat) {
-			float f = Tools.BitConverterlittleEndian.toFloat(dataArray, dataPointer);
+			float f = Tools.BitConverterLE.toFloat(dataArray, dataPointer);
 			dataPointer += 4;
 			return f;
 		}
@@ -209,7 +209,7 @@ public class BotDataPack {
 
 	public double readDouble() {
 		if (dataArray[dataPointer++] == typeDouble) {
-			double d = Tools.BitConverterlittleEndian.toDouble(dataArray, dataPointer);
+			double d = Tools.BitConverterLE.toDouble(dataArray, dataPointer);
 			dataPointer += 8;
 			return d;
 		}
@@ -220,7 +220,7 @@ public class BotDataPack {
 		try {
 			if (dataArray[dataPointer++] == typeString) {
 				int len = readInt();
-				String s = Tools.BitConverterlittleEndian.toString(dataArray, dataPointer, len);
+				String s = Tools.BitConverterLE.toString(dataArray, dataPointer, len);
 				dataPointer += len;
 				return s;
 			}

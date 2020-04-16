@@ -1,18 +1,11 @@
 package com.meng.biliv3.fragment;
 
 import android.app.*;
-import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
-import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.activity.main.*;
-import com.meng.biliv3.fragment.*;
-
-import android.view.View.OnClickListener;
 import com.meng.biliv3.libs.*;
 
 public class AvBvConvertFragment extends Fragment implements View.OnClickListener {

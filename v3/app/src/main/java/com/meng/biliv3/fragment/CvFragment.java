@@ -4,7 +4,6 @@ import android.app.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
@@ -12,10 +11,7 @@ import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
-
-public class CvFragment extends BaseIdFragment implements OnClickListener,OnLongClickListener {
+public class CvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
 	private Button send,editPre,preset,zan,coin1,coin2,favorite;
 	private EditText et;
@@ -93,7 +89,7 @@ public class CvFragment extends BaseIdFragment implements OnClickListener,OnLong
 				}
 			});
 	}
-	
+
 	@Override
 	public boolean onLongClick(View p1) {
 		try {

@@ -1,14 +1,8 @@
 package com.meng.biliv3.fragment;
 
-import android.graphics.*;
 import android.os.*;
 import android.preference.*;
-import com.google.gson.*;
 import com.meng.biliv3.*;
-import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
-import com.meng.biliv3.libs.*;
-import java.io.*;
 
 public class SettingsFragment extends PreferenceFragment {
 
@@ -20,7 +14,7 @@ public class SettingsFragment extends PreferenceFragment {
         getPreferenceManager().setSharedPreferencesName("settings");
         addPreferencesFromResource(R.xml.preference);
 
-        
+
 		/*	CheckBoxPreference cb=(CheckBoxPreference)findPreference("useLightTheme");
 		 cb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
 		 @Override

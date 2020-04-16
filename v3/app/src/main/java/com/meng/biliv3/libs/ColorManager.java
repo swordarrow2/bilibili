@@ -2,9 +2,9 @@ package com.meng.biliv3.libs;
 
 import android.app.*;
 import android.content.res.*;
+import android.graphics.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import android.graphics.*;
 
 public class ColorManager {
 	private final int colorBackground;

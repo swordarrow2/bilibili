@@ -4,19 +4,16 @@ import android.app.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 import java.util.*;
 
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
-
-public class AvFragment extends BaseIdFragment implements OnClickListener,OnLongClickListener {
+public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
 	private Button send,editPre,preset,zan,coin1,coin2,favorite;
 	private EditText et;
@@ -27,6 +24,7 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 	private Bitmap preview;
 	private ArrayList<DanmakuBean> danmakuList=null;
 
+	public ExpandableListView judgeList;
 	public AvFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
@@ -48,7 +46,7 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 		layoutInflater.inflate(R.layout.av_fragment, tab.getTabContentView()); 
 		layoutInflater.inflate(R.layout.av_fragment2, tab.getTabContentView());
 		tab.addTab(tab.newTabSpec("tab1").setIndicator("视频" , null).setContent(R.id.av_fragmentLinearLayout));
-     //   tab.addTab(tab.newTabSpec("tab2").setIndicator("弹幕" , null).setContent(R.id.av_fragment2LinearLayout));
+        tab.addTab(tab.newTabSpec("tab2").setIndicator("评论" , null).setContent(R.id.av_fragment2LinearLayout));
 		send = (Button) view.findViewById(R.id.av_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
@@ -60,6 +58,8 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.av_fragmentSpinner);
+		judgeList = (ExpandableListView) view.findViewById(R.id.av_fragment2ListView);
+		judgeList.setGroupIndicator(null);
 		preset.setOnClickListener(this);
 		zan.setOnClickListener(this);
 		coin1.setOnClickListener(this);
@@ -69,20 +69,23 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 		//editPre.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		ivPreview.setOnLongClickListener(this);
+
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
 				public void run() {
-					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.getSourceCode("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
+					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
 					if (videoInfo.code != 0) {
 						MainActivity.instance.showToast(videoInfo.message);
 						return;
 					}
+					final VideoReply aj=MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getVideoJudge(id), VideoReply.class);
 					getActivity().runOnUiThread(new Runnable(){
 
 							@Override
 							public void run() {
 								info.setText(videoInfo.toString());
+								judgeList.setAdapter(new JudgeListAdapter(aj));
 								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
 							}
 						});
@@ -98,7 +101,6 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 							public void run() {
 								ivPreview.setImageBitmap(preview);
 							}
-
 						});
 				}
 			});
@@ -112,7 +114,7 @@ public class AvFragment extends BaseIdFragment implements OnClickListener,OnLong
 		} catch (Exception e) {}
 		return true;
 	}
-	
+
 	@Override
 	public void onClick(final View p1) {
 		switch (p1.getId()) {

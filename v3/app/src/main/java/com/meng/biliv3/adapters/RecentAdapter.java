@@ -1,6 +1,5 @@
 package com.meng.biliv3.adapters;
 
-import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
@@ -132,6 +131,8 @@ public class RecentAdapter extends BaseAdapter {
 						case "设置":
 							MainActivity.instance.showFragment(SettingsFragment.class, MainActivity.Settings);
 							break;
+						case "动态":
+							MainActivity.instance.showFragment(DynamicFragment.class, "动态");
 					}
 				}
 			});

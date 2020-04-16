@@ -166,6 +166,19 @@ public class HttpConnection implements Connection {
         return this;
     }
 
+	public Connection data(Object... keyvals) {
+		for (int i = 0; i < keyvals.length; i += 2) {
+            String key =String.valueOf(keyvals[i]);
+            String value = String.valueOf(keyvals[i + 1]);
+			if (key.equals("Referer")) {
+				req.header(key, value);
+			} else {
+				req.data(KeyVal.create(key, value));
+			}
+        }
+        return this;
+    }
+
     public Connection data(String... keyvals) {
 		for (int i = 0; i < keyvals.length; i += 2) {
             String key = keyvals[i];

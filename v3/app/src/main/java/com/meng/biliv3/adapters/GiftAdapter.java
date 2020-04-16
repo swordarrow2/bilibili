@@ -3,11 +3,9 @@ package com.meng.biliv3.adapters;
 import android.app.*;
 import android.view.*;
 import android.widget.*;
-
 import com.meng.biliv3.*;
 import com.meng.biliv3.javaBean.*;
-
-import java.text.*;
+import com.meng.biliv3.libs.*;
 import java.util.*;
 
 public class GiftAdapter extends BaseAdapter {
@@ -48,7 +46,7 @@ public class GiftAdapter extends BaseAdapter {
         GiftBag.ListItem liveBagDataList = infos.get(position);
         holder.tvGiftName.setText(liveBagDataList.gift_name);
         holder.tvGiftCount.setText("数量:" + liveBagDataList.gift_num);
-        holder.tvExpire.setText("过期时间:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(liveBagDataList.expire_at * 1000)));
+        holder.tvExpire.setText("过期时间:" + Tools.Time.getTime(liveBagDataList.expire_at * 1000));
         holder.tvMark.setText(liveBagDataList.corner_mark);
         return convertView;
     }

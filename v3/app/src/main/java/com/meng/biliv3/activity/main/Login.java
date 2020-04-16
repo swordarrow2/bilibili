@@ -67,7 +67,7 @@ public class Login extends Activity {
 					new Thread(new Runnable() {
 							@Override
 							public void run() {
-								BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.getSourceCode("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
+								BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
 								AccountInfo account = MainActivity.instance.loginAccounts.get(getIntent().getIntExtra("pos", -1));
 								account.cookie = cookieStr;
 								account.name = bilibiliPersonInfo.data.name;

@@ -1,15 +1,12 @@
 package com.meng.biliv3.libs;
 
 import com.google.gson.*;
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.util.*;
-import org.java_websocket.client.*;
-import org.java_websocket.handshake.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.fragment.*;
-import java.nio.channels.*;
+import java.net.*;
+import java.nio.*;
+import org.java_websocket.client.*;
+import org.java_websocket.handshake.*;
 
 public class DanmakuListener extends WebSocketClient {
 
@@ -56,9 +53,8 @@ public class DanmakuListener extends WebSocketClient {
 							Thread.sleep(30000);
 						} catch (InterruptedException e) {
 
-						} catch (NotYetConnectedException e) {
-							MainActivity.instance.showToast("连接中断,重新连接....");
-							reconnect();
+						} catch (Exception e) {
+
 						}
 					}
 				}
@@ -66,9 +62,9 @@ public class DanmakuListener extends WebSocketClient {
 	}
 
 	@Override
-	public void onMessage(ByteBuffer bs) {	
+	public void onMessage(ByteBuffer bs) {
 		byte[] bytes=bs.array();
-		int offset=0;  
+		int offset=0;
 		do{
 			DataPackage dp=decode(bytes, offset);
 			offset += dp.length;
@@ -227,7 +223,7 @@ public class DanmakuListener extends WebSocketClient {
 			version = readShort();
 			op = readInt();
 			seq = readInt();
-			body = new String(data, 16, length - 16);
+			body = new String(data, offset + 16, length - 16);
 			data = null;
 		}
 

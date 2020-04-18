@@ -17,11 +17,12 @@ import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 import com.universalvideoview.*;
 import java.lang.reflect.*;
+import java.net.*;
 import java.util.*;
+import org.java_websocket.exceptions.*;
 
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import java.net.*;
 
 public class LiveFragment extends BaseIdFragment implements View.OnClickListener, UniversalVideoView.VideoViewCallback {
 
@@ -52,7 +53,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 	private ListView danmakuList;
 
 	private DanmakuListener danmakuListener;
-	
+
 	public LiveFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
@@ -91,14 +92,14 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 		mVideoView = (UniversalVideoView) view.findViewById(R.id.videoView);
         mMediaController = (UniversalMediaController) view.findViewById(R.id.media_controller);
 		danmakuList = (ListView) view.findViewById(R.id.livefragmentListView_danmaku);
-		
+
 		adapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, recieved);
 		danmakuList.setAdapter(adapter);
 		try {
-			danmakuListener = new DanmakuListener(this,id);
+			danmakuListener = new DanmakuListener(this, id);
 			danmakuListener.connect();
 		} catch (URISyntaxException e) {
-			MainActivity.instance.showToast("弹幕服务器连接失败:"+e.toString());
+			MainActivity.instance.showToast("弹幕服务器连接失败:" + e.toString());
 		}
 		mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
@@ -208,6 +209,14 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 		if (!isVisibleToUser && mVideoView != null && mVideoView.isPlaying()) {
 			mSeekPosition = mVideoView.getCurrentPosition();
 			mVideoView.pause();
+		}
+		if (isVisibleToUser) {
+			try {
+				danmakuListener.send(danmakuListener.encode(2, "").data);
+			} catch (WebsocketNotConnectedException e) {
+				MainActivity.instance.showToast("连接中断,重新连接....");
+				danmakuListener.reconnect();
+			}
 		}
 		super.setUserVisibleHint(isVisibleToUser);
 	}

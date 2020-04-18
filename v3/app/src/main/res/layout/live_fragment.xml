@@ -1,21 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/live_fragmentLinearLayout_main"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
 
-	<VideoView
+	<FrameLayout
+		android:id="@+id/videoLayout"
 		android:layout_width="fill_parent"
-		android:layout_height="200dp"
-		android:id="@+id/live_fragmentVideoView"/>
+		android:layout_height="250dp"
+		android:background="@android:color/black">
 
-	<LinearLayout
-		android:orientation="vertical"
+		<com.universalvideoview.UniversalVideoView
+			android:id="@+id/videoView"
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_gravity="center"
+			app:uvv_autoRotation="true"
+			app:uvv_fitXY="false"/>
+
+		<com.universalvideoview.UniversalMediaController
+			android:id="@+id/media_controller"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			app:uvv_scalable="true"/>
+
+		<ImageView
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:id="@+id/live_fragmentImageView"/>
+
+	</FrameLayout>
+
+	<RelativeLayout
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="fill_parent"
+		android:id="@+id/live_fragmentLinearLayout_b">
 
 		<TextView
+			android:textAppearance="?android:attr/textAppearanceListItemSmall"
 			android:id="@+id/live_fragmentTextView_info"
 			android:focusable="true"
 			android:longClickable="true"
@@ -23,81 +48,22 @@
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"/>
 
-		<LinearLayout
-			android:orientation="horizontal"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-
-			<EditText
-				android:id="@+id/live_fragmentEditText_danmaku"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="6"/>
-
-			<Button
-				android:id="@+id/live_fragmentButton_send"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:text="发送"
-				android:layout_weight="1"/>
-
-		</LinearLayout>
-
-		<LinearLayout
-			android:orientation="horizontal"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-
-			<Spinner
-				android:id="@+id/live_fragmentSpinner"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1.7"/>
-
-			<Button
-				android:id="@+id/live_fragmentButton_preset"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:text="预设"
-				android:layout_weight="1"/>
-
-		</LinearLayout>
-
-		<LinearLayout
-			android:orientation="horizontal"
+		<Button
+			android:layout_below="@id/live_fragmentTextView_info"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
+			android:layout_height="wrap_content"
+			android:text="保存直播视频"
+			android:id="@+id/livefragmentButtonDownload"
+			android:background="@null"
+			android:visibility="gone"/>
 
-			<Button
-				android:id="@+id/live_fragmentButton_silver"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:text="发送辣条(瓜子)"
-				android:layout_weight="1.0"/>
+		<ListView
+			android:layout_below="@id/livefragmentButtonDownload"
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:id="@+id/livefragmentListView_danmaku"/>
 
-			<Button
-				android:id="@+id/live_fragmentButton_pack"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:text="发送礼物(抽奖)"
-				android:layout_weight="1.0"/>
-
-		</LinearLayout>
-
-	</LinearLayout>
-
-	<Button
-		android:visibility="gone"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="保存直播视频"
-		android:id="@+id/livefragmentButtonDownload"/>
-
-	<Button
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="奶人序列"
-		android:id="@+id/livefragmentButtonSerialMilk"/>
+	</RelativeLayout>
 
 </LinearLayout>
 

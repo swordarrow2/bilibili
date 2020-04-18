@@ -22,15 +22,17 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private VideoInfo videoInfo;
 	private ImageView ivPreview;
 	private Bitmap preview;
-	private ArrayList<DanmakuBean> danmakuList=null;
-
+	//private ArrayList<DanmakuBean> danmakuList=null;
+	private TabHost tab;
+	
 	public ExpandableListView judgeList;
+	
 	public AvFragment(String type, long liveId) {
 		this.type = type;
 		id = liveId;
 	}
 
-	public TabHost tab;
+	
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +87,9 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 							@Override
 							public void run() {
 								info.setText(videoInfo.toString());
-								judgeList.setAdapter(new JudgeListAdapter(aj));
+								if (aj != null && aj.data != null && aj.data.replies != null && aj.data.replies.size() > 0) {
+									judgeList.setAdapter(new JudgeListAdapter(aj));
+								}
 								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
 							}
 						});

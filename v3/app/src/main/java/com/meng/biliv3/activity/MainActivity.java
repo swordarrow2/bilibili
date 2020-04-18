@@ -150,6 +150,7 @@ public class MainActivity extends Activity {
 						}
 						if (!ai.isSigned() && !ai.isCookieExceed()) {
 							int rc =new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("code").getAsInt();
+							ai.lastSign = System.currentTimeMillis();
 							switch (rc) {
 								case -101:
 									ai.setCookieExceed(true);
@@ -161,7 +162,7 @@ public class MainActivity extends Activity {
 									ai.setSigned(true);
 									break;
 								case 1011040:
-									sb.append("\n").append(ai.name).append(":今日已签到");
+									sb.append("\n").append(ai.name).append(":已在其他设备签到");
 									ai.setSigned(true);
 									break;
 							}
@@ -448,7 +449,7 @@ public class MainActivity extends Activity {
 
 	public void removeFragment(String id) {
 		if (!fragments.containsKey(id)) {
-			//throw new RuntimeException("no such key:"+id);
+			return;
 		}
 		Fragment f = fragments.get(id);
 		Iterator<Map.Entry<String,Fragment>> iterator = fragments.entrySet().iterator();

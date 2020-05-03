@@ -24,10 +24,19 @@
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+		<activity 
+			android:label="AVBV"
+			android:name=".activity.ABquickConvert" >
+            <intent-filter >
+                <action android:name="android.intent.action.PROCESS_TEXT"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+		
         <activity android:name=".activity.main.Login" />
 		<activity
             android:name=".activity.live.LiveWebActivity"

@@ -46,7 +46,7 @@ public class GiftAdapter extends BaseAdapter {
         GiftBag.ListItem liveBagDataList = infos.get(position);
         holder.tvGiftName.setText(liveBagDataList.gift_name);
         holder.tvGiftCount.setText("数量:" + liveBagDataList.gift_num);
-        holder.tvExpire.setText("过期时间:" + Tools.Time.getTime(liveBagDataList.expire_at * 1000));
+        holder.tvExpire.setText("过期:" + Tools.Time.getTime(liveBagDataList.expire_at * 1000));
         holder.tvMark.setText(liveBagDataList.corner_mark);
         return convertView;
     }

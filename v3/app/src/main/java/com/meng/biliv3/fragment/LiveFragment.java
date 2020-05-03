@@ -95,6 +95,13 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 		adapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, recieved);
 		danmakuList.setAdapter(adapter);
+		danmakuList.setOnItemClickListener(new OnItemClickListener(){
+
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+					Tools.AndroidContent.copyToClipboard(recieved.get(p3));
+				}
+			});
 		try {
 			danmakuListener = new DanmakuListener(this, id);
 			danmakuListener.connect();

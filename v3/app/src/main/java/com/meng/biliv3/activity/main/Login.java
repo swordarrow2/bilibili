@@ -24,6 +24,7 @@ public class Login extends Activity {
         webView.getSettings().setJavaScriptEnabled(true);
 		webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setBuiltInZoomControls(true);
+		webView.getSettings().setAllowFileAccess(true);
         clearWebViewCache();
         webView.setWebViewClient(new WebViewClient() {
 				@Override
@@ -37,7 +38,11 @@ public class Login extends Activity {
 					super.onPageFinished(view, url);
 					//	MainActivity.instance.showToast(url);
 					if (url.equals("https://passport.bilibili.com/login")) {
-						AccountInfo aci=MainActivity.instance.loginAccounts.get(getIntent().getIntExtra("pos", -1));
+						int po=getIntent().getIntExtra("pos", -1);
+						if (po == -1) {
+							return;
+						}
+						AccountInfo aci=MainActivity.instance.loginAccounts.get(po);
 						if (aci.phone != 0 && aci.password != null) {
 							view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete"), null);
 							view.evaluateJavascript(String.format(Tools.AndroidContent.readAssetsString("patchInput"), aci.phone, aci.password), null);
@@ -68,7 +73,8 @@ public class Login extends Activity {
 							@Override
 							public void run() {
 								BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
-								AccountInfo account = MainActivity.instance.loginAccounts.get(getIntent().getIntExtra("pos", -1));
+								int po=getIntent().getIntExtra("pos", -1);
+								AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
 								account.cookie = cookieStr;
 								account.name = bilibiliPersonInfo.data.name;
 								account.uid = bilibiliPersonInfo.data.mid;

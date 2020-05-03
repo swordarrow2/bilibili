@@ -28,6 +28,7 @@ import java.util.regex.*;
 import org.java_websocket.client.*;
 
 import com.meng.biliv3.R;
+import android.text.*;
 
 
 public class MainActivity extends Activity {
@@ -54,14 +55,19 @@ public class MainActivity extends Activity {
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
 
-	public static final String AccountManager = "管理账号";
-	public static final String Settings = "设置";
-
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	public SanaeConnect sanaeConnect;
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
+
+	public final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
+	public final String regBv = "\\D{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2})\\D{0,}";
+	public final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
+	public final String regCv = "[Cc][Vv](\\d{1,})";
+	public final String regUid = "space\\D{0,}(\\d{1,})";
+	public final String regUid2 = "UID\\D{0,}(\\d{1,})";
+
 
 	private int themeId;
     @Override
@@ -307,6 +313,47 @@ public class MainActivity extends Activity {
 					case "输入ID":
 						final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
 						final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
+						final RadioButton uid,av,live,cv;
+						uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
+						av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
+						live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
+						cv = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_cv);
+						et.addTextChangedListener(new TextWatcher(){
+
+								@Override
+								public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
+									// TODO: Implement this method
+								}
+
+								@Override
+								public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
+									// TODO: Implement this method
+								}
+
+								@Override
+								public void afterTextChanged(Editable p1) {
+									String typeReg=getIdType(p1.toString());
+									if (typeReg == null) {
+										return;
+									}
+									switch (typeReg) {
+										case regAv:
+										case regBv:
+											av.setChecked(true);
+											break;
+										case regCv:
+											cv.setChecked(true);
+											break;
+										case regLive:
+											live.setChecked(true);
+											break;
+										case regUid:
+										case regUid2:
+											uid.setChecked(true);
+											break;
+									}
+								}
+							});
 						new AlertDialog.Builder(MainActivity.this)
 							.setTitle("输入ID")
 							.setView(seView)
@@ -315,35 +362,28 @@ public class MainActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									String content = et.getText().toString();
-									RadioButton uid,av,live,cv;
-									uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
-									av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
-									live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
-									cv = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_cv);
+									String typeReg=getIdType(content);
+									long conId=getId(content, typeReg);
 									if (uid.isChecked()) {
-										showFragment(UidFragment.class, BaseIdFragment.typeUID , getId(content));
+										showFragment(UidFragment.class, BaseIdFragment.typeUID , conId);
 									} else if (av.isChecked()) {
-										if (content.startsWith("BV")) {
-											showFragment(AvFragment.class, BaseIdFragment.typeAv , AvBvConverter.decode(content));
-										} else {
-											showFragment(AvFragment.class, BaseIdFragment.typeAv , getId(content));
-										}
+										showFragment(AvFragment.class, BaseIdFragment.typeAv , conId);
 									} else if (live.isChecked()) {
-										showFragment(LiveFragment.class, BaseIdFragment.typeLive , getId(content));
+										showFragment(LiveFragment.class, BaseIdFragment.typeLive , conId);
 									} else if (cv.isChecked()) {
-										showFragment(CvFragment.class, BaseIdFragment.typeCv , getId(content));
+										showFragment(CvFragment.class, BaseIdFragment.typeCv , conId);
 									}
 								}
 							}).show();
 						break;
 					case "管理账号":
-						showFragment(ManagerFragment.class, AccountManager);
+						showFragment(ManagerFragment.class, "管理账号");
 						break;
 					case "AVBV转换":
 						showFragment(AvBvConvertFragment.class, "AVBV转换");
 						break;
                     case "设置":
-                        showFragment(SettingsFragment.class, Settings);
+                        showFragment(SettingsFragment.class, "设置");
                         break;
 					case "动态":
 						showFragment(DynamicFragment.class, "动态");
@@ -363,15 +403,44 @@ public class MainActivity extends Activity {
         }
     };
 
-	private int getId(String s) {
-		String reg = "\\D{0,}(\\d{3,})\\D{0,}";
-		Pattern p2 = Pattern.compile(reg);  
-		Matcher m2 = p2.matcher(s);  
-		int historyHighestLevel = -1;
-		if (m2.find()) {  
-			historyHighestLevel = Integer.parseInt(m2.group(1));
+	private String getIdType(String s) {
+		if (s.matches(regAv)) {
+			return regAv;
 		}
-		return historyHighestLevel;
+		if (s.matches(regBv)) {
+			return regBv;
+		}
+		if (s.matches(regCv)) {
+			return regCv;
+		}
+		if (s.matches(regLive)) {
+			return regLive;
+		}
+		if (s.matches(regUid)) {
+			return regUid;
+		}
+		if (s.matches(regUid2)) {
+			return regUid2;
+		}
+		return null;
+	}
+
+	private long getId(String link, String regex) {
+		if (regex == null) {
+			if (!link.matches("\\d{0,}")) {
+				return -1;
+			}
+			return Long.parseLong(link);
+		}
+		Matcher m2 = Pattern.compile(regex).matcher(link);  
+		if (m2.find()) {
+			if (regex.equals(regBv)) {
+				return AvBvConverter.decode(m2.group(1));
+			} else {
+				return Long.parseLong(m2.group(1));
+			} 
+		}
+		return -1;
 	}
 
     private void findViews() {
@@ -449,6 +518,7 @@ public class MainActivity extends Activity {
 
 	public void removeFragment(String id) {
 		if (!fragments.containsKey(id)) {
+			recentAdapter.remove(id);
 			return;
 		}
 		Fragment f = fragments.get(id);

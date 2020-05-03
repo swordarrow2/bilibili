@@ -126,10 +126,10 @@ public class RecentAdapter extends BaseAdapter {
 							MainActivity.instance.showFragment(AvBvConvertFragment.class, "AVBV转换");
 							break;
 						case "管理账号":
-							MainActivity.instance.showFragment(ManagerFragment.class, MainActivity.AccountManager);
+							MainActivity.instance.showFragment(ManagerFragment.class, "管理账号");
 							break;
 						case "设置":
-							MainActivity.instance.showFragment(SettingsFragment.class, MainActivity.Settings);
+							MainActivity.instance.showFragment(SettingsFragment.class, "设置");
 							break;
 						case "动态":
 							MainActivity.instance.showFragment(DynamicFragment.class, "动态");

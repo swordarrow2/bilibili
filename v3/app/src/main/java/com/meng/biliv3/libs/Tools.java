@@ -60,7 +60,7 @@ public class Tools {
         }
 
 		public static void copyToClipboard(String s) {
-			ClipData clipData = ClipData.newPlainText("text", s.substring(s.indexOf(":") + 1));
+			ClipData clipData = ClipData.newPlainText("text", s);
 			((ClipboardManager)MainActivity.instance.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(clipData);
 			MainActivity.instance.showToast("已复制到剪贴板");
 		}

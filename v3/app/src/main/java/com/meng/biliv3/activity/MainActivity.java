@@ -8,6 +8,7 @@ import android.content.res.*;
 import android.net.*;
 import android.os.*;
 import android.support.v4.widget.*;
+import android.text.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
@@ -15,10 +16,10 @@ import com.google.gson.*;
 import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.customView.*;
 import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
-import com.meng.biliv3.materialDesign.*;
 import com.meng.biliv3.update.*;
 import java.io.*;
 import java.lang.reflect.*;
@@ -28,7 +29,6 @@ import java.util.regex.*;
 import org.java_websocket.client.*;
 
 import com.meng.biliv3.R;
-import android.text.*;
 
 
 public class MainActivity extends Activity {
@@ -61,12 +61,12 @@ public class MainActivity extends Activity {
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
 
-	public final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
-	public final String regBv = "\\D{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2})\\D{0,}";
-	public final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
-	public final String regCv = "[Cc][Vv](\\d{1,})";
-	public final String regUid = "space\\D{0,}(\\d{1,})";
-	public final String regUid2 = "UID\\D{0,}(\\d{1,})";
+	public static final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
+	public static final String regBv = "\\D{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2})\\D{0,}";
+	public static final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
+	public static final String regCv = "[Cc][Vv](\\d{1,})";
+	public static final String regUid = "space\\D{0,}(\\d{1,})";
+	public static final String regUid2 = "UID\\D{0,}(\\d{1,})";
 
 
 	private int themeId;
@@ -204,30 +204,9 @@ public class MainActivity extends Activity {
     }
 
     private void setListener() {
-        drawerArrow = new DrawerArrowDrawable(this) {
-            @Override
-            public boolean isLayoutRtl() {
-                return false;
-            }
-        };
+        drawerArrow = new DrawerArrowDrawable(this);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.open, R.string.close) {
-
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, slideOffset);
-            }
-        };
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.open, R.string.close);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(
@@ -435,7 +414,7 @@ public class MainActivity extends Activity {
 		Matcher m2 = Pattern.compile(regex).matcher(link);  
 		if (m2.find()) {
 			if (regex.equals(regBv)) {
-				return AvBvConverter.decode(m2.group(1));
+				return AvBvConverter.getInstance().decode(m2.group(1));
 			} else {
 				return Long.parseLong(m2.group(1));
 			} 

@@ -96,7 +96,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getLiveRoomInfo(id), UidToLiveRoom.class);
+						UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getRoomByUid(id), UidToLiveRoom.class);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");

@@ -2,15 +2,17 @@ package com.meng.biliv3.fragment;
 
 import android.app.*;
 import android.os.*;
+import android.text.*;
 import android.view.*;
 import android.widget.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.libs.*;
+import java.util.regex.*;
 
-public class AvBvConvertFragment extends Fragment implements View.OnClickListener {
+public class AvBvConvertFragment extends Fragment {
 
-	private Button btnAv,btnBv;
+	private TextView tvAv,tvBv;
 	private EditText etAv,etBv;
 
     @Override
@@ -21,31 +23,70 @@ public class AvBvConvertFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-		btnAv = (Button) view.findViewById(R.id.av_bvButtonav);
-		btnBv = (Button) view.findViewById(R.id.av_bvButtonbv);
+		tvAv = (TextView) view.findViewById(R.id.av_bvTextViewav);
+		tvBv = (TextView) view.findViewById(R.id.av_bvTextViewbv);
 		etAv = (EditText) view.findViewById(R.id.av_bvEditTextav);
 		etBv = (EditText) view.findViewById(R.id.av_bvEditTextbv);
-		btnAv.setOnClickListener(this);
-		btnBv.setOnClickListener(this);
+		etAv.addTextChangedListener(new TextWatcher(){
+
+				@Override
+				public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
+					// TODO: Implement this method
+				}
+
+				@Override
+				public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
+					// TODO: Implement this method
+				}
+
+				@Override
+				public void afterTextChanged(Editable p1) {
+					String toString = p1.toString().toLowerCase();
+					long avId=getAVId(toString.startsWith("av") ?toString: "av" + toString);
+					if (avId != -1) {
+						tvBv.setText(AvBvConverter.getInstance().encode(avId));
+					} else {
+						tvBv.setText("");
+					}
+				}
+			});
+		etBv.addTextChangedListener(new TextWatcher(){
+
+				@Override
+				public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
+					// TODO: Implement this method
+				}
+
+				@Override
+				public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
+					// TODO: Implement this method
+				}
+
+				@Override
+				public void afterTextChanged(Editable p1) {
+					String bvId=getBVId(p1.toString());
+					if (bvId != null) {
+						tvAv.setText("av" + AvBvConverter.getInstance().decode(bvId));
+					} else {
+						tvAv.setText("");
+					}
+				}
+			});
     }
 
-	@Override
-	public void onClick(View p1) {
-		switch (p1.getId()) {
-			case R.id.av_bvButtonav:
-				try {
-					etBv.setText(AvBvConverter.encode(Long.parseLong(etAv.getText().toString())));
-				} catch (Exception e) {
-					MainActivity.instance.showToast("请输入数字");
-				}
-				break;
-			case R.id.av_bvButtonbv:
-				try {
-					etAv.setText(String.valueOf(AvBvConverter.decode(etBv.getText().toString())));
-				} catch (Exception e) {
-					MainActivity.instance.showToast("请输入BV号");
-				}
-				break;
+	private long getAVId(String s) {  
+		Matcher matcher = Pattern.compile(MainActivity.regAv).matcher(s);  
+		if (matcher.find()) {  
+			return Long.parseLong(matcher.group(1));
 		}
+		return -1;
+	}
+
+	private String getBVId(String s) {  
+		Matcher matcher = Pattern.compile(MainActivity.regBv).matcher(s);  
+		if (matcher.find()) {  
+			return matcher.group(1);
+		}
+		return null;
 	}
 }

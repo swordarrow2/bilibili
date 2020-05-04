@@ -1,14 +1,17 @@
-package com.meng.biliv3.libs;
+package com.meng.biliv3.customView;
 
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
 import android.view.*;
+import android.view.View.*;
 import android.widget.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.customView.*;
 import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.libs.*;
 import java.io.*;
 
 public class UserInfoHeaderView extends LinearLayout {

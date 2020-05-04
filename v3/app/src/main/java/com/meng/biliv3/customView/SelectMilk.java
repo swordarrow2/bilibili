@@ -1,4 +1,4 @@
-package com.meng.biliv3.libs;
+package com.meng.biliv3.customView;
 
 import android.app.*;
 import android.content.*;
@@ -7,6 +7,7 @@ import android.widget.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.libs.*;
 import java.util.*;
 
 public class SelectMilk extends LinearLayout {

@@ -17,9 +17,12 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 
-		<Button
-			android:id="@+id/av_bvButtonav"
-			android:text="转BV"
+		<TextView
+			android:textAppearance="?android:attr/textAppearanceListItemSmall"
+			android:id="@+id/av_bvTextViewbv"
+			android:focusable="true"
+			android:longClickable="true"
+			android:textIsSelectable="true"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 
@@ -37,9 +40,12 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 
-		<Button
-			android:id="@+id/av_bvButtonbv"
-			android:text="转AV"
+		<TextView
+			android:textAppearance="?android:attr/textAppearanceListItemSmall"
+			android:id="@+id/av_bvTextViewav"
+			android:focusable="true"
+			android:longClickable="true"
+			android:textIsSelectable="true"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 

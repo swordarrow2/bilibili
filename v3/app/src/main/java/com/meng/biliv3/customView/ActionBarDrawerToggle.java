@@ -1,4 +1,4 @@
-package com.meng.biliv3.materialDesign;
+package com.meng.biliv3.customView;
 
 import android.app.*;
 import android.content.res.*;
@@ -101,6 +101,7 @@ public class ActionBarDrawerToggle extends android.support.v4.app.ActionBarDrawe
             mDrawerImage.setProgress(1.f);
 		}
         setActionBarDescription();
+		mActivity.invalidateOptionsMenu();
 	}
 
     @Override
@@ -113,6 +114,7 @@ public class ActionBarDrawerToggle extends android.support.v4.app.ActionBarDrawe
             mDrawerImage.setProgress(0.f);
 		}
         setActionBarDescription();
+		mActivity.invalidateOptionsMenu();
 	}
 
     protected void setActionBarUpIndicator() {
@@ -163,11 +165,11 @@ public class ActionBarDrawerToggle extends android.support.v4.app.ActionBarDrawe
 	}
 
     public void setAnimateEnabled(boolean enabled) {
-        this.animateEnabled = enabled;
+        animateEnabled = enabled;
 	}
 
     public boolean isAnimateEnabled() {
-        return this.animateEnabled;
+        return animateEnabled;
 	}
 
 }

@@ -1,9 +1,10 @@
-package com.meng.biliv3.libs;
+package com.meng.biliv3.customView;
 
 import android.app.*;
 import android.content.*;
 import android.text.*;
 import android.view.*;
+import android.view.View.*;
 import android.widget.*;
 import android.widget.ExpandableListView.*;
 import com.google.gson.*;
@@ -11,6 +12,9 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.libs.*;
+
+import android.view.View.OnClickListener;
 
 public class MengLiveControl extends LinearLayout {
 

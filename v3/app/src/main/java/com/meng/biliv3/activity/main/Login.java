@@ -10,6 +10,8 @@ import com.meng.biliv3.libs.*;
 
 public class Login extends Activity {
 
+	String loginUrl = "https://passport.bilibili.com/login";
+
     public void clearWebViewCache() {
         CookieSyncManager.createInstance(this);
         CookieManager.getInstance().removeAllCookie();
@@ -20,11 +22,12 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         WebView webView = new WebView(this);
         setContentView(webView);
-        webView.getSettings().setUserAgentString(MainActivity.instance.userAgent);
-        webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.getSettings().setBuiltInZoomControls(true);
-		webView.getSettings().setAllowFileAccess(true);
+        WebSettings settings = webView.getSettings();
+		settings.setUserAgentString(MainActivity.instance.userAgent);
+        settings.setJavaScriptEnabled(true);
+		settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setBuiltInZoomControls(true);
+		settings.setAllowFileAccess(true);
         clearWebViewCache();
         webView.setWebViewClient(new WebViewClient() {
 				@Override
@@ -37,14 +40,14 @@ public class Login extends Activity {
 				public void onPageFinished(final WebView view, final String url) {
 					super.onPageFinished(view, url);
 					//	MainActivity.instance.showToast(url);
-					if (url.equals("https://passport.bilibili.com/login")) {
+					view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete"), null);
+					if (url.equals(loginUrl)) {
 						int po=getIntent().getIntExtra("pos", -1);
 						if (po == -1) {
 							return;
 						}
 						AccountInfo aci=MainActivity.instance.loginAccounts.get(po);
 						if (aci.phone != 0 && aci.password != null) {
-							view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete"), null);
 							view.evaluateJavascript(String.format(Tools.AndroidContent.readAssetsString("patchInput"), aci.phone, aci.password), null);
 							MainActivity.instance.threadPool.execute(new Runnable(){
 
@@ -104,7 +107,6 @@ public class Login extends Activity {
 						}).start();
 				}
 			});
-        String loginUrl = "https://passport.bilibili.com/login";
         webView.loadUrl(loginUrl);
     }
 }

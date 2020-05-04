@@ -16,6 +16,7 @@ import java.security.*;
 import java.text.*;
 import java.util.*;
 import org.jsoup.*;
+import android.webkit.*;
 
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
@@ -38,6 +39,12 @@ public class Tools {
 	}
 
 	public static class AndroidContent {
+
+		public static void runJs(Context c, String js, ValueCallback<String> callBack) {
+			WebView wv=new WebView(c);
+			wv.getSettings().setJavaScriptEnabled(true);
+			wv.evaluateJavascript(js.startsWith("javascript:") ?js: "javascript:" + js, callBack);
+		}
 
         public static int px2dp(float pxValue) { 
 			float scale = MainActivity.instance.getResources().getDisplayMetrics().density; 

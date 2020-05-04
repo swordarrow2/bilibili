@@ -66,7 +66,7 @@ public class DownloadImageRunnable implements Runnable {
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
             }
-            BilibiliUserInfo bilibiliPersonInfoJavaBean = new Gson().fromJson(stringBuilder.toString(), BilibiliUserInfo.class);
+            UserInfo bilibiliPersonInfoJavaBean = new Gson().fromJson(stringBuilder.toString(), UserInfo.class);
             return bilibiliPersonInfoJavaBean.data.face;
         } catch (Exception e) {
             e.printStackTrace();

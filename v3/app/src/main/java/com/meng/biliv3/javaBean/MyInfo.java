@@ -1,12 +1,12 @@
 package com.meng.biliv3.javaBean;
 
-public class BilibiliMyInfo {
+public class MyInfo {
     public int code;
     public String message;
     public int ttl;
-    public MyInfoData data;
+    public Data data;
 
-    public class MyInfoData {
+    public class Data {
         public long mid;
         public String name;
         public String sex;
@@ -67,6 +67,4 @@ public class BilibiliMyInfo {
         public int vip_pay_type;
         public int theme_type;
     }
-
-
 }

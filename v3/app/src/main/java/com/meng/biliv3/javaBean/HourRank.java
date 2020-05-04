@@ -6,12 +6,12 @@ public class HourRank {
     public int code;
     public String message;
     public String msg;
-    public HourRankData data;
+    public Data data;
 
-    public class HourRankData {
+    public class Data {
         public RankInfo rank_info;
         public ArrayList<Object> realtime_hour_rank_info;
-        public ArrayList<HourRankDataList> list;
+        public ArrayList<DataListItem> list;
     }
 
     public class RankInfo {
@@ -20,7 +20,7 @@ public class HourRank {
         public int end_timestamp;
     }
 
-    public class HourRankDataList {
+    public class DataListItem {
         public long id;
         public int score;
         public int rank;
@@ -43,7 +43,7 @@ public class HourRank {
         public int broadcast_type;
         public int personal_verify;
         public ArrayList<BestAssist> best_assist;
-        public HourRankInfoOwn own;
+        public Own own;
     }
 
     public class BestAssist {
@@ -52,7 +52,7 @@ public class HourRank {
         public String uname;
     }
 
-    public class HourRankInfoOwn {
+    public class Own {
         public long id;
         public int score;
         public String rank;

@@ -137,7 +137,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 										public void run() {
 											VideoReply.Reply rootReply = videoReply.data.replies.get(groupPosition);
 											MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge("回复 @" + parentReply.member.uname + " :" + et.getText().toString(), rootReply.oid, rootReply.rpid, parentReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
-											videoReply = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid), VideoReply.class);
+											videoReply = Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid);
 											MainActivity.instance.runOnUiThread(new Runnable(){
 
 													@Override
@@ -270,7 +270,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 										@Override
 										public void run() {
 											MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), rootReply.oid, rootReply.rpid, rootReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
-											videoReply = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid), VideoReply.class);
+											videoReply = Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid);
 											MainActivity.instance.runOnUiThread(new Runnable(){
 
 													@Override
@@ -307,7 +307,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 
 				@Override
 				public void run() {
-					VideoReply aj = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getVideoJudge(root.oid, root.rpid), VideoReply.class);
+					VideoReply aj = Tools.BilibiliTool.getVideoJudge(root.oid, root.rpid);
 					root.replies.clear();
 					root.replies.addAll(aj.data.replies);
 					MainActivity.instance.runOnUiThread(new Runnable(){

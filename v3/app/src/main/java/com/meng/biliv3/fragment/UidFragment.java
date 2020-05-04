@@ -56,7 +56,7 @@ public class UidFragment extends BaseIdFragment {
 				public void run() {
 					try {
 						if (containsID(id)) {
-							final BilibiliMyInfo info = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getMyInfo(MainActivity.instance.getAccount(id).cookie), BilibiliMyInfo.class);
+							final MyInfo info = Tools.BilibiliTool.getMyInfo(MainActivity.instance.getAccount(id).cookie);
 							addData("ID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -78,7 +78,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						} else {
-							final BilibiliUserInfo info = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getUserInfo(id), BilibiliUserInfo.class);
+							final UserInfo info = Tools.BilibiliTool.getUserInfo(id);
 							addData("UID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -96,18 +96,18 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getRoomByUid(id), UidToLiveRoom.class);
+						UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(id);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");
 						addData("房间号", sjb.data.roomid);
 						notifyList();
-						Relation r = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getRelation(id), Relation.class);
+						Relation r = Tools.BilibiliTool.getRelation(id);
 						addData("粉丝", r.data.follower);
 						addData("关注", r.data.following);
 						//addData("黑名单", r.data.black);
 						notifyList();
-						Upstat u = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getUpstat(id), Upstat.class);
+						Upstat u = Tools.BilibiliTool.getUpstat(id);
 						addData("播放量", u.data.archive.view);
 						addData("阅读量", u.data.article.view);
 						notifyList();

@@ -20,8 +20,7 @@ public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
     public static Map<String, String> mainHead = new HashMap<>();
 	public static String REFERER = "Referer";
-	public static final String DEFAULT_ENCODING = "UTF-8";
-
+	
 	static{
 		liveHead.put("Host", "api.live.bilibili.com");
         liveHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -156,40 +155,44 @@ public class Tools {
 
 	public static class BilibiliTool {
 
-		public static String getCvInfo(long cvId) {
-			return Tools.Network.httpGet("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp");
+		public static CvInfo getCvInfo(long cvId) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp"), CvInfo.class);
 		}
 
-		public static String getVideoJudge(long aid) {
-			return Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid);
+		public static VideoReply getVideoJudge(long aid) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid), VideoReply.class);
 		}
 
-		public static String getVideoJudge(long aid, long root) {
-			return Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid + "&ps=10&root=" + root + "&_=" + System.currentTimeMillis());
+		public static VideoReply getVideoJudge(long aid, long root) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/v2/reply/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid + "&ps=10&root=" + root + "&_=" + System.currentTimeMillis()), VideoReply.class);
 		}
 
-		public static String getMyInfo(String cookie) {
-			return Tools.Network.httpGet("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie);
+		public static MyInfo getMyInfo(String cookie) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookie), MyInfo.class);
 		}
 
-		public static String getUserInfo(long id) {
-			return Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie);
+		public static UserInfo getUserInfo(long id) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie), UserInfo.class);
 		}
 
-		public static String getRoomByUid(long uid) {
-			return Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid);
+		public static UidToLiveRoom getRoomByUid(long uid) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
 		}
 
 		public static String getUidByRoom(long roomId) {
+			return Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + roomId);
+		}
+
+		public static String getRoomInfo(long roomId) {
 			return Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=" + roomId);
 		}
 
-		public static String getRelation(long uid) {
-			return Tools.Network.httpGet("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp");
+		public static Relation getRelation(long uid) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/relation/stat?vmid=" + uid + "&jsonp=jsonp"), Relation.class);
 		}
 
-		public static String getUpstat(long uid) {
-			return Tools.Network.httpGet("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp");
+		public static Upstat getUpstat(long uid) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp"), Upstat.class);
 		}
 
 		public static String getFollowing(String cookie, int page, int pageSize) {
@@ -317,7 +320,7 @@ public class Tools {
 //		}
 
 		public static String sendCvCoin(int count, long CvId, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getCvInfo(CvId), CvInfo.class).data.mid), "avtype", 2, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(Tools.BilibiliTool.getCvInfo(CvId).data.mid), "avtype", 2, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 		}
 
 		public static String sendAvCoin(int count, long AID, String cookie) {

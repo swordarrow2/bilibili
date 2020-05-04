@@ -1,6 +1,6 @@
 package com.meng.biliv3.javaBean;
 
-public class BilibiliUserInfo {
+public class UserInfo {
     public int code;
     public String message;
     public Data data;

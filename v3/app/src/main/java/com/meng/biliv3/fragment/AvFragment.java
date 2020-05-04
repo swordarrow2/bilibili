@@ -81,7 +81,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 						MainActivity.instance.showToast(videoInfo.message);
 						return;
 					}
-					final VideoReply aj=MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getVideoJudge(id), VideoReply.class);
+					final VideoReply aj = Tools.BilibiliTool.getVideoJudge(id);
 					getActivity().runOnUiThread(new Runnable(){
 
 							@Override

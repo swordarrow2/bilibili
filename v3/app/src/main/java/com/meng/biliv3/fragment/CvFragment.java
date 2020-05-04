@@ -59,7 +59,7 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 
 				@Override
 				public void run() {
-					cvInfo = MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getCvInfo(id), CvInfo.class);	
+					cvInfo = Tools.BilibiliTool.getCvInfo(id);	
 					if (cvInfo.code != 0) {
 						MainActivity.instance.showToast(cvInfo.message);
 						return;

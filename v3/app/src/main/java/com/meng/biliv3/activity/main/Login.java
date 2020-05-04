@@ -72,10 +72,10 @@ public class Login extends Activity {
 					}
 					CookieManager cookieManager = CookieManager.getInstance();
 					final String cookieStr = cookieManager.getCookie(url) == null ? "null" : cookieManager.getCookie(url);
-					new Thread(new Runnable() {
+					MainActivity.instance.threadPool.execute(new Runnable() {
 							@Override
 							public void run() {
-								BilibiliUserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), BilibiliUserInfo.class);
+								UserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), UserInfo.class);
 								int po=getIntent().getIntExtra("pos", -1);
 								AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
 								account.cookie = cookieStr;
@@ -104,7 +104,7 @@ public class Login extends Activity {
 										}
 									});
 							}
-						}).start();
+						});
 				}
 			});
         webView.loadUrl(loginUrl);

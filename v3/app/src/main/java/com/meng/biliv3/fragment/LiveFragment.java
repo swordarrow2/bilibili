@@ -175,8 +175,8 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
-					final byte[] imgbs = PictureCacher.getNetPicture(MainActivity.instance.gson.fromJson(Tools.BilibiliTool.getRoomByUid(uid), UidToLiveRoom.class).data.cover);
+					final UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(uid);
+					final byte[] imgbs = PictureCacher.getNetPicture(Tools.BilibiliTool.getRoomByUid(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){
 

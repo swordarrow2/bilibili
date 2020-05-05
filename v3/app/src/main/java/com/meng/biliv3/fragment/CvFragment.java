@@ -72,7 +72,7 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 								MainActivity.instance.renameFragment(type + id, cvInfo.data.title);
 							}
 						});
-					byte[] img = PictureCacher.getNetPicture(cvInfo.data.banner_url);
+					byte[] img = NetworkCacher.getNetPicture(cvInfo.data.banner_url);
 					if (img == null) {
 						MainActivity.instance.showToast("封面图获取失败");
 						return;

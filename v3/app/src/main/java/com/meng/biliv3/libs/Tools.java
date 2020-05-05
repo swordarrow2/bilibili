@@ -384,7 +384,7 @@ public class Tools {
 			if (response.statusCode() != 200) {
 				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 			}
-			Log.network(Connection.Method.POST, url, response.body(), params);
+			Log.network(Connection.Method.POST, url, formatJson(response.body()), params);
 			return response.body();
 		}
 
@@ -413,6 +413,7 @@ public class Tools {
 			}
 			return map;
 		}
+		
 		public static String getRealUrl(String surl) throws Exception {
 			URL url = new URL(surl);
 			URLConnection conn = url.openConnection();
@@ -451,8 +452,9 @@ public class Tools {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			Log.network(Connection.Method.GET, url, response.body());
+			if (!url.contains("/room/v1/Area/getList")) {
+				Log.network(Connection.Method.GET, url, formatJson(response.body()));
+			}
 			return response.body();
 		}
 

@@ -89,7 +89,7 @@ public class UserInfoHeaderView extends LinearLayout {
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					UidToLiveRoom sjb = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + info.data.mid), UidToLiveRoom.class);
+					final UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(info.data.mid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -110,7 +110,7 @@ public class UserInfoHeaderView extends LinearLayout {
 									tvBLive.setVisibility(View.VISIBLE);
 									tvBLive.setText("主播 Lv." + obj2.get("level").getAsInt() + "(" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1).getAsInt() + ")");
 									if (MainActivity.instance.mDrawerList.getHeaderViewsCount() == 1) {
-										MainActivity.instance.mDrawerList.addHeaderView(new MengLiveControl(MainActivity.instance));
+										MainActivity.instance.mDrawerList.addHeaderView(new MengLiveControl(MainActivity.instance,sjb));
 									}
 								}
 							});

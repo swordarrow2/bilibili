@@ -176,7 +176,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
 					final UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(uid);
-					final byte[] imgbs = PictureCacher.getNetPicture(Tools.BilibiliTool.getRoomByUid(uid).data.cover);
+					final byte[] imgbs = NetworkCacher.getNetPicture(Tools.BilibiliTool.getRoomByUid(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){
 

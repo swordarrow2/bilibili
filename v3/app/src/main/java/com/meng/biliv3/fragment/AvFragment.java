@@ -93,7 +93,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
 							}
 						});
-					byte[] img = PictureCacher.getNetPicture(videoInfo.data.pic);
+					byte[] img = NetworkCacher.getNetPicture(videoInfo.data.pic);
 					if (img == null) {
 						MainActivity.instance.showToast("封面图获取失败");
 						return;

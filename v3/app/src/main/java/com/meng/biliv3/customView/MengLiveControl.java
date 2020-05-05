@@ -27,9 +27,11 @@ public class MengLiveControl extends LinearLayout {
 	private ExpandableListView mainlistview = null;
 	private LivePartSelectAdapter adapter;
 	private AlertDialog dialog;
+	private UidToLiveRoom sjb;
 
-    public MengLiveControl(final Context context) {
+    public MengLiveControl(final Context context, UidToLiveRoom utlr) {
         super(context);
+		sjb = utlr;
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
 		mainlistview = new ExpandableListView(context);
 		mainlistview.setOnChildClickListener(new OnChildClickListener(){
@@ -52,7 +54,6 @@ public class MengLiveControl extends LinearLayout {
 							public void run() {
 								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 								String cookie = MainActivity.instance.getCookie(mainUID);
-								final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
 								String streamJson = Tools.Network.httpGet("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, cookie, "https://link.bilibili.com/p/center/index");
 								JsonParser parser = new JsonParser();
 								JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();

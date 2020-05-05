@@ -1,5 +1,7 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
+
 public class MyInfo {
     public int code;
     public String message;
@@ -67,4 +69,9 @@ public class MyInfo {
         public int vip_pay_type;
         public int theme_type;
     }
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
+	}
 }

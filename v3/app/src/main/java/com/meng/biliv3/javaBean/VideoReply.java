@@ -1,5 +1,6 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
 import java.util.*;
 
 public class VideoReply {
@@ -176,5 +177,10 @@ public class VideoReply {
 		public String answer_guide_icon_url;
 		public String answer_guide_ios_url;
 		public String answer_guide_android_url;
+	}
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
 	}
 }

@@ -1,5 +1,6 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
 import java.util.*;
 
 public class HourRank {
@@ -69,4 +70,9 @@ public class HourRank {
         public int identification;
         public int broadcast_type;
     }
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
+	}
 }

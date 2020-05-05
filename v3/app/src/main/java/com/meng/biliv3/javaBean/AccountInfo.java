@@ -1,5 +1,7 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
+
 public class AccountInfo {
 	public long phone;
 	public String password;
@@ -31,5 +33,10 @@ public class AccountInfo {
 		} else {
 			flag &= ~0b10;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
 	}
 }

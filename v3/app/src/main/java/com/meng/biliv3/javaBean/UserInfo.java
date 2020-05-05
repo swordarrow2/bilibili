@@ -1,5 +1,7 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
+
 public class UserInfo {
     public int code;
     public String message;
@@ -39,4 +41,9 @@ public class UserInfo {
         public int status;
         public int theme_type;
     }
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
+	}
 }

@@ -1,6 +1,8 @@
 package com.meng.biliv3.javaBean;
 
-public class Relation {
+import com.meng.biliv3.activity.*;
+
+	public class Relation {
 	public int code;
 	public String message;
 	public int ttl;
@@ -12,5 +14,10 @@ public class Relation {
 		public int whisper;
 		public int follower;
 		public int black;
+	}
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
 	}
 }

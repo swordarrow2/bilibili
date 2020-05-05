@@ -14,13 +14,14 @@ import java.net.*;
 import java.nio.charset.*;
 import java.text.*;
 import java.util.*;
+import java.util.regex.*;
 import org.jsoup.*;
 
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
     public static Map<String, String> mainHead = new HashMap<>();
 	public static String REFERER = "Referer";
-	
+
 	static{
 		liveHead.put("Host", "api.live.bilibili.com");
         liveHead.put("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -211,7 +212,7 @@ public class Tools {
 			return Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create", cookie, "dynamic_id", 0, "type", 4, "rid", 0, "content", content, "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "ctrl", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 		}
 
-		public static String sendDynamic(String content, String cookie, ArrayList<File> pics) {
+		public static DynamicWithPictureResult sendDynamic(String content, String cookie, ArrayList<File> pics) {
 			HashSet<UploadPicResult> bset=new HashSet<>(); 
 			try {
 				for (File pic:pics) {
@@ -234,7 +235,7 @@ public class Tools {
 				}
 				String result=Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw", cookie, "biz", 3, "category", 3, "type", 0, "pictures", new Gson().toJson(bset), "title", "", "tags", "", "description", "", "content", content, "setting", "{\"copy_forbidden\":0,\"cachedTime\":0}", "from", "create.dynamic.web", "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "at_control", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 				pics.clear();
-				return result;
+				return MainActivity.instance.gson.fromJson(result, DynamicWithPictureResult.class);
 			} catch (Exception e) {
 				return null;
 			}
@@ -383,6 +384,7 @@ public class Tools {
 			if (response.statusCode() != 200) {
 				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
 			}
+			Log.network(Connection.Method.POST, url, response.body(), params);
 			return response.body();
 		}
 
@@ -417,7 +419,6 @@ public class Tools {
 			conn.connect();
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
 			String nurl = conn.getURL().toString();
-			System.out.println("realUrl" + nurl);
 			in.close();
 			return nurl;
 		}
@@ -450,10 +451,54 @@ public class Tools {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			if (response != null) {
-				return response.body();
+
+			Log.network(Connection.Method.GET, url, response.body());
+			return response.body();
+		}
+
+		public static String formatJson(String content) {
+			StringBuilder sb = new StringBuilder();
+			int index = 0;
+			int count = 0;
+			while (index < content.length()) {
+				char ch = content.charAt(index);
+				if (ch == '{' || ch == '[') {
+					sb.append(ch);
+					sb.append('\n');
+					count++;
+					for (int i = 0; i < count; i++) {                   
+						sb.append('\t');
+					}
+				} else if (ch == '}' || ch == ']') {
+					sb.append('\n');
+					count--;
+					for (int i = 0; i < count; i++) {                   
+						sb.append('\t');
+					}
+					sb.append(ch);
+				} else if (ch == ',') {
+					sb.append(ch);
+					sb.append('\n');
+					for (int i = 0; i < count; i++) {                   
+						sb.append('\t');
+					}
+				} else {
+					sb.append(ch);              
+				}
+				index++;
 			}
-			return "";
+			return sb.toString();
+		}
+		/**
+		 * 把格式化的json紧凑
+		 * @param content
+		 * @return
+		 */
+		public static String compactJson(String content) {
+			String regEx="[\t\n]"; 
+			Pattern p = Pattern.compile(regEx); 
+			Matcher m = p.matcher(content);
+			return m.replaceAll("").trim();
 		}
 	}
 

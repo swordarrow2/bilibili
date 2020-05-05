@@ -1,5 +1,7 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
+
 public class UidToLiveRoom {
 	public int code;
     public String msg;
@@ -17,4 +19,9 @@ public class UidToLiveRoom {
         public int roomid;
         public int broadcast_type;
     }
+	
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
+	}
 }

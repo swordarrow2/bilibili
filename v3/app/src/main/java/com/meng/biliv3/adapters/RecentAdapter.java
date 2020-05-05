@@ -165,7 +165,7 @@ public class RecentAdapter extends BaseAdapter {
         }
     }
 
-	private class Recent {
+	private static class Recent {
 		public String type;
 		public long id;
 		public String name;

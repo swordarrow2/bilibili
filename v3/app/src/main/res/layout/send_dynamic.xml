@@ -50,11 +50,12 @@
 		android:layout_height="wrap_content"
 		android:layout_above="@id/send_dynamicLinearLayout"/>
 
-	<TextView
-		android:layout_alignParentTop="true"
+	<ListView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:id="@+id/send_dynamicTextViewSelectPic"/>
+		android:id="@+id/send_dynamicListView"
+		android:layout_alignParentTop="true"
+		android:layout_above="@id/send_dynamicEditText"/>
 
 </RelativeLayout>
 

@@ -11,17 +11,19 @@ import com.meng.biliv3.javaBean.*;
 import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
+import com.meng.biliv3.adapters.*;
+import android.widget.AdapterView.*;
 
 public class DynamicFragment extends Fragment implements View.OnClickListener {
 
-	public TabHost tab;
+	private TabHost tab;
 	private Spinner selectAccount;
 	private ArrayAdapter<String> spinnerAccountAdapter=null;
-	private ArrayList<String> spList=null;
-	private ArrayList<File> selectedPic=new ArrayList<>();
+	private ArrayList<String> spList=new ArrayList<>();
+	private SelectedImageAdapter selectedImageAdapter=new SelectedImageAdapter();
 	private Button btnSelect,btnSend;
 	private EditText et;
-	private TextView selected;
+	private ListView selected;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,20 +43,28 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 		et = (EditText) view.findViewById(R.id.send_dynamicEditText);
 		btnSelect = (Button) view.findViewById(R.id.send_dynamicButton_pic);
 		btnSend = (Button) view.findViewById(R.id.send_dynamicButton_send);
-		selected = (TextView) view.findViewById(R.id.send_dynamicTextViewSelectPic);
+		selected = (ListView) view.findViewById(R.id.send_dynamicListView);
 		btnSelect.setOnClickListener(this);
 		btnSend.setOnClickListener(this);
 		selectAccount = (Spinner) view.findViewById(R.id.send_dynamicSpinner_account);
-		if (spList == null) {
-			spList = new ArrayList<>();
-		} else {
-			spList.clear();
-		}
 		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
 			spList.add(ai.name);
 		}
-		spinnerAccountAdapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, spList);
-		selectAccount.setAdapter(spinnerAccountAdapter);
+		selectAccount.setAdapter(spinnerAccountAdapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, spList));
+		selected.setAdapter(selectedImageAdapter);
+		selected.setOnItemLongClickListener(new OnItemLongClickListener(){
+
+				@Override
+				public boolean onItemLongClick(AdapterView<?> p1, View p2, final int p3, long p4) {
+					new AlertDialog.Builder(getActivity()).setTitle("确定删除吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface p1, int p2) {
+								selectedImageAdapter.removeFile(p3);
+							}
+						}).setNegativeButton("取消", null).show();
+					return true;
+				}
+			});
 	}
 
 	@Override
@@ -72,12 +82,13 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 						@Override
 						public void run() {
 							String result;
-							if (selectedPic.size() == 0) {
+							ArrayList<File> files=selectedImageAdapter.getFiles();
+							if (files.size() == 0) {
 								result = Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie);
-							} else {
-								result = Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, selectedPic);
+								MainActivity.instance.showToast(result);
+								} else {
+							MainActivity.instance.showToast(Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, files).toString());
 							}
-							MainActivity.instance.showToast(result);
 //							if (new JsonParser().parse(result).getAsJsonObject().get("code").getAsInt() == 0) {
 //								MainActivity.instance.showToast("发送成功");
 //							} else {
@@ -99,10 +110,7 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 			if (requestCode == 9961 && data.getData() != null) {
-				String path = Tools.AndroidContent.absolutePathFromUri(getActivity().getApplicationContext(), data.getData());
-				MainActivity.instance.showToast(path);
-				selectedPic.add(new File(path));
-				selected.setText(selected.getText().toString() + "已选择:" + path + "\n");
+				selectedImageAdapter.addFile(new File(Tools.AndroidContent.absolutePathFromUri(getActivity().getApplicationContext(), data.getData())));
 			} 
 		} else if (resultCode == Activity.RESULT_CANCELED) {
 			MainActivity.instance.showToast("取消选择图片");

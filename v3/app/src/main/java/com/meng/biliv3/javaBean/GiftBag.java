@@ -1,5 +1,6 @@
 package com.meng.biliv3.javaBean;
 
+import com.meng.biliv3.activity.*;
 import java.util.*;
 
 public class GiftBag {
@@ -34,4 +35,9 @@ public class GiftBag {
         public long num;
         public String text;
     }
+
+	@Override
+	public String toString() {
+		return MainActivity.instance.gson.toJson(this);
+	}
 }

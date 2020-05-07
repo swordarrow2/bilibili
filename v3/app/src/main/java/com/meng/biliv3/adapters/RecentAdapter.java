@@ -7,6 +7,7 @@ import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.fragment.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
@@ -164,19 +165,4 @@ public class RecentAdapter extends BaseAdapter {
             e.printStackTrace();
         }
     }
-
-	private static class Recent {
-		public String type;
-		public long id;
-		public String name;
-
-		public Recent(String type, long id, String name) {
-			this.type = type;
-			this.id = id;
-			this.name = name;
-		}
-	}
 }
-
-
-

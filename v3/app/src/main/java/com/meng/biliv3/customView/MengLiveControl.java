@@ -11,7 +11,7 @@ import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 import com.meng.biliv3.libs.*;
 
 import android.view.View.OnClickListener;
@@ -27,9 +27,9 @@ public class MengLiveControl extends LinearLayout {
 	private ExpandableListView mainlistview = null;
 	private LivePartSelectAdapter adapter;
 	private AlertDialog dialog;
-	private UidToLiveRoom sjb;
+	private UidToRoom sjb;
 
-    public MengLiveControl(final Context context, UidToLiveRoom utlr) {
+    public MengLiveControl(final Context context, UidToRoom utlr) {
         super(context);
 		sjb = utlr;
         LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
@@ -117,7 +117,7 @@ public class MengLiveControl extends LinearLayout {
 					}
 					long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 					if (mainUID != -1) {
-						final UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+						final UidToRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToRoom.class);
 						String streamJson = Tools.Network.httpGet("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + sjb.data.roomid, MainActivity.instance.getCookie(mainUID), "https://link.bilibili.com/p/center/index");
 						JsonParser parser = new JsonParser();
 						final JsonObject rtmp = parser.parse(streamJson).getAsJsonObject().get("data").getAsJsonObject().get("rtmp").getAsJsonObject();				
@@ -158,7 +158,7 @@ public class MengLiveControl extends LinearLayout {
 								public void run() {
 									long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 									String cookie = MainActivity.instance.getCookie(mainUID);
-									UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+									UidToRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToRoom.class);
 									Tools.BilibiliTool.stopLive(sjb.data.roomid, cookie);
 									((Activity) context).runOnUiThread(new Runnable() {
 											@Override
@@ -188,7 +188,7 @@ public class MengLiveControl extends LinearLayout {
 							public void run() {
 								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 								String cookie = MainActivity.instance.getCookie(mainUID);
-								UidToLiveRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToLiveRoom.class);
+								UidToRoom sjb = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + mainUID), UidToRoom.class);
 								Tools.BilibiliTool.renameLive(sjb.data.roomid, name, cookie);
 							}
 						});

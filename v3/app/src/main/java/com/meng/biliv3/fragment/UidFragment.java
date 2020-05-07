@@ -6,8 +6,9 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 import java.io.*;
 import java.util.*;
 
@@ -96,7 +97,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(id);
+						UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(id);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");

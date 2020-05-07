@@ -5,7 +5,7 @@ import android.view.*;
 import android.widget.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 
 public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 

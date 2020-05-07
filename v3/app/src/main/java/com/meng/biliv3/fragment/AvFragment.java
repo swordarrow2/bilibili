@@ -9,7 +9,7 @@ import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 import com.meng.biliv3.libs.*;
 import java.util.*;
 

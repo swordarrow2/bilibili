@@ -1,4 +1,4 @@
-package com.meng.biliv3.javaBean;
+package com.meng.biliv3.javabean;
 
 import android.os.*;
 import java.io.*;

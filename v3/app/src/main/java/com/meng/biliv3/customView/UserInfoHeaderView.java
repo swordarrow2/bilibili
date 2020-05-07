@@ -4,14 +4,13 @@ import android.app.*;
 import android.content.*;
 import android.graphics.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.customView.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 import java.io.*;
 
 public class UserInfoHeaderView extends LinearLayout {
@@ -89,7 +88,7 @@ public class UserInfoHeaderView extends LinearLayout {
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					final UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(info.data.mid);
+					final UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(info.data.mid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {

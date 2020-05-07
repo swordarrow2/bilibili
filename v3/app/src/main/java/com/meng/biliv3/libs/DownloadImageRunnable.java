@@ -4,7 +4,7 @@ import android.graphics.*;
 import android.widget.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 import java.io.*;
 import java.net.*;
 

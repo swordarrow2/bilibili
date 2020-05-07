@@ -1,4 +1,4 @@
-package com.meng.biliv3.javaBean;
+package com.meng.biliv3.javabean;
 
 import com.meng.biliv3.activity.*;
 import java.util.*;

@@ -5,14 +5,14 @@ import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
-import com.meng.biliv3.adapters.*;
-import android.widget.AdapterView.*;
 
 public class DynamicFragment extends Fragment implements View.OnClickListener {
 

@@ -5,8 +5,9 @@ import android.os.*;
 import android.webkit.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 
 public class Login extends Activity {
 

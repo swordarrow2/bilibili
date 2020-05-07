@@ -10,7 +10,7 @@ import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.main.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.update.*;
 import org.java_websocket.client.*;
 

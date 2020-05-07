@@ -1,12 +1,12 @@
-package com.meng.biliv3.javaBean;
+package com.meng.biliv3.result;
 
 import com.meng.biliv3.activity.*;
 
-public class UidToLiveRoom {
+public class UidToRoom {
 	public int code;
     public String msg;
     public String message;
-    public Data data = new Data();
+    public Data data;
 
     public class Data {
         public int roomStatus;

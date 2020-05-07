@@ -14,7 +14,7 @@ import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.customView.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 import com.meng.biliv3.libs.*;
 import com.universalvideoview.*;
 import java.lang.reflect.*;
@@ -175,7 +175,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToLiveRoom sjb = Tools.BilibiliTool.getRoomByUid(uid);
+					final UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(uid);
 					final byte[] imgbs = NetworkCacher.getNetPicture(Tools.BilibiliTool.getRoomByUid(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){

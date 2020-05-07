@@ -8,7 +8,7 @@ import android.provider.*;
 import android.webkit.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javaBean.*;
+import com.meng.biliv3.result.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
@@ -176,12 +176,12 @@ public class Tools {
 			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie), UserInfo.class);
 		}
 
-		public static UidToLiveRoom getRoomByUid(long uid) {
-			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToLiveRoom.class);
+		public static UidToRoom getRoomByUid(long uid) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
 		}
 
-		public static String getUidByRoom(long roomId) {
-			return Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + roomId);
+		public static RoomToUid getUidByRoom(long roomId) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + roomId), RoomToUid.class);
 		}
 
 		public static String getRoomInfo(long roomId) {
@@ -200,8 +200,8 @@ public class Tools {
 			return Tools.Network.httpGet("https://api.live.bilibili.com/relation/v1/feed/feed_list?page=" + page + "&pagesize=" + pageSize, cookie);
 		}
 
-		public static String getMedal(String cookie, int page, int pageSize) {
-			return Tools.Network.httpGet("https://api.live.bilibili.com/i/api/medal?page=" + page + "&pagesize=" + pageSize, cookie);
+		public static Medals getMedal(String cookie, int page, int pageSize) {
+			return MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/i/api/medal?page=" + page + "&pagesize=" + pageSize, cookie), Medals.class);
 		}
 
 		public static String getMedalRank(String cookie, long uid, long roomId) {
@@ -413,7 +413,7 @@ public class Tools {
 			}
 			return map;
 		}
-		
+
 		public static String getRealUrl(String surl) throws Exception {
 			URL url = new URL(surl);
 			URLConnection conn = url.openConnection();

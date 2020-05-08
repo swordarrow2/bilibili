@@ -24,7 +24,7 @@ public class RecentAdapter extends BaseAdapter {
         if (!f.exists()) {
             saveConfig();
 		}
-		recents = MainActivity.instance.gson.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<Recent>>(){}.getType());
+		recents = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<Recent>>(){}.getType());
 		if (recents == null) {
 			recents = new ArrayList<>();
 		}
@@ -158,7 +158,7 @@ public class RecentAdapter extends BaseAdapter {
             File file = new File(jsonPath);
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(MainActivity.instance.gson.toJson(recents));
+            writer.write(GSON.toJson(recents));
             writer.flush();
             fos.close();
         } catch (IOException e) {

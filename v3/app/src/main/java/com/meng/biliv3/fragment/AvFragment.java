@@ -9,9 +9,8 @@ import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.result.*;
 import com.meng.biliv3.libs.*;
-import java.util.*;
+import com.meng.biliv3.result.*;
 
 public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
@@ -76,7 +75,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 
 				@Override
 				public void run() {
-					videoInfo = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
+					videoInfo = GSON.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
 					if (videoInfo.code != 0) {
 						MainActivity.instance.showToast(videoInfo.message);
 						return;

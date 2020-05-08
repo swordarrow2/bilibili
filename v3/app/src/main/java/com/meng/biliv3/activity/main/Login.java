@@ -3,7 +3,6 @@ package com.meng.biliv3.activity.main;
 import android.app.*;
 import android.os.*;
 import android.webkit.*;
-import com.google.gson.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
@@ -76,7 +75,7 @@ public class Login extends Activity {
 					MainActivity.instance.threadPool.execute(new Runnable() {
 							@Override
 							public void run() {
-								UserInfo bilibiliPersonInfo = new Gson().fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), UserInfo.class);
+								UserInfo bilibiliPersonInfo = GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), UserInfo.class);
 								int po=getIntent().getIntExtra("pos", -1);
 								AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
 								account.cookie = cookieStr;

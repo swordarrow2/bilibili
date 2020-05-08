@@ -83,7 +83,7 @@ public class UserInfoHeaderView extends LinearLayout {
 		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					final UserInfo info = MainActivity.instance.gson.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), UserInfo.class);
+					final UserInfo info = GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), UserInfo.class);
 					if (info.code != 0) {
 						MainActivity.instance.showToast("cookie过期");
 						return;

@@ -1,6 +1,6 @@
 package com.meng.biliv3.result;
 
-import com.meng.biliv3.activity.*;
+import com.meng.biliv3.libs.*;
 
 public class DanmakuBean {
 	/*	1.29800, 为弹幕播放起始时间 （在视频中出现的时间，单位是秒）
@@ -27,6 +27,6 @@ public class DanmakuBean {
 	
 	@Override
 	public String toString() {
-		return MainActivity.instance.gson.toJson(this);
+		return GSON.toJson(this);
 	}
 }

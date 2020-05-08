@@ -55,7 +55,7 @@ public class BaseIdFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		customSentenseFile = new File(Environment.getExternalStorageDirectory() + "/sjf.json");
 		if (customSentenseFile.exists() && customSentence != null) {
-			customSentence = new Gson().fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
+			customSentence = GSON.fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
 		} else {
 			customSentence = new CustomSentence();
 			String[] strings = new String[]{ "此生无悔入东方,来世愿生幻想乡","红魔地灵夜神雪,永夜风神星莲船","非想天则文花贴,萃梦神灵绯想天","冥界地狱异变起,樱下华胥主谋现","净罪无改渡黄泉,华鸟风月是非辨","境界颠覆入迷途,幻想花开啸风弄","二色花蝶双生缘,前缘未尽今生还","星屑洒落雨霖铃,虹彩彗光银尘耀","无寿迷蝶彼岸归,幻真如画妖如月","永劫夜宵哀伤起,幼社灵中幻似梦","追忆往昔巫女缘,须弥之间冥梦现","仁榀华诞井中天,歌雅风颂心无念" };
@@ -244,7 +244,7 @@ public class BaseIdFragment extends Fragment {
 	private void sendPackDialog(final AccountInfo ai) {
 		JsonObject liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 		final long uid=liveToMainInfo.get("uid").getAsLong();
-		final GiftBag liveBag = new Gson().fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
+		final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -381,7 +381,7 @@ public class BaseIdFragment extends Fragment {
         try {
 			FileOutputStream fos = new FileOutputStream(customSentenseFile);
             OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(new Gson().toJson(customSentence));
+            writer.write(GSON.toJson(customSentence));
             writer.flush();
             fos.close();
 		} catch (IOException e) {

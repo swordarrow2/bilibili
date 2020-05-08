@@ -41,16 +41,15 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerArrowDrawable drawerArrow;
 
-	public HashMap<String,Fragment> fragments=new HashMap<>();
+	public HashMap<String,Fragment> fragments = new HashMap<>();
     public TextView tvMemory;
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
-    public Gson gson = new Gson();
     public ArrayList<AccountInfo> loginAccounts;
 
     public AccountAdapter mainAccountAdapter;
 
-    public String jsonPath;
-    public String mainDic = "";
+    public String jsonPath = getApplicationContext().getFilesDir() + "/account.json";
+    public String mainDic = mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
@@ -87,12 +86,11 @@ public class MainActivity extends Activity {
 		rightDrawer.setBackgroundColor(colorManager.getColorBackground());
 
         setListener();
-        jsonPath = getApplicationContext().getFilesDir() + "/account.json";
         File f = new File(jsonPath);
         if (!f.exists()) {
             saveConfig();
 		}
-		loginAccounts = gson.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
+		loginAccounts = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
 		if (loginAccounts == null) {
 			loginAccounts = new ArrayList<>();
 		}
@@ -102,7 +100,6 @@ public class MainActivity extends Activity {
         } else {
             mDrawerLayout.closeDrawer(mDrawerList);
         }
-        mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
 		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
 			File ff = new File(mainDic + s);
@@ -131,7 +128,7 @@ public class MainActivity extends Activity {
 					public void action(WebSocketClient wsc) {
 						try {
 							PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
-							wsc.send(new Gson().toJson(new CheckNewBean(packageInfo.packageName, packageInfo.versionCode)));
+							wsc.send(GSON.toJson(new CheckNewBean(packageInfo.packageName, packageInfo.versionCode)));
 						} catch (PackageManager.NameNotFoundException e) {
 							MainActivity.instance.showToast(e.toString());
 						}
@@ -596,7 +593,7 @@ public class MainActivity extends Activity {
             File file = new File(jsonPath);
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(gson.toJson(loginAccounts));
+            writer.write(GSON.toJson(loginAccounts));
             writer.flush();
             fos.close();
         } catch (IOException e) {
@@ -612,7 +609,7 @@ public class MainActivity extends Activity {
             File file = new File(Environment.getExternalStorageDirectory() + "/account.json");
             fos = new FileOutputStream(file);
             writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(gson.toJson(loginAccounts));
+            writer.write(GSON.toJson(loginAccounts));
             writer.flush();
             fos.close();
 		} catch (IOException e) {

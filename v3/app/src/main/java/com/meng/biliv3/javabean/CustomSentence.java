@@ -1,6 +1,6 @@
 package com.meng.biliv3.javabean;
 
-import com.meng.biliv3.activity.*;
+import com.meng.biliv3.libs.*;
 import java.util.*;
 
 public class CustomSentence {
@@ -8,6 +8,6 @@ public class CustomSentence {
 
 	@Override
 	public String toString() {
-		return MainActivity.instance.gson.toJson(this);
+		return GSON.toJson(this);
 	}
 }

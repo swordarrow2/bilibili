@@ -3,8 +3,8 @@ package com.meng.biliv3.update;
 import android.app.*;
 import android.content.*;
 import android.os.*;
-import com.google.gson.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
@@ -61,7 +61,7 @@ public class SanaeConnect extends WebSocketClient {
 	@Override
 	public void onMessage(String p1) {
 		if (!p1.equals("")) {
-			final SoftwareInfo esi=new Gson().fromJson(p1, SoftwareInfo.class);
+			final SoftwareInfo esi=GSON.fromJson(p1, SoftwareInfo.class);
 			if (!MainActivity.instance.sjfSettings.getVersion().equals(esi.infoList.get(esi.infoList.size() - 1).versionName)) {	
 				MainActivity.instance.runOnUiThread(new Runnable(){
 

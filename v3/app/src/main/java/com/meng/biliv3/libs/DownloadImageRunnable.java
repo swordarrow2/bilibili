@@ -2,7 +2,6 @@ package com.meng.biliv3.libs;
 
 import android.graphics.*;
 import android.widget.*;
-import com.google.gson.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
@@ -66,7 +65,7 @@ public class DownloadImageRunnable implements Runnable {
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
             }
-            UserInfo bilibiliPersonInfoJavaBean = new Gson().fromJson(stringBuilder.toString(), UserInfo.class);
+            UserInfo bilibiliPersonInfoJavaBean = GSON.fromJson(stringBuilder.toString(), UserInfo.class);
             return bilibiliPersonInfoJavaBean.data.face;
         } catch (Exception e) {
             e.printStackTrace();

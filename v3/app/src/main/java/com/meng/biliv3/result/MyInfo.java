@@ -1,6 +1,6 @@
 package com.meng.biliv3.result;
 
-import com.meng.biliv3.activity.*;
+import com.meng.biliv3.libs.*;
 
 public class MyInfo {
     public int code;
@@ -72,6 +72,6 @@ public class MyInfo {
 	
 	@Override
 	public String toString() {
-		return MainActivity.instance.gson.toJson(this);
+		return GSON.toJson(this);
 	}
 }

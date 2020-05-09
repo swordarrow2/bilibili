@@ -26,6 +26,7 @@ public class BaseIdFragment extends Fragment {
 	public static final String typeAv = "av";
 	public static final String typeLive = "lv";
 	public static final String typeCv = "cv";
+	public static final String typeMedal = "medal";
 
 	protected static final int SendDanmaku=0;
 	protected static final int Silver=1;
@@ -242,8 +243,7 @@ public class BaseIdFragment extends Fragment {
 	}
 
 	private void sendPackDialog(final AccountInfo ai) {
-		JsonObject liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
-		final long uid=liveToMainInfo.get("uid").getAsLong();
+		final long uid=Tools.BilibiliTool.getUidByRoom(id).data.info.uid;
 		final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -328,7 +328,7 @@ public class BaseIdFragment extends Fragment {
 			});
 	}
 
-	private int getStripCount(ArrayList<GiftBag.ListItem> list) {
+	protected int getStripCount(ArrayList<GiftBag.ListItem> list) {
 		int ii=0;
 		for (GiftBag.ListItem i:list) {
 			if (i.gift_name.equals("辣条")) {
@@ -338,7 +338,7 @@ public class BaseIdFragment extends Fragment {
 		return ii;
 	}
 
-	private void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
+	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
 		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
 		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 		connection.userAgent(MainActivity.instance.userAgent)
@@ -347,15 +347,15 @@ public class BaseIdFragment extends Fragment {
 			.referrer("https://live.bilibili.com/" + roomID)
 			.cookies(Tools.Network.cookieToMap(cookie))
 			.method(Connection.Method.POST)
-			.data("uid", String.valueOf(uid))
-			.data("gift_id", String.valueOf(liveBagDataList.gift_id))
-			.data("ruid", String.valueOf(ruid))
-			.data("gift_num", String.valueOf(num))
-			.data("bag_id", String.valueOf(liveBagDataList.bag_id))
+			.data("uid", uid)
+			.data("gift_id", liveBagDataList.gift_id)
+			.data("ruid", ruid)
+			.data("gift_num", num)
+			.data("bag_id", liveBagDataList.bag_id)
 			.data("platform", "pc")
 			.data("biz_code", "live")
-			.data("biz_id", String.valueOf(roomID))
-			.data("rnd", String.valueOf(System.currentTimeMillis() / 1000))
+			.data("biz_id", roomID)
+			.data("rnd", System.currentTimeMillis() / 1000)
 			.data("storm_beat_id", "0")
 			.data("metadata", "")
 			.data("price", "0")

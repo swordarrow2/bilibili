@@ -80,7 +80,7 @@ public class ExceptionCatcher implements Thread.UncaughtExceptionHandler {
                 paramsMap.put("versionCode", versionCode);
 			}
 		} catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, e.toString());
+			
 		}
         Field[] fields=Build.class.getDeclaredFields();
         for (Field field : fields) {
@@ -88,7 +88,7 @@ public class ExceptionCatcher implements Thread.UncaughtExceptionHandler {
                 field.setAccessible(true);
                 paramsMap.put(field.getName(), field.get(null).toString());
 			} catch (Exception e) {
-                Log.e(TAG, e.toString());
+                
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public class ExceptionCatcher implements Thread.UncaughtExceptionHandler {
 			}
             return fileName;
 		} catch (Exception e) {
-            Log.e(TAG, e.toString());
+            
 		}
         return null;
 	}

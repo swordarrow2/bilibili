@@ -122,6 +122,9 @@ public class RecentAdapter extends BaseAdapter {
 						case BaseIdFragment.typeUID:
 							MainActivity.instance.showFragment(UidFragment.class, r.type, r.id);
 							break;
+						case BaseIdFragment.typeMedal:
+							MainActivity.instance.showFragment(MedalFragment.class, r.type, r.id);
+							break;
 						case "AVBV转换":
 							MainActivity.instance.showFragment(AvBvConvertFragment.class, "AVBV转换");
 							break;

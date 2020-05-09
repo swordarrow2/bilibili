@@ -39,16 +39,14 @@ public class MainActivity extends Activity {
     private RelativeLayout rightDrawer;
     public ListView lvRecent;
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerArrowDrawable drawerArrow;
-
-	public HashMap<String,Fragment> fragments = new HashMap<>();
+    public HashMap<String,Fragment> fragments = new HashMap<>();
     public TextView tvMemory;
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public ArrayList<AccountInfo> loginAccounts;
 
     public AccountAdapter mainAccountAdapter;
 
-    public String jsonPath = getApplicationContext().getFilesDir() + "/account.json";
+    public String jsonPath ;
     public String mainDic = mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
     public static boolean onWifi = false;
@@ -74,6 +72,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         instance = this;
+		jsonPath = getFilesDir() + "/account.json";
 		ExceptionCatcher.getInstance().init(getApplicationContext());
 		//  DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -84,7 +83,6 @@ public class MainActivity extends Activity {
 		colorManager.doRun(this);
 		mDrawerList.setBackgroundColor(colorManager.getColorBackground());
 		rightDrawer.setBackgroundColor(colorManager.getColorBackground());
-
         setListener();
         File f = new File(jsonPath);
         if (!f.exists()) {
@@ -100,7 +98,6 @@ public class MainActivity extends Activity {
         } else {
             mDrawerLayout.closeDrawer(mDrawerList);
         }
-
 		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
 			File ff = new File(mainDic + s);
 			if (!ff.exists()) {
@@ -201,14 +198,13 @@ public class MainActivity extends Activity {
     }
 
     private void setListener() {
-        drawerArrow = new DrawerArrowDrawable(this);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.open, R.string.close);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, new DrawerArrowDrawable(this), R.string.open, R.string.close);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mDrawerList.setAdapter(
 			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-										 "输入ID", "动态","管理账号","AVBV转换", "设置", "退出"
+										 "输入ID", "动态","头衔","管理账号","AVBV转换", "设置", "退出"
 									 }));
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
@@ -354,6 +350,9 @@ public class MainActivity extends Activity {
 						break;
 					case "管理账号":
 						showFragment(ManagerFragment.class, "管理账号");
+						break;
+					case "头衔":
+						showFragment(MedalFragment.class, BaseIdFragment.typeMedal, loginAccounts.get(0).uid);
 						break;
 					case "AVBV转换":
 						showFragment(AvBvConvertFragment.class, "AVBV转换");

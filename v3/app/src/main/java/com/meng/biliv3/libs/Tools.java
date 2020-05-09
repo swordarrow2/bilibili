@@ -196,7 +196,11 @@ public class Tools {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/upstat?mid=" + uid + "&jsonp=jsonp"), Upstat.class);
 		}
 
-		public static String getFollowing(String cookie, int page, int pageSize) {
+		public static String getFollowing(String cookie, long uid, int page, int pageSize) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/relation/followings?vmid=" + uid + "&pn=1&ps=" + pageSize + "&order=desc&jsonp=jsonp", cookie);
+		}
+
+		public static String getFollowingLiving(String cookie, int page, int pageSize) {
 			return Tools.Network.httpGet("https://api.live.bilibili.com/relation/v1/feed/feed_list?page=" + page + "&pagesize=" + pageSize, cookie);
 		}
 
@@ -463,6 +467,9 @@ public class Tools {
 		}
 
 		public static String formatJson(String content) {
+			if (content == null) {
+				return "{}";
+			}
 			StringBuilder sb = new StringBuilder();
 			int index = 0;
 			int count = 0;

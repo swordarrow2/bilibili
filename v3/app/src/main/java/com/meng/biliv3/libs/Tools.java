@@ -200,8 +200,8 @@ public class Tools {
 			return Tools.Network.httpGet("https://api.bilibili.com/x/relation/followings?vmid=" + uid + "&pn=1&ps=" + pageSize + "&order=desc&jsonp=jsonp", cookie);
 		}
 
-		public static String getFollowingLiving(String cookie, int page, int pageSize) {
-			return Tools.Network.httpGet("https://api.live.bilibili.com/relation/v1/feed/feed_list?page=" + page + "&pagesize=" + pageSize, cookie);
+		public static FollowingLiving getFollowingLiving(String cookie, int page, int pageSize) {
+			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/relation/v1/feed/feed_list?page=" + page + "&pagesize=" + pageSize, cookie), FollowingLiving.class);
 		}
 
 		public static Medals getMedal(String cookie, int page, int pageSize) {
@@ -249,13 +249,13 @@ public class Tools {
 			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, "Referer", "https://www.bilibili.com/", "type", 12, "message", msg, "plat", 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
 		}
 
-		public static String startLive(long roomID, String partID, String cookie) {
+		public static StartLive startLive(long roomID, String partID, String cookie) {
 			if (partID == null) {
 				partID = "235";
 				MainActivity.instance.showToast("没有发现这个分区，已自动选择\"单机-其他分区\"");
 			}
 			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/startLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "platform", "pc", "area_v2", partID, "csrf_token", csrf, "csrf", csrf);
+			return GSON.fromJson(Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/startLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "platform", "pc", "area_v2", partID, "csrf_token", csrf, "csrf", csrf), StartLive.class);
 		}
 
 		public static String stopLive(int roomID, String cookie) {

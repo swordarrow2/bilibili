@@ -50,12 +50,11 @@ public class MengLiveControl extends LinearLayout {
 							public void run() {
 								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 								String cookie = MainActivity.instance.getCookie(mainUID);
-								Tools.BilibiliTool.startLive(utr.data.roomid, partID, cookie);
+								StartLive sl=Tools.BilibiliTool.startLive(utr.data.roomid, partID, cookie);
 								m1 = new TextView(context);
 								m2 = new TextView(context);
-								LiveStream ls=Tools.BilibiliTool.getLiveStream(utr.data.roomid, cookie);
-								m1.setText(ls.data.rtmp.addr);
-								m2.setText(ls.data.rtmp.code);
+								m1.setText(sl.data.rtmp.addr);
+								m2.setText(sl.data.rtmp.code);
 								m1.setTextAppearance(android.R.style.TextAppearance_Medium);
 								m2.setTextAppearance(android.R.style.TextAppearance_Medium);
 								m1.setOnClickListener(onclick);

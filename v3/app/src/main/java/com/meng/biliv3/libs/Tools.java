@@ -184,6 +184,10 @@ public class Tools {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + roomId), RoomToUid.class);
 		}
 
+		public static LivePart getLivePart() {
+			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Area/getList"), LivePart.class);
+		}
+
 		public static String getRoomInfo(long roomId) {
 			return Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=" + roomId);
 		}

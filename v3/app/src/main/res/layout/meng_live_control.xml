@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearlayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/et_new_name"
+	<EditText
+		android:id="@+id/meng_live_controlEditText_new_name"
 		android:background="@null"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:hint="@string/new_room_name" />
+		android:layout_width="match_parent"
+		android:layout_height="55dp"
+		android:hint="@string/new_room_name"/>
 
-    <Button
-        android:id="@+id/btn_rename"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/rename"
-        android:visibility="gone" />
+	<Button
+		android:id="@+id/meng_live_controlButton_rename"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/rename"
+		android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/btn_start"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal">
+
+		<Button
+			android:id="@+id/meng_live_controlButton_start"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="打开直播间"/>
+
+		<Button
+			android:enabled="false"
+			android:id="@+id/meng_live_controlButton_copy"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="获取推流码"/>
+
+	</LinearLayout>
 
 </LinearLayout>
-
 

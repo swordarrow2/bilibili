@@ -15,7 +15,7 @@ import java.io.*;
 
 public class UserInfoHeaderView extends LinearLayout {
 
-    private ImageView ivHead;
+	private ImageView ivHead;
     private TextView tvName;
     private TextView tvBMain;
 	private TextView tvBLive;
@@ -23,10 +23,11 @@ public class UserInfoHeaderView extends LinearLayout {
     public UserInfoHeaderView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.main_account_list_header, this);
-        ivHead = (ImageView) findViewById(R.id.imageView);
-        tvName = (TextView) findViewById(R.id.textView1);
-        tvBMain = (TextView) findViewById(R.id.textView2);
-		tvBLive = (TextView) findViewById(R.id.textView3);
+		ivHead = (ImageView) findViewById(R.id.main_account_list_headerImageView_header);
+        tvName = (TextView) findViewById(R.id.main_account_list_headerTextView_name);
+        tvBMain = (TextView) findViewById(R.id.main_account_list_headerTextView_bmain);
+		tvBLive = (TextView) findViewById(R.id.main_account_list_headerTextView_blive);
+
 		setBackgroundColor(MainActivity.instance.colorManager.getColorDrawerHeader());
 		long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 		if (mainUID == -1) {
@@ -66,13 +67,6 @@ public class UserInfoHeaderView extends LinearLayout {
     }
 
 	private void getInfo(final AccountInfo ai) {
-		tvName.setVisibility(View.GONE);
-		tvBMain.setVisibility(View.GONE);
-		tvBLive.setVisibility(View.GONE);
-		View v=MainActivity.instance.mDrawerList.getChildAt(1);
-		if (v instanceof MengLiveControl) {
-			MainActivity.instance.mDrawerList.removeHeaderView(v);
-		}
 		File imf = new File(MainActivity.instance.mainDic + "bilibili/" + ai.uid + ".jpg");
 		if (imf.exists()) {
 			Bitmap b = BitmapFactory.decodeFile(imf.getAbsolutePath());
@@ -83,7 +77,7 @@ public class UserInfoHeaderView extends LinearLayout {
 		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					final UserInfo info = GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + ai.uid + "&jsonp=jsonp"), UserInfo.class);
+					final UserInfo info = Tools.BilibiliTool.getUserInfo(ai.uid);
 					if (info.code != 0) {
 						MainActivity.instance.showToast("cookie过期");
 						return;
@@ -92,40 +86,24 @@ public class UserInfoHeaderView extends LinearLayout {
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								tvName.setVisibility(View.VISIBLE);
-								tvBMain.setVisibility(View.VISIBLE);
 								tvName.setText(info.data.name);
 								tvBMain.setText("主站 Lv." + info.data.level);
 							}
 						});
-					try {
-						String json = Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + sjb.data.roomid);
-						JsonObject obj = new JsonParser().parse(json).getAsJsonObject();
-						final JsonObject obj2=obj.get("data").getAsJsonObject().get("level").getAsJsonObject().get("master_level").getAsJsonObject();
-						MainActivity.instance.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									JsonArray ja = obj2.get("next").getAsJsonArray();
-									tvBLive.setVisibility(View.VISIBLE);
-									tvBLive.setText("主播 Lv." + obj2.get("level").getAsInt() + "(" + obj2.get("anchor_score").getAsInt() + "/" + ja.get(1).getAsInt() + ")");
-									if (MainActivity.instance.mDrawerList.getHeaderViewsCount() == 1) {
-										MainActivity.instance.mDrawerList.addHeaderView(new MengLiveControl(MainActivity.instance,sjb));
-									}
-								}
-							});
-					} catch (Exception e) {
-						MainActivity.instance.runOnUiThread(new Runnable(){
 
-								@Override
-								public void run() {
+					final RoomToUid rtu=Tools.BilibiliTool.getUidByRoom(sjb.data.roomid);
+					MainActivity.instance.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								if (rtu != null) {
+									tvBLive.setText("主播 Lv." + rtu.data.level.master_level.level + "(" + rtu.data.level.master_level.anchor_score + "/" + rtu.data.level.master_level.next.get(1) + ")");
+								} else {
 									tvBLive.setVisibility(View.VISIBLE);
 									tvBLive.setText("未开通直播间");
 								}
-							});
-					}
-
+							}
+						});
 				}
 			});
 	}
-
 }

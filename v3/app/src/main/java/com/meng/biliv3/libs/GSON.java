@@ -7,11 +7,19 @@ public class GSON {
 	private static Gson gson = new Gson();
 
 	public static <T> T fromJson(String json, Class<T> clz) {
-		return (T)gson.fromJson(json, clz);
+		try {
+			return (T)gson.fromJson(json, clz);
+		} catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
-	
+
 	public static <T> T fromJson(String json, Type t) {
-		return (T)gson.fromJson(json, t);
+		try {
+			return (T)gson.fromJson(json, t);
+		} catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
 
 	public static String toJson(Object obj) {

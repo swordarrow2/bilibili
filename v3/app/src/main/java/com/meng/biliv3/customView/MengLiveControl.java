@@ -15,177 +15,165 @@ import com.meng.biliv3.result.*;
 public class MengLiveControl extends LinearLayout {
 
     private Button btnStart;
+	private Button btnCopy;
+	private Button btnRename;
     private EditText newName;
-    private LinearLayout ll;
-    private TextView m1;
-    private TextView m2;
     private String partID = null;
 	private ExpandableListView mainlistview = null;
 	private LivePartSelectAdapter adapter;
 	private AlertDialog dialog;
 	private UidToRoom utr;
+	private StartLive liveStart;
+	private LiveStream liveStream;
 
-    public MengLiveControl(final Context context, UidToRoom utlr) {
+    public MengLiveControl(final Context context) {
         super(context);
-		utr = utlr;
-        LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
-		mainlistview = new ExpandableListView(context);
-		mainlistview.setOnChildClickListener(new OnChildClickListener(){
+		LayoutInflater.from(context).inflate(R.layout.meng_live_control, this);
 
-				@Override
-				public boolean onChildClick(ExpandableListView p1, View p2, int p3, int p4, long p5) {
-					partID = ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).id;
-					MainActivity.instance.showToast("选择分区:" + ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).name);
-					return false;
-				}
-			});
-		dialog = new AlertDialog.Builder(context).setView(mainlistview).setTitle("选择分区").setPositiveButton("确定",
-			new DialogInterface.OnClickListener(){
+		MainActivity.instance.threadPool.execute(new Runnable(){
 
-				@Override
-				public void onClick(DialogInterface p1, int p2) {
-					MainActivity.instance.threadPool.execute(new Runnable(){
-
-							@Override
-							public void run() {
-								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
-								String cookie = MainActivity.instance.getCookie(mainUID);
-								StartLive sl=Tools.BilibiliTool.startLive(utr.data.roomid, partID, cookie);
-								m1 = new TextView(context);
-								m2 = new TextView(context);
-								m1.setText(sl.data.rtmp.addr);
-								m2.setText(sl.data.rtmp.code);
-								m1.setTextAppearance(android.R.style.TextAppearance_Medium);
-								m2.setTextAppearance(android.R.style.TextAppearance_Medium);
-								m1.setOnClickListener(onclick);
-								m2.setOnClickListener(onclick);
-								((Activity) context).runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											newName.setHint("房间名:" + utr.data.title);
-											ll.addView(m1);
-											ll.addView(m2);
-											btnStart.setText("关闭直播");
-										}
-									});
-							}
-						});
-				}
-			}).setNegativeButton("返回", null).create();
-        btnStart = (Button) findViewById(R.id.btn_start);
-        final Button btnRename = (Button) findViewById(R.id.btn_rename);
-        newName = (EditText) findViewById(R.id.et_new_name);
-		newName.setTextAppearance(android.R.style.TextAppearance_Medium);
-        ll = (LinearLayout) findViewById(R.id.linearlayout);
-        newName.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-				}
-
-				@Override
-				public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-				}
-
-				@Override
-				public void afterTextChanged(Editable editable) {
-					btnRename.setVisibility(editable.toString().equals("") ? GONE : VISIBLE);
-				}
-			});
-		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						final LivePart livePartList = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Area/getList"), LivePart.class);
-						((Activity) context).runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									adapter = new LivePartSelectAdapter(livePartList);
-									mainlistview.setAdapter(adapter);
-								}
-							});         
-					} catch (Exception e) {
-						MainActivity.instance.showToast(e.toString());
-					}
-					long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
-					if (mainUID != -1) {
-						final LiveStream ls=Tools.BilibiliTool.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(mainUID));
-						((Activity) context).runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									if (utr.data.liveStatus == 0) {
-										btnStart.setText("开始直播");
-									} else {
-										m1 = new TextView(context);
-										m1.setText(ls.data.rtmp.addr);
-										m2 = new TextView(context);
-										m2.setText(ls.data.rtmp.code);
-										m1.setOnClickListener(onclick);
-										m2.setOnClickListener(onclick);
-										m1.setTextAppearance(android.R.style.TextAppearance_Medium);
-										m2.setTextAppearance(android.R.style.TextAppearance_Medium);
-										ll.addView(m1);
-										ll.addView(m2);
-										newName.setHint("房间名:" + utr.data.title);
-										btnStart.setText("关闭直播");                                                     
-									}
-								}
-							});
-					}
-				}
-			});
-
-        btnStart.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (btnStart.getText().toString().equals("开始直播")) {
-						dialog.show();
-					} else {
-						MainActivity.instance.threadPool.execute(new Runnable(){
-
-								@Override
-								public void run() {
-									long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
-									Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(mainUID));
-									((Activity) context).runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												ll.removeView(m1);
-												ll.removeView(m2);
-												btnStart.setText("开始直播");
-											}
-										});
-								}
-							});
-					}	
-				}
-			});
-
-		btnRename.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					view.setVisibility(View.GONE);
-					final String name = newName.getText().toString();
-					if (name.equals("")) {
-						MainActivity.instance.showToast("房间名不能为空");
+					utr = Tools.BilibiliTool.getRoomByUid(MainActivity.instance.sjfSettings.getMainAccount());
+					liveStream = Tools.BilibiliTool.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+					final LivePart livePartList = Tools.BilibiliTool.getLivePart();
+					if (utr == null | liveStream == null || livePartList == null) {
+						MainActivity.instance.showToast("直播间连接失败");
 						return;
 					}
-					MainActivity.instance.threadPool.execute(new Runnable() {
+					MainActivity.instance.runOnUiThread(new Runnable(){
+
 							@Override
 							public void run() {
-								Tools.BilibiliTool.renameLive(utr.data.roomid, name, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+								btnStart = (Button) findViewById(R.id.meng_live_controlButton_start);
+								btnRename = (Button) findViewById(R.id.meng_live_controlButton_rename);
+								newName = (EditText) findViewById(R.id.meng_live_controlEditText_new_name);
+								btnCopy = (Button) findViewById(R.id.meng_live_controlButton_copy);
+								if (liveStream != null) {
+									btnCopy.setEnabled(true);
+									btnCopy.setText("复制推流码");
+								}
+								mainlistview = new ExpandableListView(context);
+								mainlistview.setOnChildClickListener(new OnChildClickListener(){
+
+										@Override
+										public boolean onChildClick(ExpandableListView p1, View p2, int p3, int p4, long p5) {
+											partID = ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).id;
+											MainActivity.instance.showToast("选择分区:" + ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).name);
+											MainActivity.instance.threadPool.execute(new Runnable(){
+
+													@Override
+													public void run() {
+														long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
+														String cookie = MainActivity.instance.getCookie(mainUID);
+														liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, partID, cookie);
+														MainActivity.instance.runOnUiThread(new Runnable() {
+																@Override
+																public void run() {
+																	btnCopy.setEnabled(true);
+																	btnCopy.setText("复制推流码");
+																	newName.setHint("房间名:" + utr.data.title);
+																	btnStart.setText("关闭直播间");
+																}
+															});
+													}
+												});
+											dialog.dismiss();
+											return true;
+										}
+									});
+								btnCopy.setOnClickListener(new OnClickListener(){
+
+										@Override
+										public void onClick(View p1) {
+											if (liveStart != null) {
+												Tools.AndroidContent.copyToClipboard("服务器:\n" + liveStart.data.rtmp.addr + "\n推流码:\n" + liveStart.data.rtmp.code);
+												MainActivity.instance.showToast("已复制推流码到剪贴板");
+											} else if (liveStream != null) {
+												Tools.AndroidContent.copyToClipboard("服务器:\n" + liveStream.data.rtmp.addr + "\n推流码:\n" + liveStream.data.rtmp.code);
+												MainActivity.instance.showToast("已复制推流码到剪贴板");
+											} else {
+												MainActivity.instance.showToast("未知错误");
+											}	
+										}
+									});
+								dialog = new AlertDialog.Builder(context).setView(mainlistview).setTitle("选择分区").setPositiveButton("确定", null).setNegativeButton("返回", null).create();
+								btnStart.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											if (btnStart.getText().toString().equals("打开直播间")) {
+												dialog.show();
+											} else {
+												MainActivity.instance.threadPool.execute(new Runnable(){
+
+														@Override
+														public void run() {
+															long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
+															Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(mainUID));
+															MainActivity.instance.runOnUiThread(new Runnable() {
+																	@Override
+																	public void run() {
+																		btnStart.setText("打开直播间");
+																	}
+																});
+														}
+													});
+											}	
+										}
+									});
+								btnRename.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View view) {
+											view.setVisibility(View.GONE);
+											final String name = newName.getText().toString();
+											if (name.equals("")) {
+												MainActivity.instance.showToast("房间名不能为空");
+												return;
+											}
+											MainActivity.instance.threadPool.execute(new Runnable() {
+													@Override
+													public void run() {
+														Tools.BilibiliTool.renameLive(utr.data.roomid, name, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+													}
+												});
+										}
+									});
+								newName.setTextAppearance(android.R.style.TextAppearance_Medium);
+								newName.addTextChangedListener(new TextWatcher() {
+										@Override
+										public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+										}
+
+										@Override
+										public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+										}
+
+										@Override
+										public void afterTextChanged(Editable editable) {
+											btnRename.setVisibility(editable.toString().equals("") ? GONE : VISIBLE);
+										}
+									});
+
+								if (livePartList == null) {
+									MainActivity.instance.showToast("获取直播分区列表失败");
+									return;
+								}
+								adapter = new LivePartSelectAdapter(livePartList);
+								mainlistview.setAdapter(adapter);       
+								long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
+								if (mainUID != -1) {
+									if (utr.data.liveStatus == 0) {
+										btnStart.setText("打开直播间");
+									} else {
+										newName.setHint("房间名:" + utr.data.title);
+										btnStart.setText("关闭直播间");                                                     
+									}
+								}
 							}
 						});
 				}
 			});
     }
-
-	OnClickListener onclick=new OnClickListener(){
-
-		@Override
-		public void onClick(View p1) {
-			Tools.AndroidContent.copyToClipboard(((TextView) p1).getText().toString());
-		}
-	};
 }

@@ -137,6 +137,7 @@ public class MainActivity extends Activity {
 		}
 
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
+		mDrawerList.addHeaderView(new MengLiveControl(this));
         onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new Runnable(){
 

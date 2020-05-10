@@ -37,7 +37,7 @@ public class MedalFragment extends BaseIdFragment {
 
 				@Override
 				public void run() {
-					final Medals mds=Tools.BilibiliTool.getMedal(MainActivity.instance.loginAccounts.get(0).cookie, 1, 20);
+					final Medals mds=Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, 1, 20);
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override
@@ -114,11 +114,17 @@ public class MedalFragment extends BaseIdFragment {
 																										giftAdapter.notifyDataSetChanged();
 																									}
 																								});
-																							notifyDataSetChange();
 																						}
 																					});
 																			}
-																		}).setNegativeButton("取消", null).show();
+																		}).setNegativeButton("取消", null)
+																		.setOnCancelListener(new DialogInterface.OnCancelListener(){
+
+																			@Override
+																			public void onCancel(DialogInterface p1) {
+																				notifyDataSetChange();
+																			}
+																		}).show();
 																}
 															});
 														listView.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -139,7 +145,6 @@ public class MedalFragment extends BaseIdFragment {
 																							giftAdapter.notifyDataSetChanged();
 																						}
 																					});
-																				notifyDataSetChange();
 																			}
 																		});
 																	return true;
@@ -166,8 +171,7 @@ public class MedalFragment extends BaseIdFragment {
 
 																@Override
 																public void run() {
-																	String content = editText.getText().toString();
-																	MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, ((Medals.FansMedal)medalsAdapter.getItem(position)).target_id, id, Integer.parseInt(content), ai.cookie)).getAsJsonObject().get("message").getAsString());
+																	MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, ((Medals.FansMedal)medalsAdapter.getItem(position)).target_id, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
 																	notifyDataSetChange();
 																}
 															});
@@ -180,7 +184,7 @@ public class MedalFragment extends BaseIdFragment {
 				}
 			});
 	}
-	
+
 	private void notifyDataSetChange() {
 		MainActivity.instance.threadPool.execute(new Runnable(){
 

@@ -86,8 +86,8 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 							if (files.size() == 0) {
 								result = Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie);
 								MainActivity.instance.showToast(result);
-								} else {
-							MainActivity.instance.showToast(Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, files).toString());
+							} else {
+								MainActivity.instance.showToast(Tools.BilibiliTool.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, files).toString());
 							}
 //							if (new JsonParser().parse(result).getAsJsonObject().get("code").getAsInt() == 0) {
 //								MainActivity.instance.showToast("发送成功");

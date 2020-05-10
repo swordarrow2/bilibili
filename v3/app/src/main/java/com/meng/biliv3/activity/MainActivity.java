@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
 	public SanaeConnect sanaeConnect;
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
-
+	private boolean autoDrawerOperated=false;
 	public static final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
 	public static final String regBv = "\\D{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2})\\D{0,}";
 	public static final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
@@ -93,11 +93,6 @@ public class MainActivity extends Activity {
 			loginAccounts = new ArrayList<>();
 		}
         mainAccountAdapter = new AccountAdapter(this);
-        if (sjfSettings.getOpenDrawer()) {
-            mDrawerLayout.openDrawer(mDrawerList);
-        } else {
-            mDrawerLayout.closeDrawer(mDrawerList);
-        }
 		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
 			File ff = new File(mainDic + s);
 			if (!ff.exists()) {
@@ -137,8 +132,7 @@ public class MainActivity extends Activity {
 		}
 
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
-		mDrawerList.addHeaderView(new MengLiveControl(this));
-        onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new Runnable(){
 
 				@Override
@@ -184,6 +178,15 @@ public class MainActivity extends Activity {
 			});
 	}
 
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		if (!autoDrawerOperated && hasFocus && sjfSettings.getOpenDrawer() && !mDrawerLayout.isDrawerOpen(mDrawerList)) {
+			mDrawerLayout.openDrawer(mDrawerList);
+			autoDrawerOperated = true;
+		}
+		super.onWindowFocusChanged(hasFocus);
+	}
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -191,8 +194,6 @@ public class MainActivity extends Activity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     showToast("缺失权限会使应用工作不正常");
-                } else {
-					//      showFragment(NaiFragment.class);
                 }
             }
         }
@@ -353,7 +354,16 @@ public class MainActivity extends Activity {
 						showFragment(ManagerFragment.class, "管理账号");
 						break;
 					case "头衔":
-						showFragment(MedalFragment.class, BaseIdFragment.typeMedal, loginAccounts.get(0).uid);
+						String items[] = new String[MainActivity.instance.loginAccounts.size()];
+						for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {
+							items[i] = MainActivity.instance.loginAccounts.get(i).name;
+						}
+						new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setItems(items, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									showFragment(MedalFragment.class, BaseIdFragment.typeMedal, MainActivity.instance.loginAccounts.get(which).uid);
+								}
+							}).show();
 						break;
 					case "AVBV转换":
 						showFragment(AvBvConvertFragment.class, "AVBV转换");

@@ -15,7 +15,7 @@ import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
 
-public class UserInfoHeaderView extends LinearLayout implements View.OnClickListener{
+public class UserInfoHeaderView extends LinearLayout implements View.OnClickListener {
 
 	private ImageView ivHead;
     private TextView tvName;
@@ -33,8 +33,8 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 	private UidToRoom utr;
 	private StartLive liveStart;
 	private LiveStream liveStream;
-	
-	
+
+
     public UserInfoHeaderView(final Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.main_account_list_header, this);
@@ -78,14 +78,14 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 						}).show();
 				}
 			});
-			
+
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
 				public void run() {
-					utr = Tools.BilibiliTool.getRoomByUid(MainActivity.instance.sjfSettings.getMainAccount());
+					utr = Tools.BilibiliTool.getUidToRoom(MainActivity.instance.sjfSettings.getMainAccount());
 					liveStream = Tools.BilibiliTool.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
-					final LivePart livePartList = Tools.BilibiliTool.getLivePart();
+					final LivePart livePartList = GSON.fromJson(Tools.AndroidContent.readAssetsString("livePart.json"), LivePart.class);
 					if (utr == null | liveStream == null || livePartList == null) {
 						MainActivity.instance.showToast("直播间连接失败");
 						return;
@@ -102,6 +102,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 									btnCopy.setEnabled(true);
 									btnCopy.setText("复制推流码");
 								}
+								newName.setHint("房间名:" + utr.data.title);
 								mainlistview = new ExpandableListView(context);
 								mainlistview.setOnChildClickListener(new OnChildClickListener(){
 
@@ -114,6 +115,10 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 													@Override
 													public void run() {
 														liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, partID, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+														if (liveStart.code != 0) {
+															return;
+														}
+														MainActivity.instance.showToast("开播成功");
 														MainActivity.instance.runOnUiThread(new Runnable() {
 																@Override
 																public void run() {
@@ -129,7 +134,33 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 											return true;
 										}
 									});
-								dialog = new AlertDialog.Builder(context).setView(mainlistview).setTitle("选择分区").setPositiveButton("确定", null).setNegativeButton("返回", null).create();
+								dialog = new AlertDialog.Builder(context).setView(mainlistview).setTitle("选择分区")
+									.setPositiveButton("其它单机", new DialogInterface.OnClickListener(){
+
+										@Override
+										public void onClick(DialogInterface p1, int p2) {
+											MainActivity.instance.threadPool.execute(new Runnable(){
+
+													@Override
+													public void run() {
+														liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, "235", MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+														if (liveStart.code != 0) {
+															return;
+														}
+														MainActivity.instance.showToast("开播成功");
+														MainActivity.instance.runOnUiThread(new Runnable() {
+																@Override
+																public void run() {
+																	btnCopy.setEnabled(true);
+																	btnCopy.setText("复制推流码");
+																	newName.setHint("房间名:" + utr.data.title);
+																	btnStart.setText("关闭直播间");
+																}
+															});
+													}
+												});
+										}
+									}).create();
 								btnStart.setOnClickListener(UserInfoHeaderView.this);
 								btnRename.setOnClickListener(UserInfoHeaderView.this);
 								btnCopy.setOnClickListener(UserInfoHeaderView.this);
@@ -185,7 +216,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					final UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(info.data.mid);
+					final UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(info.data.mid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -194,7 +225,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 							}
 						});
 
-					final RoomToUid rtu=Tools.BilibiliTool.getUidByRoom(sjb.data.roomid);
+					final RoomToUid rtu=Tools.BilibiliTool.getRoomToUid(sjb.data.roomid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -220,7 +251,10 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 							@Override
 							public void run() {
-								Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+								if (Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
+									return;
+								}
+								MainActivity.instance.showToast("开播成功");
 								MainActivity.instance.runOnUiThread(new Runnable() {
 										@Override
 										public void run() {

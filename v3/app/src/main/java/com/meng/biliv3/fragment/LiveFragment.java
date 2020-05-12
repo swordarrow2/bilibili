@@ -175,8 +175,8 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(uid);
-					final byte[] imgbs = NetworkCacher.getNetPicture(Tools.BilibiliTool.getRoomByUid(uid).data.cover);
+					final UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(uid);
+					final byte[] imgbs = NetworkCacher.getNetPicture(Tools.BilibiliTool.getUidToRoom(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){
 
@@ -412,7 +412,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 		@Override
 		public void onOpen(ServerHandshake serverHandshake) {
-			send(encode(initJoin, String.format(Tools.AndroidContent.readAssetsString("bliveInit"), roomId)).data);
+			send(encode(initJoin, String.format(Tools.AndroidContent.readAssetsString("bliveInit.json"), roomId)).data);
 			MainActivity.instance.threadPool.execute(new Runnable(){
 
 					@Override

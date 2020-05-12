@@ -16,6 +16,7 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.*;
 import org.jsoup.*;
+import com.meng.biliv3.javabean.*;
 
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
@@ -176,11 +177,11 @@ public class Tools {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie), UserInfo.class);
 		}
 
-		public static UidToRoom getRoomByUid(long uid) {
+		public static UidToRoom getUidToRoom(long uid) {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
 		}
 
-		public static RoomToUid getUidByRoom(long roomId) {
+		public static RoomToUid getRoomToUid(long roomId) {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + roomId), RoomToUid.class);
 		}
 
@@ -216,8 +217,27 @@ public class Tools {
 			return Tools.Network.httpGet("https://api.live.bilibili.com/rankdb/v1/RoomRank/webMedalRank?roomid=" + roomId + "&ruid=" + uid, cookie);
 		}
 
+		public static String allSearch(String keyword, int page) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/web-interface/search/all/v2?__refresh__=true&highlight=1&single_column=0&jsonp=jsonp&keyword=" + keyword + "&page=" + page);
+		}
+
+		public static String userSearch(String keyword, int page) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/web-interface/search/type?search_type=bili_user&changing=mid&__refresh__=true&highlight=1&single_column=0&jsonp=jsonp&keyword=" + keyword + "&page=" + page);
+		}
+
+		public static String videoSearch(String keyword, int page) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/web-interface/search/type?search_type=video&__refresh__=true&highlight=1&single_column=0&jsonp=jsonp&keyword=" + keyword + "&page=" + page);
+		}
+
+		public static String photoSearch(String keyword, int page) {
+			return Tools.Network.httpGet("https://api.bilibili.com/x/web-interface/search/type?search_type=photo&__refresh__=true&highlight=1&single_column=0&jsonp=jsonp&keyword=" + keyword + "&page=" + page);
+		}
+
+		public static String getUserDynamicList(long uid, int offsetDynamicID) {
+			return Tools.Network.httpGet("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?offset_dynamic_id=" + offsetDynamicID  + "&host_uid=" + uid);
+		}
 		public static String sendDynamic(String content, String cookie) {
-			return Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create", cookie, "dynamic_id", 0, "type", 4, "rid", 0, "content", content, "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "ctrl", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create", cookie, "dynamic_id", 0, "type", 4, "rid", 0, "content", content, "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "ctrl", "[]", "csrf_token", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static DynamicWithPictureResult sendDynamic(String content, String cookie, ArrayList<File> pics) {
@@ -241,7 +261,7 @@ public class Tools {
 						return null;
 					}
 				}
-				String result=Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw", cookie, "biz", 3, "category", 3, "type", 0, "pictures", GSON.toJson(bset), "title", "", "tags", "", "description", "", "content", content, "setting", "{\"copy_forbidden\":0,\"cachedTime\":0}", "from", "create.dynamic.web", "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "at_control", "[]", "csrf_token", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+				String result=Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create_draw", cookie, "biz", 3, "category", 3, "type", 0, "pictures", GSON.toJson(bset), "title", "", "tags", "", "description", "", "content", content, "setting", "{\"copy_forbidden\":0,\"cachedTime\":0}", "from", "create.dynamic.web", "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "at_control", "[]", "csrf_token", Tools.BilibiliTool.getCsrf(cookie));
 				pics.clear();
 				return GSON.fromJson(result, DynamicWithPictureResult.class);
 			} catch (Exception e) {
@@ -250,7 +270,7 @@ public class Tools {
 		}
 
 		public static String sendArticalJudge(long cvId, String msg, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, "Referer", "https://www.bilibili.com/", "type", 12, "message", msg, "plat", 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, "Referer", "https://www.bilibili.com/", "type", 12, "message", msg, "plat", 1, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static StartLive startLive(long roomID, String partID, String cookie) {
@@ -258,17 +278,17 @@ public class Tools {
 				partID = "235";
 				MainActivity.instance.showToast("没有发现这个分区，已自动选择\"单机-其他分区\"");
 			}
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+			String csrf = Tools.BilibiliTool.getCsrf(cookie);
 			return GSON.fromJson(Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/startLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "platform", "pc", "area_v2", partID, "csrf_token", csrf, "csrf", csrf), StartLive.class);
 		}
 
-		public static String stopLive(int roomID, String cookie) {
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
-			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/stopLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "csrf_token", csrf, "csrf", csrf);
+		public static StopLive stopLive(int roomID, String cookie) {
+			String csrf = Tools.BilibiliTool.getCsrf(cookie);
+			return GSON.fromJson(Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/stopLive", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "csrf_token", csrf, "csrf", csrf), StopLive.class);
 		}
 
 		public static String renameLive(int roomID, String newName, String cookie) {
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+			String csrf = Tools.BilibiliTool.getCsrf(cookie);
 			return Tools.Network.bilibiliLivePost("https://api.live.bilibili.com/room/v1/Room/update", cookie, "Referer", "https://link.bilibili.com/p/center/index", "room_id", roomID, "title", newName, "csrf_token", csrf, "csrf", csrf);
 		}
 
@@ -281,16 +301,24 @@ public class Tools {
 		}
 
 		public static String sendHotStrip(long myUid, long roomMasterUid, long roomID, int count, String cookie) {
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+			String csrf = Tools.BilibiliTool.getCsrf(cookie);
 			return Tools.Network.bilibiliLivePost("http://api.live.bilibili.com/gift/v2/gift/send", cookie, "Referer" , "https://live.bilibili.com/" + roomID, "uid", myUid, "gift_id", 1, "ruid", roomMasterUid, "gift_num", count, "coin_type", "silver", "bag_id", 0, "platform", "pc", "biz_code", "live", "biz_id", roomID, "rnd", System.currentTimeMillis() / 1000, "metadata", "", "price", 0, "csrf_token", csrf, "csrf", csrf, "visit_id", "");
 		}
 
 		public static String followUser(String cookie, long UID) {
-			String firstStep=Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/modify?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fid", UID, "act", 1, "re_src", 122, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			String firstStep=Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/modify?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fid", UID, "act", 1, "re_src", 122, "csrf", Tools.BilibiliTool.getCsrf(cookie));
 			if (new JsonParser().parse(firstStep).getAsJsonObject().get("code").getAsInt() != 0) {
 				return "关注失败";
 			}
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fids", UID, "tagids", 0, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/relation/tags/addUsers?cross_domain=true", cookie, REFERER, "https://www.bilibili.com/video/av" + new Random().nextInt(47957369), "fids", UID, "tagids", 0, "csrf", Tools.BilibiliTool.getCsrf(cookie));
+		}
+
+		public static String getCsrf(String cookie) {
+			return Tools.Network.cookieToMap(cookie).get("bili_jct");
+		}
+
+		public static String getCsrf(AccountInfo ai) {
+			return getCsrf(ai.cookie);
 		}
 
 		//收藏,未完成
@@ -316,7 +344,7 @@ public class Tools {
 //                .data("multiply", String.valueOf(count))
 //                .data("select_like", "0")
 //                .data("cross_domain", "true")
-//                .data("csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+//                .data("csrf", Tools.BilibiliTool.getCsrf(cookie));
 //			Connection.Response response=null;
 //			try {
 //				response = connection.execute();
@@ -333,43 +361,43 @@ public class Tools {
 //		}
 
 		public static String sendCvCoin(int count, long CvId, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(Tools.BilibiliTool.getCvInfo(CvId).data.mid), "avtype", 2, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(Tools.BilibiliTool.getCvInfo(CvId).data.mid), "avtype", 2, "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendAvCoin(int count, long AID, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "multiply", count, "select_like", 0, "cross_domain", "true", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "multiply", count, "select_like", 0, "cross_domain", "true", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendVideoJudge(String content, long AID, String cookie) {		
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "message", content, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "message", content, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendVideoJudge(String content, long AID, long rootId, long parentId, String cookie) {		
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "root", rootId, "parent", parentId, "message", content, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "root", rootId, "parent", parentId, "message", content, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendLikeReply(long AID, long rpid, boolean deLike, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/action", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deLike ?0: 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/action", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deLike ?0: 1, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendDisikeReply(long AID, long rpid, boolean deDislike, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/hate", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deDislike ?0: 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/hate", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "action", deDislike ?0: 1, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String deleteReply(long AID, long rpid, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/del", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/del", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "oid", AID, "type", 1, "rpid", rpid, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendCvLike(long cvID, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/article/like", cookie, REFERER, "https://www.bilibili.com/read/cv" + cvID, "id", cvID, "type", 1, "jsonp", "jsonp", "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/article/like", cookie, REFERER, "https://www.bilibili.com/read/cv" + cvID, "id", cvID, "type", 1, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendAvLike(long AID, String cookie) {
-			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/archive/like", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "like", 1, "csrf", Tools.Network.cookieToMap(cookie).get("bili_jct"));
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/archive/like", cookie, REFERER, "https://www.bilibili.com/video/av" + AID, "aid", AID, "like", 1, "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
 		public static String sendLiveDanmaku(String msg, String cookie, long roomId) {
-			String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+			String csrf = Tools.BilibiliTool.getCsrf(cookie);
 			return Tools.Network.bilibiliLivePost("http://api.live.bilibili.com/msg/send", cookie, REFERER, "https://live.bilibili.com/" + roomId, "color", 0xffffff, "fontsize", 25, "mode", 1, "msg", msg, "rnd", System.currentTimeMillis() / 1000, "roomid", roomId, "bubble", 0, "csrf_token", csrf, "csrf", csrf);
 		}
 	}
@@ -464,9 +492,9 @@ public class Tools {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			if (!url.contains("/room/v1/Area/getList")) {
-				Log.network(Connection.Method.GET, url, formatJson(response.body()));
-			}
+			//	if (!url.contains("/room/v1/Area/getList")) {
+			Log.network(Connection.Method.GET, url, formatJson(response.body()));
+			//	}
 			return response.body();
 		}
 

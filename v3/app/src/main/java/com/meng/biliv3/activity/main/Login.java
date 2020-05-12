@@ -40,7 +40,7 @@ public class Login extends Activity {
 				public void onPageFinished(final WebView view, final String url) {
 					super.onPageFinished(view, url);
 					//	MainActivity.instance.showToast(url);
-					view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete"), null);
+					view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete.js"), null);
 					if (url.equals(loginUrl)) {
 						int po=getIntent().getIntExtra("pos", -1);
 						if (po == -1) {
@@ -48,7 +48,7 @@ public class Login extends Activity {
 						}
 						AccountInfo aci=MainActivity.instance.loginAccounts.get(po);
 						if (aci.phone != 0 && aci.password != null) {
-							view.evaluateJavascript(String.format(Tools.AndroidContent.readAssetsString("patchInput"), aci.phone, aci.password), null);
+							view.evaluateJavascript(String.format(Tools.AndroidContent.readAssetsString("patchInput.js"), aci.phone, aci.password), null);
 							MainActivity.instance.threadPool.execute(new Runnable(){
 
 									@Override

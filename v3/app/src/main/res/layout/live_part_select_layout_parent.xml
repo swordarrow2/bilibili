@@ -3,14 +3,14 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical">
+	android:orientation="horizontal">
 
 	<TextView
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:layout_width="match_parent"
-		android:layout_height="50dp"
+		android:layout_height="72dp"
 		android:gravity="center"
-		android:id="@+id/layoutparent_TextView1"/>
+		android:id="@+id/live_part_select_layout_parentTextView"/>
 
 </LinearLayout>
 

@@ -243,7 +243,7 @@ public class BaseIdFragment extends Fragment {
 	}
 
 	private void sendPackDialog(final AccountInfo ai) {
-		final long uid=Tools.BilibiliTool.getUidByRoom(id).data.info.uid;
+		final long uid=Tools.BilibiliTool.getRoomToUid(id).data.info.uid;
 		final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override

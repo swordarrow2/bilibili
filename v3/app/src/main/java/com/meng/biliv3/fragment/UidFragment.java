@@ -97,7 +97,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						UidToRoom sjb = Tools.BilibiliTool.getRoomByUid(id);
+						UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(id);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");

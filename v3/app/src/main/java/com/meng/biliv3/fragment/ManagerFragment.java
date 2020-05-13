@@ -11,6 +11,8 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.main.*;
 import com.meng.biliv3.javabean.*;
+import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 import com.meng.biliv3.update.*;
 import org.java_websocket.client.*;
 
@@ -104,29 +106,28 @@ public class ManagerFragment extends Fragment {
 
 																	@Override
 																	public void action(WebSocketClient wsc) {
-																		BotDataPack bdp=BotDataPack.encode(BotDataPack.cookie);
-																		bdp.write((int)aif.uid).write(aif.cookie);
-																		wsc.send(bdp.getData());
+																		wsc.send(BotDataPack.encode(BotDataPack.cookie).write((int)aif.uid).write(aif.cookie).getData());
 																	}
 																});
 															rc.connect();
 														} else {
-															BotDataPack bdp=BotDataPack.encode(BotDataPack.cookie);
-															bdp.write((int)aif.uid).write(aif.cookie);
-															rc.send(bdp.getData());
+															rc.send(BotDataPack.encode(BotDataPack.cookie).write((int)aif.uid).write(aif.cookie).getData());
 														}
+														MainActivity.instance.showToast(aif.name + "的cookie已上传");
 													} catch (Exception e) {
 														MainActivity.instance.showToast(e.toString());
 													}
 												}
 											});
-										MainActivity.instance.showToast(aif.name + "的cookie已上传");
 										break;
 									case "删除":
 										new AlertDialog.Builder(getActivity()).setTitle("确定删除" + MainActivity.instance.loginAccounts.get(position).name + "吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
 												@Override
 												public void onClick(DialogInterface p1, int p2) {
 													MainActivity.instance.loginAccounts.remove(position);
+													MainActivity.instance.saveConfig();
+													MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+													BaseIdFragment.createSpinnerList();
 												}
 											}).setNegativeButton("取消", null).show();
 										break;
@@ -135,7 +136,6 @@ public class ManagerFragment extends Fragment {
 								MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
 								BaseIdFragment.createSpinnerList();
 								selectOpDialog.cancel();
-								selectOpDialog = null;
 							}
 						});
 					selectOpDialog = new AlertDialog.Builder(getActivity()).setView(lvSelectOp).setTitle("选择操作").setNegativeButton("返回", null).show();
@@ -146,9 +146,52 @@ public class ManagerFragment extends Fragment {
 
 				@Override
 				public void onClick(View p1) {
-					startActivity(new Intent(getActivity(), Login.class));
+					new AlertDialog.Builder(getActivity()).setTitle("添加账号").setPositiveButton("登录", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface p1, int p2) {
+								startActivity(new Intent(getActivity(), Login.class));
+							}
+						}).setNegativeButton("输入cookie", new DialogInterface.OnClickListener(){
+
+							@Override
+							public void onClick(DialogInterface p1, int p2) {
+								final EditText et = new EditText(getActivity());
+								new AlertDialog.Builder(getActivity()).setTitle("输入cookie").setView(et)
+								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface p1, int p2) {
+											MainActivity.instance.threadPool.execute(new Runnable(){
+
+													@Override
+													public void run() {
+														MyInfo myInfo=Tools.BilibiliTool.getMyInfo(et.getText().toString());
+														for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+															if (ai.uid == myInfo.data.mid) {
+																MainActivity.instance.showToast("已添加过此帐号");
+																return;
+															}
+														}
+														AccountInfo accountInfo=new AccountInfo();
+														accountInfo.cookie = et.getText().toString();
+														accountInfo.name = myInfo.data.name;
+														accountInfo.uid = myInfo.data.mid;
+														MainActivity.instance.loginAccounts.add(accountInfo);
+														MainActivity.instance.saveConfig();
+														MainActivity.instance.runOnUiThread(new Runnable(){
+
+																@Override
+																public void run() {
+																	MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+																	BaseIdFragment.createSpinnerList();
+																}
+															});
+													}
+												});
+										}
+									}).show();
+							}
+						}).show();
 				}
 			});
     }
-
 }

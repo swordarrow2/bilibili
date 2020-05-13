@@ -236,6 +236,7 @@ public class Tools {
 		public static String getUserDynamicList(long uid, int offsetDynamicID) {
 			return Tools.Network.httpGet("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?offset_dynamic_id=" + offsetDynamicID  + "&host_uid=" + uid);
 		}
+
 		public static String sendDynamic(String content, String cookie) {
 			return Tools.Network.bilibiliPost("https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create", cookie, "dynamic_id", 0, "type", 4, "rid", 0, "content", content, "extension", "{\"from\":{\"emoji_type\":1}}", "at_uids", "", "ctrl", "[]", "csrf_token", Tools.BilibiliTool.getCsrf(cookie));
 		}
@@ -293,7 +294,7 @@ public class Tools {
 		}
 
 		public static LiveStream getLiveStream(long roomid, String cookie) {
-			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + roomid, cookie, "https://link.bilibili.com/p/center/index"), LiveStream.class);
+			return GSON.fromJson(NetworkCacher.getNetJson("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + roomid, cookie, "https://link.bilibili.com/p/center/index"), LiveStream.class);
 		}
 
 		public static String sendLiveSign(String cookie) {

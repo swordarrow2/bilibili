@@ -19,7 +19,7 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 	}
 	//得到子item需要关联的数据
 	@Override
-	public Object getChild(int groupPosition, int childPosition) {
+	public LivePart.PartData getChild(int groupPosition, int childPosition) {
 		return livePart.data.get(groupPosition).list.get(childPosition);
 	}
 
@@ -32,7 +32,7 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 	//设置子item的组件
 	@Override
 	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-		final LivePart.GroupData.PartData pd = livePart.data.get(groupPosition).list.get(childPosition);
+		final LivePart.PartData pd = livePart.data.get(groupPosition).list.get(childPosition);
 
 
 		final ViewHolder holder;
@@ -73,7 +73,7 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 
 	//获取当前父item的数据
 	@Override
-	public Object getGroup(int groupPosition) {
+	public LivePart.GroupData getGroup(int groupPosition) {
 		return livePart.data.get(groupPosition);
 	}
 

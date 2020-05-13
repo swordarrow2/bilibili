@@ -14,6 +14,7 @@ import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
+import com.meng.biliv3.result.LivePart.*;
 
 public class UserInfoHeaderView extends LinearLayout implements View.OnClickListener {
 
@@ -26,8 +27,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 	private Button btnCopy;
 	private Button btnRename;
     private EditText newName;
-    private String partID = null;
-	private ExpandableListView mainlistview = null;
+    private ExpandableListView mainlistview = null;
 	private LivePartSelectAdapter adapter;
 	private AlertDialog dialog;
 	private UidToRoom utr;
@@ -72,13 +72,16 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 								if (ai == null) {
 									return;
 								}
-								getInfo(ai);
 								MainActivity.instance.sjfSettings.setMainAccount(ai.uid);
+								getInfo(ai);
 							}
 						}).show();
 				}
 			});
+		initCtrl();
+    }
 
+	private void initCtrl() {
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
@@ -103,38 +106,42 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 									btnCopy.setText("复制推流码");
 								}
 								newName.setHint("房间名:" + utr.data.title);
-								mainlistview = new ExpandableListView(context);
+								mainlistview = new ExpandableListView(MainActivity.instance);
 								mainlistview.setOnChildClickListener(new OnChildClickListener(){
 
 										@Override
 										public boolean onChildClick(ExpandableListView p1, View p2, int p3, int p4, long p5) {
-											partID = ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).id;
-											MainActivity.instance.showToast("选择分区:" + ((LivePart.GroupData.PartData)adapter.getChild(p3, p4)).name);
-											MainActivity.instance.threadPool.execute(new Runnable(){
-
+											final LivePart.PartData child = adapter.getChild(p3, p4);
+											new AlertDialog.Builder(MainActivity.instance).setIcon(R.drawable.ic_launcher).setTitle("确定在" + child.name + "开播吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
 													@Override
-													public void run() {
-														liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, partID, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
-														if (liveStart.code != 0) {
-															return;
-														}
-														MainActivity.instance.showToast("开播成功");
-														MainActivity.instance.runOnUiThread(new Runnable() {
+													public void onClick(DialogInterface p1, int p2) {
+														MainActivity.instance.threadPool.execute(new Runnable(){
+
 																@Override
 																public void run() {
-																	btnCopy.setEnabled(true);
-																	btnCopy.setText("复制推流码");
-																	newName.setHint("房间名:" + utr.data.title);
-																	btnStart.setText("关闭直播间");
+																	liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, child.id, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+																	if (liveStart.code != 0) {
+																		return;
+																	}
+																	MainActivity.instance.showToast("开播成功");
+																	MainActivity.instance.runOnUiThread(new Runnable() {
+																			@Override
+																			public void run() {
+																				btnCopy.setEnabled(true);
+																				btnCopy.setText("复制推流码");
+																				newName.setHint("房间名:" + utr.data.title);
+																				btnStart.setText("关闭直播间");
+																			}
+																		});
 																}
 															});
 													}
-												});
+												}).setNegativeButton("取消", null).show();
 											dialog.dismiss();
 											return true;
 										}
 									});
-								dialog = new AlertDialog.Builder(context).setView(mainlistview).setTitle("选择分区")
+								dialog = new AlertDialog.Builder(MainActivity.instance).setView(mainlistview).setTitle("选择分区")
 									.setPositiveButton("其它单机", new DialogInterface.OnClickListener(){
 
 										@Override
@@ -199,7 +206,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 						});
 				}
 			});
-    }
+	}
 
 	private void getInfo(final AccountInfo ai) {
 		File imf = new File(MainActivity.instance.mainDic + "bilibili/" + ai.uid + ".jpg");
@@ -231,9 +238,15 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 							public void run() {
 								if (rtu != null) {
 									tvBLive.setText("主播 Lv." + rtu.data.level.master_level.level + "(" + rtu.data.level.master_level.anchor_score + "/" + rtu.data.level.master_level.next.get(1) + ")");
+									btnStart.setEnabled(true);
+									btnCopy.setEnabled(true);
+									newName.setVisibility(View.VISIBLE);
+									initCtrl();
 								} else {
-									tvBLive.setVisibility(View.VISIBLE);
 									tvBLive.setText("未开通直播间");
+									btnStart.setEnabled(false);
+									btnCopy.setEnabled(false);
+									newName.setVisibility(View.GONE);
 								}
 							}
 						});
@@ -247,22 +260,27 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 				if (btnStart.getText().toString().equals("打开直播间")) {
 					dialog.show();
 				} else {
-					MainActivity.instance.threadPool.execute(new Runnable(){
-
+					new AlertDialog.Builder(MainActivity.instance).setTitle("确定关播吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
-							public void run() {
-								if (Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
-									return;
-								}
-								MainActivity.instance.showToast("开播成功");
-								MainActivity.instance.runOnUiThread(new Runnable() {
+							public void onClick(DialogInterface p1, int p2) {
+								MainActivity.instance.threadPool.execute(new Runnable(){
+
 										@Override
 										public void run() {
-											btnStart.setText("打开直播间");
+											if (Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
+												return;
+											}
+											MainActivity.instance.showToast("关播成功");
+											MainActivity.instance.runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														btnStart.setText("打开直播间");
+													}
+												});
 										}
 									});
 							}
-						});
+						}).setNegativeButton("取消", null).show();
 				}	
 				break;
 			case R.id.main_account_list_headerButton_rename:

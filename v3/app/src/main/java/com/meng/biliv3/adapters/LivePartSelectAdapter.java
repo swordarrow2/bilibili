@@ -8,10 +8,12 @@ import com.meng.biliv3.activity.*;
 import com.meng.biliv3.result.*;
 import android.graphics.*;
 import com.meng.biliv3.libs.*;
+import java.util.*;
 
 public class LivePartSelectAdapter extends BaseExpandableListAdapter {
 
 	private LivePart livePart;
+	private HashMap<String,Bitmap> bitmapCache = new HashMap<>();
 
 	public LivePartSelectAdapter(LivePart livePartList) {
 		livePart = livePartList;
@@ -48,20 +50,27 @@ public class LivePartSelectAdapter extends BaseExpandableListAdapter {
         }
 		holder.tvName.setText(pd.name);
 		holder.ivHead.setImageBitmap(null);
-		MainActivity.instance.threadPool.execute(new Runnable(){
+		final Bitmap get = bitmapCache.get(pd.pic);
+		if (get != null) {
+			holder.ivHead.setImageBitmap(get);
+		} else {
+			MainActivity.instance.threadPool.execute(new Runnable(){
 
-				@Override
-				public void run() {
-					final byte[] imgArray = NetworkCacher.getNetPicture(pd.pic);
-					MainActivity.instance.runOnUiThread(new Runnable(){
+					@Override
+					public void run() {
+						final byte[] imgArray = NetworkCacher.getNetPicture(pd.pic);
+						MainActivity.instance.runOnUiThread(new Runnable(){
 
-							@Override
-							public void run() {
-								holder.ivHead.setImageBitmap(BitmapFactory.decodeByteArray(imgArray, 0, imgArray.length));
-							}
-						});
-				}
-			});
+								@Override
+								public void run() {
+									Bitmap bmp = BitmapFactory.decodeByteArray(imgArray, 0, imgArray.length);
+									bitmapCache.put(pd.pic, bmp);
+									holder.ivHead.setImageBitmap(bmp);
+								}
+							});
+					}
+				});
+		}
 		return convertView;
 	}
 

@@ -42,12 +42,20 @@
         <item name="android:background">#00000000</item>
 	</style>
 	
-	<style name="AppThemeHolo" parent="android:style/Theme.Holo.Wallpaper">
+	<style name="AppThemeHoloWallpaper" parent="android:style/Theme.Holo.Wallpaper">
 		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
 		<!--<item name="android:statusBarColor">@color/possible_result_points</item>-->
 		<item name="android:windowIsTranslucent">true</item>
 		<item name="android:windowBackground">@color/windowBackground</item>
 		<item name="android:colorForeground">#80000000</item>
+	</style>
+	
+	<style name="AppThemeHolo" parent="android:style/Theme.Holo">
+		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>
+		<item name="android:statusBarColor">@color/possible_result_points</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowBackground">@color/windowBackground</item>
+		<item name="android:colorForeground">#80000000</item>-->
 	</style>
 
 </resources>

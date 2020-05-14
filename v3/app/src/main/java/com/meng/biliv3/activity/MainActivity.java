@@ -266,6 +266,9 @@ public class MainActivity extends Activity {
             case "Holo":
 				super.setTheme(themeId = R.style.AppThemeHolo);
 				break;
+			case "Holo Wallpaper":
+				super.setTheme(themeId = R.style.AppThemeHoloWallpaper);
+				break;
             case "MD":
 				super.setTheme(themeId = R.style.AppThemeLight);
 				break;

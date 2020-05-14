@@ -21,9 +21,13 @@ public class ColorManager {
 				colorDrawerHeader = 0xff009688;
 				break;
 			case R.style.AppThemeDark:
-			case R.style.AppThemeHolo:
+			case R.style.AppThemeHoloWallpaper:
 				colorBackground = 0x2feeeeee;
 				colorDrawerHeader = 0x7f009688;
+				break;
+			case R.style.AppThemeHolo:
+				colorBackground = 0xff111111;
+				colorDrawerHeader = 0xff009688;
 				break;
 			default:
 				throw new RuntimeException("unknown theme");
@@ -49,9 +53,12 @@ public class ColorManager {
 		ActionBar ab=a.getActionBar();
 		ab.setDisplayOptions(ab.getDisplayOptions() ^ ActionBar.DISPLAY_HOME_AS_UP);
 		switch (themeId) {
-            case R.style.AppThemeHolo:
+            case R.style.AppThemeHoloWallpaper:
             case R.style.AppThemeHoloL:
 				a.getWindow().setStatusBarColor(Color.TRANSPARENT);
+				break;
+			case R.style.AppThemeHolo:
+
 				break;
 			case R.style.AppThemeDark:
 

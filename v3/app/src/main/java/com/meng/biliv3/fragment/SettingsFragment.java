@@ -13,7 +13,7 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesName("settings");
         addPreferencesFromResource(R.xml.preference);
-
+		
 
 		/*	CheckBoxPreference cb=(CheckBoxPreference)findPreference("useLightTheme");
 		 cb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){

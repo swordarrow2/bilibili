@@ -7,6 +7,9 @@ import com.meng.biliv3.activity.*;
 public class Log {
 
 	public static void network(Connection.Method method, String link, String result, Object... args) {
+		if (!MainActivity.instance.sjfSettings.isUseNetLog()) {
+			return;
+		}
 		File f=new File(Environment.getExternalStorageDirectory() + "/sjfLogNetwork.log");
 		try {  
 			BufferedWriter writer  = new BufferedWriter(new FileWriter(f, true));  

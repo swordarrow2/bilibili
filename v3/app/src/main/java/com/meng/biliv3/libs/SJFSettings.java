@@ -61,6 +61,29 @@ public class SJFSettings {
 		putBoolean("exit", b);
 	}
 
+	public boolean isUseNetLog() {
+		return sp.getBoolean("netLog", true);
+	}
+
+	public void setUseNetLog(boolean use) {
+		putBoolean("netLog", use);
+	}
+
+	public String getPicCacheMode() {
+		return sp.getString("cacheModePic", null);
+	}
+
+	public void setPicCacheMode(String s) {
+		putString("cacheModePic", s);
+	}
+
+	public String getJsonCacheMode() {
+		return sp.getString("cacheModeJson", null);
+	}
+
+	public void setJsonCacheMode(String s) {
+		putString("cacheModeJson", s);
+	}
 
 	private void putLong(String key, long value) {
 		SharedPreferences.Editor editor = sp.edit();

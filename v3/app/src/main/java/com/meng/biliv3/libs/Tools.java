@@ -178,7 +178,7 @@ public class Tools {
 		}
 
 		public static UidToRoom getUidToRoom(long uid) {
-			return GSON.fromJson(NetworkCacher.getNetJson("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
+			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
 		}
 
 		public static RoomToUid getRoomToUid(long roomId) {
@@ -294,7 +294,7 @@ public class Tools {
 		}
 
 		public static LiveStream getLiveStream(long roomid, String cookie) {
-			return GSON.fromJson(NetworkCacher.getNetJson("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + roomid, cookie, "https://link.bilibili.com/p/center/index"), LiveStream.class);
+			return GSON.fromJson(NetworkCacher.getNetJson("https://api.live.bilibili.com/live_stream/v1/StreamList/get_stream_by_roomId?room_id=" + roomid, cookie, "https://link.bilibili.com/p/center/index", NetworkCacher.Mode.CachePrefer), LiveStream.class);
 		}
 
 		public static String sendLiveSign(String cookie) {
@@ -583,18 +583,17 @@ public class Tools {
 		}
 
 		public static String readString(File f) {
-			String s = "";
 			try {      
 				long filelength = f.length();
 				byte[] filecontent = new byte[(int) filelength];
 				FileInputStream in = new FileInputStream(f);
 				in.read(filecontent);
 				in.close();
-				s = new String(filecontent, StandardCharsets.UTF_8);
+				return new String(filecontent, StandardCharsets.UTF_8);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return s;
+			return null;
 		}
 
 		public static byte[] readBytes(File f) {

@@ -260,6 +260,8 @@ public class MainActivity extends Activity {
 	public void setTheme(int resid) {
 		themeId = resid;
 		sjfSettings = new SJFSettings(this);
+		NetworkCacher.setJsonCacheMode(NetworkCacher.Mode.valueOf(sjfSettings.getJsonCacheMode()));
+		NetworkCacher.setPicCacheMode(NetworkCacher.Mode.valueOf(sjfSettings.getPicCacheMode()));
 		switch (sjfSettings.getTheme()) {
             case "Holo":
 				super.setTheme(themeId = R.style.AppThemeHolo);

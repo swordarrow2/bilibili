@@ -6,5 +6,12 @@
         <item>MD</item>
 		<item>MD dark</item>
     </string-array>
+	
+	<string-array name="cache_mode">
+        <item>CacheOnly</item>
+		<item>CachePrefer</item>
+        <item>CacheRefresh</item>
+		<item>NoCache</item>
+    </string-array>
 </resources>
 

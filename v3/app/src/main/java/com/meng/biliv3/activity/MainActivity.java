@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
 	public ColorManager colorManager;
 	private boolean autoDrawerOperated=false;
 	public static final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
-	public static final String regBv = "\\D{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2})\\D{0,}";
+	public static final String regBv = ".{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2}).{0,}";
 	public static final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
 	public static final String regCv = "[Cc][Vv](\\d{1,})";
 	public static final String regUid = "space\\D{0,}(\\d{1,})";

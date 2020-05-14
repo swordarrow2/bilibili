@@ -99,7 +99,17 @@ public class DrawerArrowDrawable extends Drawable {
         invalidateSelf();
 	}
 
-    public void setColor(int resourceId) {
+    public void setColorRes(int resourceId) {
         mPaint.setColor(context.getResources().getColor(resourceId));
+	}
+
+	public DrawerArrowDrawable setColorARGB(int ARGB) {
+        mPaint.setColor(ARGB);
+		return this;
+	}
+
+	public DrawerArrowDrawable setColorARGB(int A, int R, int G, int B) {
+        mPaint.setColor((A << 24) | (R << 16) | (G << 8) | B);
+		return this;
 	}
 }

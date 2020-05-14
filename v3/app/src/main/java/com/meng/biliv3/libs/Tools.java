@@ -178,7 +178,7 @@ public class Tools {
 		}
 
 		public static UidToRoom getUidToRoom(long uid) {
-			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
+			return GSON.fromJson(NetworkCacher.getNetJson("https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=" + uid), UidToRoom.class);
 		}
 
 		public static RoomToUid getRoomToUid(long roomId) {

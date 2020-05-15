@@ -16,20 +16,13 @@
 
 package android.support.v4.graphics.drawable;
 
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.util.AttributeSet;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.support.v4.view.*;
+import android.util.*;
+import java.io.*;
+import org.xmlpull.v1.*;
 
 /**
  * Helper for accessing features in {@link android.graphics.drawable.Drawable}
@@ -313,7 +306,7 @@ public final class DrawableCompat {
      *
      * @param drawable The Drawable against which to invoke the method.
      */
-    public static void jumpToCurrentState(@NonNull Drawable drawable) {
+    public static void jumpToCurrentState(Drawable drawable) {
         IMPL.jumpToCurrentState(drawable);
     }
 
@@ -329,7 +322,7 @@ public final class DrawableCompat {
      * @param mirrored Set to true if the Drawable should be mirrored, false if
      *            not.
      */
-    public static void setAutoMirrored(@NonNull Drawable drawable, boolean mirrored) {
+    public static void setAutoMirrored(Drawable drawable, boolean mirrored) {
         IMPL.setAutoMirrored(drawable, mirrored);
     }
 
@@ -344,7 +337,7 @@ public final class DrawableCompat {
      * @return boolean Returns true if this Drawable will be automatically
      *         mirrored.
      */
-    public static boolean isAutoMirrored(@NonNull Drawable drawable) {
+    public static boolean isAutoMirrored(Drawable drawable) {
         return IMPL.isAutoMirrored(drawable);
     }
 
@@ -355,7 +348,7 @@ public final class DrawableCompat {
      * @param x The X coordinate of the center of the hotspot
      * @param y The Y coordinate of the center of the hotspot
      */
-    public static void setHotspot(@NonNull Drawable drawable, float x, float y) {
+    public static void setHotspot(Drawable drawable, float x, float y) {
         IMPL.setHotspot(drawable, x, y);
     }
 
@@ -365,7 +358,7 @@ public final class DrawableCompat {
      *
      * @param drawable The Drawable against which to invoke the method.
      */
-    public static void setHotspotBounds(@NonNull Drawable drawable, int left, int top,
+    public static void setHotspotBounds(Drawable drawable, int left, int top,
             int right, int bottom) {
         IMPL.setHotspotBounds(drawable, left, top, right, bottom);
     }
@@ -376,7 +369,7 @@ public final class DrawableCompat {
      * @param drawable The Drawable against which to invoke the method.
      * @param tint     Color to use for tinting this drawable
      */
-    public static void setTint(@NonNull Drawable drawable, @ColorInt int tint) {
+    public static void setTint(Drawable drawable, int tint) {
         IMPL.setTint(drawable, tint);
     }
 
@@ -386,7 +379,7 @@ public final class DrawableCompat {
      * @param drawable The Drawable against which to invoke the method.
      * @param tint     Color state list to use for tinting this drawable, or null to clear the tint
      */
-    public static void setTintList(@NonNull Drawable drawable, @Nullable ColorStateList tint) {
+    public static void setTintList(Drawable drawable, ColorStateList tint) {
         IMPL.setTintList(drawable, tint);
     }
 
@@ -396,7 +389,7 @@ public final class DrawableCompat {
      * @param drawable The Drawable against which to invoke the method.
      * @param tintMode A Porter-Duff blending mode
      */
-    public static void setTintMode(@NonNull Drawable drawable, @Nullable PorterDuff.Mode tintMode) {
+    public static void setTintMode(Drawable drawable, PorterDuff.Mode tintMode) {
         IMPL.setTintMode(drawable, tintMode);
     }
 
@@ -406,7 +399,7 @@ public final class DrawableCompat {
      *
      * @param drawable The Drawable against which to invoke the method.
      */
-    public static int getAlpha(@NonNull Drawable drawable) {
+    public static int getAlpha(Drawable drawable) {
         return IMPL.getAlpha(drawable);
     }
 
@@ -477,7 +470,7 @@ public final class DrawableCompat {
      * @see #setTintMode(Drawable, PorterDuff.Mode)
      * @see #unwrap(Drawable)
      */
-    public static Drawable wrap(@NonNull Drawable drawable) {
+    public static Drawable wrap(Drawable drawable) {
         return IMPL.wrap(drawable);
     }
 
@@ -491,7 +484,7 @@ public final class DrawableCompat {
      *
      * @see #wrap(Drawable)
      */
-    public static <T extends Drawable> T unwrap(@NonNull Drawable drawable) {
+    public static <T extends Drawable> T unwrap(Drawable drawable) {
         if (drawable instanceof DrawableWrapper) {
             return (T) ((DrawableWrapper) drawable).getWrappedDrawable();
         }
@@ -508,7 +501,7 @@ public final class DrawableCompat {
      *                        or {@link ViewCompat#LAYOUT_DIRECTION_RTL}
      * @see #getLayoutDirection(Drawable)
      */
-    public static void setLayoutDirection(@NonNull Drawable drawable, int layoutDirection) {
+    public static void setLayoutDirection(Drawable drawable, int layoutDirection) {
         IMPL.setLayoutDirection(drawable, layoutDirection);
     }
 
@@ -519,7 +512,7 @@ public final class DrawableCompat {
      *         {@link ViewCompat#LAYOUT_DIRECTION_RTL}
      * @see #setLayoutDirection(Drawable, int)
      */
-    public static int getLayoutDirection(@NonNull Drawable drawable) {
+    public static int getLayoutDirection(Drawable drawable) {
         return IMPL.getLayoutDirection(drawable);
     }
 

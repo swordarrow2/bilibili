@@ -23,7 +23,6 @@ import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.*;
-import android.support.annotation.*;
 import android.support.v4.content.*;
 import android.support.v4.view.*;
 import android.support.v4.widget.*;
@@ -68,7 +67,6 @@ public class ActionBarDrawerToggle implements DrawerLayout.DrawerListener {
          * @return Delegate to use for ActionBarDrawableToggles, or null if the Activity
          *         does not wish to override the default behavior.
          */
-        @Nullable
         Delegate getDrawerToggleDelegate();
     }
 
@@ -77,7 +75,6 @@ public class ActionBarDrawerToggle implements DrawerLayout.DrawerListener {
          * @return Up indicator drawable as defined in the Activity's theme, or null if one is not
          *         defined.
          */
-        @Nullable
         Drawable getThemeUpIndicator();
 
         /**
@@ -218,7 +215,7 @@ public class ActionBarDrawerToggle implements DrawerLayout.DrawerListener {
      *                                  for accessibility
      */
     public ActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout,
-								 @DrawableRes int drawerImageRes,  int openDrawerContentDescRes,
+								 int drawerImageRes,  int openDrawerContentDescRes,
 								 int closeDrawerContentDescRes) {
         this(activity, drawerLayout, !assumeMaterial(activity), drawerImageRes,
 			 openDrawerContentDescRes, closeDrawerContentDescRes);
@@ -251,7 +248,7 @@ public class ActionBarDrawerToggle implements DrawerLayout.DrawerListener {
      *                                  for accessibility
      */
     public ActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, boolean animate,
-								 @DrawableRes int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+								 int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
         mActivity = activity;
 
         // Allow the Activity to provide an impl

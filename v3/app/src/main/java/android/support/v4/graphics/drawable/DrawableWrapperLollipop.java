@@ -16,18 +16,10 @@
 
 package android.support.v4.graphics.drawable;
 
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Outline;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.os.*;
 
 class DrawableWrapperLollipop extends DrawableWrapperKitKat {
 
@@ -89,8 +81,7 @@ class DrawableWrapperLollipop extends DrawableWrapperKitKat {
     @Override
     public boolean setState(int[] stateSet) {
         if (super.setState(stateSet)) {
-            // Manually invalidate because the framework doesn't currently force an invalidation
-            // on a state change
+            // Manually invalidate because the framework doesn't currently force an invalidation on a state change
             invalidateSelf();
             return true;
         }
@@ -101,26 +92,24 @@ class DrawableWrapperLollipop extends DrawableWrapperKitKat {
     protected boolean isCompatTintEnabled() {
         if (Build.VERSION.SDK_INT == 21) {
             final Drawable drawable = mDrawable;
-            return drawable instanceof GradientDrawable || drawable instanceof DrawableContainer
-                    || drawable instanceof InsetDrawable;
+            return drawable instanceof GradientDrawable || drawable instanceof DrawableContainer || drawable instanceof InsetDrawable;
         }
         return false;
     }
 
-    @NonNull
+
     @Override
     DrawableWrapperState mutateConstantState() {
         return new DrawableWrapperStateLollipop(mState, null);
     }
 
     private static class DrawableWrapperStateLollipop extends DrawableWrapperState {
-        DrawableWrapperStateLollipop(@Nullable DrawableWrapperState orig,
-                @Nullable Resources res) {
+        DrawableWrapperStateLollipop(DrawableWrapperState orig, Resources res) {
             super(orig, res);
         }
 
         @Override
-        public Drawable newDrawable(@Nullable Resources res) {
+        public Drawable newDrawable(Resources res) {
             return new DrawableWrapperLollipop(this, res);
         }
     }

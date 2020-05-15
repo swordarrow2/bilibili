@@ -16,15 +16,8 @@
 
 package android.support.v4.graphics.drawable;
 
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.Region;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import android.content.res.*;
+import android.graphics.drawable.*;
 
 class DrawableWrapperEclair extends DrawableWrapperDonut {
 
@@ -47,13 +40,12 @@ class DrawableWrapperEclair extends DrawableWrapperDonut {
     }
 
     private static class DrawableWrapperStateEclair extends DrawableWrapperState {
-        DrawableWrapperStateEclair(@Nullable DrawableWrapperState orig,
-                @Nullable Resources res) {
+        DrawableWrapperStateEclair(DrawableWrapperState orig, Resources res) {
             super(orig, res);
         }
 
         @Override
-        public Drawable newDrawable(@Nullable Resources res) {
+        public Drawable newDrawable(Resources res) {
             return new DrawableWrapperEclair(this, res);
         }
     }

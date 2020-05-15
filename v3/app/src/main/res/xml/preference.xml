@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
         android:key="opendraw"
+		android:defaultValue="true"
         android:title="启动时打开滑动菜单" />
 	
 	<ListPreference
@@ -35,7 +36,7 @@
 
 		<CheckBoxPreference
 			android:key="netLog"
-			android:defaultValue="true"
+			android:defaultValue="false"
 			android:title="记录网络日志"
 			android:summary="保存在SD卡/sjfLogNetwork.log"/>
 	</PreferenceScreen>

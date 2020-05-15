@@ -86,7 +86,11 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 				@Override
 				public void run() {
-					utr = Tools.BilibiliTool.getUidToRoom(MainActivity.instance.sjfSettings.getMainAccount());
+					long mainUid = MainActivity.instance.sjfSettings.getMainAccount();
+					if (mainUid == -1) {
+						return;
+					}
+					utr = Tools.BilibiliTool.getUidToRoom(mainUid);
 					liveStream = Tools.BilibiliTool.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 					final LivePart livePartList = GSON.fromJson(Tools.AndroidContent.readAssetsString("livePart.json"), LivePart.class);
 					if (utr == null | liveStream == null || livePartList == null) {

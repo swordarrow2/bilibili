@@ -21,7 +21,6 @@ import android.content.pm.*;
 import android.content.res.*;
 import android.graphics.drawable.*;
 import android.os.*;
-import android.support.annotation.*;
 import android.util.*;
 import java.io.*;
 
@@ -140,7 +139,7 @@ public class ContextCompat {
         }
     }
 
-    public static int checkSelfPermission(@NonNull Context context, @NonNull String permission) {
+    public static int checkSelfPermission(Context context, String permission) {
         if (permission == null) {
             throw new IllegalArgumentException("permission is null");
         }

@@ -16,10 +16,8 @@
 
 package android.support.v4.graphics.drawable;
 
-import android.content.res.ColorStateList;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
+import android.content.res.*;
+import android.graphics.*;
 
 /**
  * Interface which allows a {@link android.graphics.drawable.Drawable} to receive tinting calls
@@ -28,7 +26,7 @@ import android.support.annotation.ColorInt;
  * @hide
  */
 public interface TintAwareDrawable {
-    void setTint(@ColorInt int tint);
+    void setTint(int tint);
     void setTintList(ColorStateList tint);
     void setTintMode(PorterDuff.Mode tintMode);
 }

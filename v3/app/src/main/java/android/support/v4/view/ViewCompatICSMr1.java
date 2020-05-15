@@ -16,11 +16,7 @@
 
 package android.support.v4.view;
 
-import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.View.AccessibilityDelegate;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.*;
 
 /**
  * Helper for accessing newer features in View introduced in ICS Mr1.

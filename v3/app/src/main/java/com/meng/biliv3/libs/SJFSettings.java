@@ -29,7 +29,7 @@ public class SJFSettings {
 		try {
 			return sp.getLong("mainAccount", -1);
 		} catch (ClassCastException e) {
-			return Long.parseLong(sp.getString("mainAccount", null));
+			return Long.parseLong(sp.getString("mainAccount", "-1"));
 		}
 	}
 
@@ -62,7 +62,7 @@ public class SJFSettings {
 	}
 
 	public boolean isUseNetLog() {
-		return sp.getBoolean("netLog", true);
+		return sp.getBoolean("netLog", false);
 	}
 
 	public void setUseNetLog(boolean use) {
@@ -70,7 +70,7 @@ public class SJFSettings {
 	}
 
 	public String getPicCacheMode() {
-		return sp.getString("cacheModePic", null);
+		return sp.getString("cacheModePic", "CachePrefer");
 	}
 
 	public void setPicCacheMode(String s) {
@@ -78,7 +78,7 @@ public class SJFSettings {
 	}
 
 	public String getJsonCacheMode() {
-		return sp.getString("cacheModeJson", null);
+		return sp.getString("cacheModeJson", "NoCache");
 	}
 
 	public void setJsonCacheMode(String s) {

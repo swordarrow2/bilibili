@@ -16,9 +16,8 @@
 
 package android.support.v4.view;
 
-import android.content.res.ColorStateList;
-import android.graphics.PorterDuff;
-import android.support.annotation.Nullable;
+import android.content.res.*;
+import android.graphics.*;
 
 /**
  * Interface which allows a {@link android.view.View} to receive background tinting calls from
@@ -37,14 +36,14 @@ public interface TintableBackgroundView {
      *
      * @see #getSupportBackgroundTintList()
      */
-    void setSupportBackgroundTintList(@Nullable ColorStateList tint);
+    void setSupportBackgroundTintList(ColorStateList tint);
 
     /**
      * Return the tint applied to the background drawable, if specified.
      *
      * @return the tint applied to the background drawable
      */
-    @Nullable
+
     ColorStateList getSupportBackgroundTintList();
 
     /**
@@ -56,7 +55,7 @@ public interface TintableBackgroundView {
      *                 {@code null} to clear tint
      * @see #getSupportBackgroundTintMode()
      */
-    void setSupportBackgroundTintMode(@Nullable PorterDuff.Mode tintMode);
+    void setSupportBackgroundTintMode(PorterDuff.Mode tintMode);
 
     /**
      * Return the blending mode used to apply the tint to the background
@@ -65,6 +64,6 @@ public interface TintableBackgroundView {
      * @return the blending mode used to apply the tint to the background
      *         drawable
      */
-    @Nullable
+
     PorterDuff.Mode getSupportBackgroundTintMode();
 }

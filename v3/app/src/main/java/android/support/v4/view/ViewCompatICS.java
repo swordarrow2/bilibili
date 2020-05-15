@@ -16,11 +16,9 @@
 
 package android.support.v4.view;
 
-import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.View.AccessibilityDelegate;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.*;
+import android.view.View.*;
+import android.view.accessibility.*;
 
 /**
  * Helper for accessing newer features in View introduced in ICS.
@@ -35,7 +33,7 @@ class ViewCompatICS {
         return v.canScrollVertically(direction);
     }
 
-    public static void setAccessibilityDelegate(View v, @Nullable Object delegate) {
+    public static void setAccessibilityDelegate(View v, Object delegate) {
         v.setAccessibilityDelegate((AccessibilityDelegate) delegate);
     }
 

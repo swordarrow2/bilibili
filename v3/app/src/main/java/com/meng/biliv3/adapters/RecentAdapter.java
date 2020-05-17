@@ -144,6 +144,38 @@ public class RecentAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View p1) {
 					MainActivity.instance.removeFragment(s);
+					if (recents.size() == 0) {
+						return;
+					}
+					Recent r = recents.get(0);		
+					switch (r.type) {
+						case BaseIdFragment.typeAv:
+							MainActivity.instance.showFragment(AvFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeCv:
+							MainActivity.instance.showFragment(CvFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeLive:
+							MainActivity.instance.showFragment(LiveFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeUID:
+							MainActivity.instance.showFragment(UidFragment.class, r.type, r.id);
+							break;
+						case BaseIdFragment.typeMedal:
+							MainActivity.instance.showFragment(MedalFragment.class, r.type, r.id);
+							break;
+						case "AVBV转换":
+							MainActivity.instance.showFragment(AvBvConvertFragment.class, "AVBV转换");
+							break;
+						case "管理账号":
+							MainActivity.instance.showFragment(ManagerFragment.class, "管理账号");
+							break;
+						case "设置":
+							MainActivity.instance.showFragment(SettingsFragment.class, "设置");
+							break;
+						case "动态":
+							MainActivity.instance.showFragment(DynamicFragment.class, "动态");
+					}
 				}
 			});
         return convertView;

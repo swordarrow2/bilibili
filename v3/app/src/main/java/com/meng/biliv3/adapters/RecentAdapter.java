@@ -188,11 +188,8 @@ public class RecentAdapter extends BaseAdapter {
 
 	private void saveConfig() {
         try {
-            FileOutputStream fos = null;
-            OutputStreamWriter writer = null;
-            File file = new File(jsonPath);
-            fos = new FileOutputStream(file);
-            writer = new OutputStreamWriter(fos, "utf-8");
+			FileOutputStream fos = new FileOutputStream(new File(jsonPath));
+			OutputStreamWriter writer = new OutputStreamWriter(fos, "utf-8");
             writer.write(GSON.toJson(recents));
             writer.flush();
             fos.close();

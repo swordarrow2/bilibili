@@ -6,6 +6,7 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
@@ -18,9 +19,8 @@ public class UidFragment extends BaseIdFragment {
 	private ArrayAdapter<String> adapter;
 	private ArrayList<String> dataSet=new ArrayList<>();
 
-	public UidFragment(String type, long uid) {
-		id = uid;
-		this.type = type;
+	public UidFragment(IDType type, long id) {
+		super(type, id);
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class UidFragment extends BaseIdFragment {
 							getActivity().runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										MainActivity.instance.renameFragment(type + id, info.data.name);
+										MainActivity.instance.renameFragment(type.toString() + id, info.data.name);
 										adapter.notifyDataSetChanged();				
 									}
 								});
@@ -92,7 +92,7 @@ public class UidFragment extends BaseIdFragment {
 							getActivity().runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										MainActivity.instance.renameFragment(type + id, info.data.name);
+										MainActivity.instance.renameFragment(type.toString() + id, info.data.name);
 										adapter.notifyDataSetChanged();				
 									}
 								});

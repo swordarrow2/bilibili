@@ -14,8 +14,9 @@ import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.customView.*;
-import com.meng.biliv3.result.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 import com.universalvideoview.*;
 import java.lang.reflect.*;
 import java.net.*;
@@ -27,6 +28,7 @@ import org.java_websocket.handshake.*;
 
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import java.nio.charset.*;
 
 public class LiveFragment extends BaseIdFragment implements View.OnClickListener, UniversalVideoView.VideoViewCallback {
 
@@ -58,9 +60,8 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 	private DanmakuListener danmakuListener;
 
-	public LiveFragment(String type, long liveId) {
-		this.type = type;
-		id = liveId;
+	public LiveFragment(IDType type, long id) {
+		super(type, id);
 	}
 
 	@Override
@@ -149,7 +150,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 				@Override
 				public boolean onLongClick(View p1) {
 					try {
-						saveBitmap(type + id, preview);
+						saveBitmap(type.toString() + id, preview);
 						MainActivity.instance.showToast("图片已保存至" + MainActivity.instance.mainDic + type + id + ".png");
 					} catch (Exception e) {}
 					return true;
@@ -186,14 +187,14 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 								if (sjb.data.liveStatus != 1) {
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n未直播");
 									mMediaController.setTitle("未直播");
-									MainActivity.instance.renameFragment(type + id, uname + "的直播间");
+									MainActivity.instance.renameFragment(type.toString() + id, uname + "的直播间");
 								} else {
 									uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
 									mVideoView.setVideoURI(uri);
 									mVideoView.requestFocus();
 									mMediaController.setTitle(sjb.data.title);
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
-									MainActivity.instance.renameFragment(type + id, uname + "的直播间");
+									MainActivity.instance.renameFragment(type.toString() + id, uname + "的直播间");
 									MainActivity.instance.showToast("uri:" + uri);
 								}
 							}
@@ -525,7 +526,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 						}
 					});
 			} catch (JsonSyntaxException je) {
-				MainActivity.instance.showToast(dp.body);
+				MainActivity.instance.showToast("json解析失败:"+ dp.body);
 			}
 		}
 
@@ -593,7 +594,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 				version = readShort();
 				op = readInt();
 				seq = readInt();
-				body = new String(data, offset + 16, length - 16);
+				body = new String(data, offset + 16, length - 16,StandardCharsets.UTF_8);
 				data = null;
 			}
 
@@ -604,27 +605,35 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 			}
 
 			private byte[] getBytes(int i) {
-				byte[] bs=new byte[4];
+				return BitConverter.getInstanceBigEndian().getBytes(i);
+			/*	byte[] bs=new byte[4];
 				bs[0] = (byte) ((i >> 24) & 0xff);
 				bs[1] = (byte) ((i >> 16) & 0xff);
 				bs[2] = (byte) ((i >> 8) & 0xff);
 				bs[3] = (byte) (i & 0xff);
-				return bs;	
+				return bs;	*/
 			}
 
 			private byte[] getBytes(short s) {
-				byte[] bs=new byte[2];
+				return BitConverter.getInstanceBigEndian().getBytes(s);
+			/*	byte[] bs=new byte[2];
 				bs[0] = (byte) ((s >> 8) & 0xff);
 				bs[1] = (byte) (s & 0xff) ;
-				return bs;	
+				return bs;	*/
 			}
 			/*大端模式*/
 			public short readShort() {
-				return (short) ((data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0);
+				short s= BitConverter.getInstanceBigEndian().toShort(data,pos);
+				pos+=2;
+				return s;
+			//	return (short) ((data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0);
 			}
 
 			public int readInt() {
-				return (data[pos++] & 0xff) << 24 | (data[pos++] & 0xff) << 16 | (data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0;
+				int i=BitConverter.getInstanceBigEndian().toInt(data,pos);
+				pos+=4;
+				return i;
+				//return (data[pos++] & 0xff) << 24 | (data[pos++] & 0xff) << 16 | (data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0;
 			}
 		}
 	}

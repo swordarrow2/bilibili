@@ -9,6 +9,7 @@ import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
 
@@ -23,15 +24,12 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private Bitmap preview;
 	//private ArrayList<DanmakuBean> danmakuList=null;
 	private TabHost tab;
-	
-	public ExpandableListView judgeList;
-	
-	public AvFragment(String type, long liveId) {
-		this.type = type;
-		id = liveId;
-	}
 
-	
+	public ExpandableListView judgeList;
+
+	public AvFragment(IDType type, long id) {
+		super(type, id);
+	}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,7 +87,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 								if (aj != null && aj.data != null && aj.data.replies != null && aj.data.replies.size() > 0) {
 									judgeList.setAdapter(new JudgeListAdapter(aj));
 								}
-								MainActivity.instance.renameFragment(type + id, videoInfo.data.title);
+								MainActivity.instance.renameFragment(type.toString() + id, videoInfo.data.title);
 							}
 						});
 					byte[] img = NetworkCacher.getNetPicture(videoInfo.data.pic);
@@ -112,7 +110,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	@Override
 	public boolean onLongClick(View p1) {
 		try {
-			saveBitmap(type + id, preview);
+			saveBitmap(type.toString() + id, preview);
 			MainActivity.instance.showToast("图片已保存至" + MainActivity.instance.mainDic + type + id + ".png");
 		} catch (Exception e) {}
 		return true;

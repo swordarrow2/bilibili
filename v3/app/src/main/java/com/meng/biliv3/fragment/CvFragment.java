@@ -8,8 +8,9 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.result.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.result.*;
 
 public class CvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
@@ -21,9 +22,8 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private ImageView ivPreview;
 	private Bitmap preview;
 
-	public CvFragment(String type, long cvId) {
-		this.type = type;
-		id = cvId;
+	public CvFragment(IDType type, long id) {
+		super(type, id);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 							@Override
 							public void run() {
 								info.setText(cvInfo.toString());
-								MainActivity.instance.renameFragment(type + id, cvInfo.data.title);
+								MainActivity.instance.renameFragment(type.toString() + id, cvInfo.data.title);
 							}
 						});
 					byte[] img = NetworkCacher.getNetPicture(cvInfo.data.banner_url);
@@ -93,7 +93,7 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 	@Override
 	public boolean onLongClick(View p1) {
 		try {
-			saveBitmap(type + id, preview);
+			saveBitmap(type.toString() + id, preview);
 			MainActivity.instance.showToast("图片已保存至" + MainActivity.instance.mainDic + type + id + ".png");
 		} catch (Exception e) {}
 		return true;

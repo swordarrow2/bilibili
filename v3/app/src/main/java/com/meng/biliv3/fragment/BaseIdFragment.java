@@ -19,14 +19,9 @@ import com.meng.biliv3.result.*;
 import java.io.*;
 import java.util.*;
 import org.jsoup.*;
+import com.meng.biliv3.enums.*;
 
 public class BaseIdFragment extends Fragment {
-
-	public static final String typeUID = "uid";
-	public static final String typeAv = "av";
-	public static final String typeLive = "lv";
-	public static final String typeCv = "cv";
-	public static final String typeMedal = "medal";
 
 	protected static final int SendDanmaku=0;
 	protected static final int Silver=1;
@@ -43,14 +38,19 @@ public class BaseIdFragment extends Fragment {
 	protected static final int LikeArtical=12;
 
 	protected long id;
-	protected String type;
+	protected IDType type;
 
 	protected static ArrayAdapter<String> sencencesAdapter=null;
 	protected static ArrayAdapter<String> spinnerAccountAdapter=null;
 	private static ArrayList<String> spList=null;
 	private static CustomSentence customSentence;
 	private static File customSentenseFile;
-
+	
+	public BaseIdFragment(IDType type,long id){
+		this.type = type;
+		this.id = id;
+	}
+	
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

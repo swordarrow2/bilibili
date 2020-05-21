@@ -29,6 +29,7 @@ import java.util.regex.*;
 import org.java_websocket.client.*;
 
 import com.meng.biliv3.R;
+import com.meng.biliv3.enums.*;
 
 
 public class MainActivity extends Activity {
@@ -344,19 +345,19 @@ public class MainActivity extends Activity {
 									String typeReg=getIdType(content);
 									long conId=getId(content, typeReg);
 									if (uid.isChecked()) {
-										showFragment(UidFragment.class, BaseIdFragment.typeUID , conId);
+										showFragment(UidFragment.class, IDType.UID , conId);
 									} else if (av.isChecked()) {
-										showFragment(AvFragment.class, BaseIdFragment.typeAv , conId);
+										showFragment(AvFragment.class, IDType.Video , conId);
 									} else if (live.isChecked()) {
-										showFragment(LiveFragment.class, BaseIdFragment.typeLive , conId);
+										showFragment(LiveFragment.class, IDType.Live , conId);
 									} else if (cv.isChecked()) {
-										showFragment(CvFragment.class, BaseIdFragment.typeCv , conId);
+										showFragment(CvFragment.class, IDType.Article , conId);
 									}
 								}
 							}).show();
 						break;
 					case "管理账号":
-						showFragment(ManagerFragment.class, "管理账号");
+						showFragment(ManagerFragment.class,IDType.Accounts);
 						break;
 					case "头衔":
 						String items[] = new String[MainActivity.instance.loginAccounts.size()];
@@ -366,18 +367,18 @@ public class MainActivity extends Activity {
 						new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setItems(items, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									showFragment(MedalFragment.class, BaseIdFragment.typeMedal, MainActivity.instance.loginAccounts.get(which).uid);
+									showFragment(MedalFragment.class, IDType.Medal, MainActivity.instance.loginAccounts.get(which).uid);
 								}
 							}).show();
 						break;
 					case "AVBV转换":
-						showFragment(AvBvConvertFragment.class, "AVBV转换");
+						showFragment(AvBvConvertFragment.class, IDType.AVBV);
 						break;
                     case "设置":
-                        showFragment(SettingsFragment.class, "设置");
+                        showFragment(SettingsFragment.class,IDType.Settings);
                         break;
 					case "动态":
-						showFragment(DynamicFragment.class, "动态");
+						showFragment(DynamicFragment.class, IDType.Dynamic);
 						break;
                     case "退出":
                         if (sjfSettings.getExit0()) {
@@ -454,15 +455,15 @@ public class MainActivity extends Activity {
 		transaction.commit();
 	}
 
-	public <T extends Fragment> void showFragment(Class<T> c, String type) {
+	public <T extends Fragment> void showFragment(Class<T> c, IDType type) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		Fragment frag = fragments.get(type);
+		Fragment frag = fragments.get(type.toString());
 		if (frag == null) {
 			try {
 				Class<?> cls = Class.forName(c.getName());
 				frag = (Fragment) cls.newInstance();
-				fragments.put(type, frag);
-				recentAdapter.add(type, 0, type);
+				fragments.put(type.toString(), frag);
+				recentAdapter.add(type, 0, type.toString());
 				transaction.add(R.id.main_activityLinearLayout, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());
@@ -473,16 +474,16 @@ public class MainActivity extends Activity {
         transaction.commit();
 	}
 
-	public <T extends Fragment> void showFragment(Class<T> c, String type, long id) {
+	public <T extends Fragment> void showFragment(Class<T> c, IDType type, long id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		Fragment frag = fragments.get(type + id);
+		Fragment frag = fragments.get(type.toString() + id);
 		if (frag == null) {
 			try {
 				Class<?> cls = Class.forName(c.getName());
-				Constructor con = cls.getConstructor(String.class, long.class);
+				Constructor con = cls.getConstructor(IDType.class, long.class);
 				frag = (Fragment) con.newInstance(type, id);
-				fragments.put(type + id, frag);
-				recentAdapter.add(type , id, type + id);
+				fragments.put(type.toString()+ id, frag);
+				recentAdapter.add(type , id, type.toString() + id);
 				transaction.add(R.id.main_activityLinearLayout, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());

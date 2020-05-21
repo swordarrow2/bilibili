@@ -223,12 +223,12 @@ public class Medals {
 	public int code;
     public String msg;
     public String message;
-    public Data data;
+    public Data data = new Data();
 
     public class Data {
 		public int medalCount;
 		public int count;
-		public ArrayList<FansMedal> fansMedalList;
+		public ArrayList<FansMedal> fansMedalList = new ArrayList<>();
 		public String name;
 		public PageInfo pageinfo;
     }
@@ -306,12 +306,12 @@ public class Medals {
 		public String desc;
         public int type;  
     }
-	
+
 	public class PageInfo {
 		public int totalpages;
 		public int curPage;
 	}
-	
+
 	@Override
 	public String toString() {
 		return GSON.toJson(this);

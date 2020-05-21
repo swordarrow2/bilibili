@@ -17,6 +17,7 @@ import com.meng.biliv3.update.*;
 import org.java_websocket.client.*;
 
 import android.view.View.OnClickListener;
+import com.meng.biliv3.enums.*;
 
 public class ManagerFragment extends Fragment {
 
@@ -35,7 +36,7 @@ public class ManagerFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-					MainActivity.instance.showFragment(UidFragment.class, BaseIdFragment.typeUID, MainActivity.instance.loginAccounts.get(position).uid);
+					MainActivity.instance.showFragment(UidFragment.class, IDType.UID, MainActivity.instance.loginAccounts.get(position).uid);
 				}
 			});
         list.setOnItemLongClickListener(new OnItemLongClickListener() {

@@ -9,8 +9,8 @@ android {
         applicationId "com.meng.biliv3"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 47
-        versionName "1.4.5"
+        versionCode 48
+        versionName "1.4.6"
     }
     buildTypes {
         release {

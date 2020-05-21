@@ -11,6 +11,7 @@ import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import java.io.*;
 import java.util.*;
+import com.meng.biliv3.enums.*;
 
 public class RecentAdapter extends BaseAdapter {
 
@@ -30,10 +31,10 @@ public class RecentAdapter extends BaseAdapter {
 		}
 	}
 
-	public void add(String type, long id, String name) {
+	public void add(IDType type, long id, String name) {
 		for (int i=0;i < recents.size();++i) {
 			Recent r=recents.get(i);
-			if (r.id == id && r.type.equals(type)) {
+			if (r.id == id && r.type == type) {
 				return;
 			}
 		}
@@ -110,32 +111,32 @@ public class RecentAdapter extends BaseAdapter {
 					Recent r = recents.get(position);
 					toFirst(r.name);		
 					switch (r.type) {
-						case BaseIdFragment.typeAv:
+						case Video:
 							MainActivity.instance.showFragment(AvFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeCv:
+						case Article:
 							MainActivity.instance.showFragment(CvFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeLive:
+						case Live:
 							MainActivity.instance.showFragment(LiveFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeUID:
+						case UID:
 							MainActivity.instance.showFragment(UidFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeMedal:
+						case Medal:
 							MainActivity.instance.showFragment(MedalFragment.class, r.type, r.id);
 							break;
-						case "AVBV转换":
-							MainActivity.instance.showFragment(AvBvConvertFragment.class, "AVBV转换");
+						case AVBV:
+							MainActivity.instance.showFragment(AvBvConvertFragment.class, IDType.AVBV);
 							break;
-						case "管理账号":
-							MainActivity.instance.showFragment(ManagerFragment.class, "管理账号");
+						case Accounts:
+							MainActivity.instance.showFragment(ManagerFragment.class, IDType.Accounts);
 							break;
-						case "设置":
-							MainActivity.instance.showFragment(SettingsFragment.class, "设置");
+						case Settings:
+							MainActivity.instance.showFragment(SettingsFragment.class, IDType.Settings);
 							break;
-						case "动态":
-							MainActivity.instance.showFragment(DynamicFragment.class, "动态");
+						case Dynamic:
+							MainActivity.instance.showFragment(DynamicFragment.class, IDType.Dynamic);
 					}
 				}
 			});
@@ -149,32 +150,32 @@ public class RecentAdapter extends BaseAdapter {
 					}
 					Recent r = recents.get(0);		
 					switch (r.type) {
-						case BaseIdFragment.typeAv:
+						case Video:
 							MainActivity.instance.showFragment(AvFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeCv:
+						case Article:
 							MainActivity.instance.showFragment(CvFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeLive:
+						case Live:
 							MainActivity.instance.showFragment(LiveFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeUID:
+						case UID:
 							MainActivity.instance.showFragment(UidFragment.class, r.type, r.id);
 							break;
-						case BaseIdFragment.typeMedal:
+						case Medal:
 							MainActivity.instance.showFragment(MedalFragment.class, r.type, r.id);
 							break;
-						case "AVBV转换":
-							MainActivity.instance.showFragment(AvBvConvertFragment.class, "AVBV转换");
+						case AVBV:
+							MainActivity.instance.showFragment(AvBvConvertFragment.class,IDType.AVBV);
 							break;
-						case "管理账号":
-							MainActivity.instance.showFragment(ManagerFragment.class, "管理账号");
+						case Accounts:
+							MainActivity.instance.showFragment(ManagerFragment.class, IDType.Accounts);
 							break;
-						case "设置":
-							MainActivity.instance.showFragment(SettingsFragment.class, "设置");
+						case Settings:
+							MainActivity.instance.showFragment(SettingsFragment.class, IDType.Settings);
 							break;
-						case "动态":
-							MainActivity.instance.showFragment(DynamicFragment.class, "动态");
+						case Dynamic:
+							MainActivity.instance.showFragment(DynamicFragment.class, IDType.Dynamic);
 					}
 				}
 			});

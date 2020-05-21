@@ -13,21 +13,33 @@ import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
+import com.meng.biliv3.enums.*;
 
 public class MedalFragment extends BaseIdFragment {
 
 	private ListView selected;
+	private Button refresh;
 	private MedalsAdapter medalsAdapter;
-	public MedalFragment(String type, long uid) {
-		this.type = type;
-		id = uid;
+	
+	public MedalFragment(IDType type, long id) {
+		super(type, id);
 	}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		selected = new ListView(getActivity());
-		MainActivity.instance.renameFragment(typeMedal + id, MainActivity.instance.getAccount(id).name + "的头衔");
-		return selected;
+		MainActivity.instance.renameFragment(IDType.Medal.toString() + id, MainActivity.instance.getAccount(id).name + "的头衔");
+		RelativeLayout rl=(RelativeLayout) inflater.inflate(R.layout.account_manager,null);
+		selected = (ListView) rl.findViewById(R.id.account_managerListView);
+		refresh = (Button) rl.findViewById(R.id.account_managerButton);
+		refresh.setText("刷新");
+		refresh.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View p1) {
+					notifyDataSetChange();
+				}
+			});
+		return rl;
     }
 
     @Override
@@ -37,7 +49,7 @@ public class MedalFragment extends BaseIdFragment {
 
 				@Override
 				public void run() {
-					final Medals mds=Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, 1, 20);
+					final Medals mds = getAllMedals();
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override
@@ -51,7 +63,7 @@ public class MedalFragment extends BaseIdFragment {
 		selected.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(final AdapterView<?> parent, View view, final int position, long itemId) {
-					final AccountInfo ai=MainActivity.instance.getAccount(id);
+					final AccountInfo ai = MainActivity.instance.getAccount(id);
 					new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择辣条(" + ai.name + ")")
 						.setNegativeButton("包裹", new DialogInterface.OnClickListener(){
 
@@ -61,7 +73,6 @@ public class MedalFragment extends BaseIdFragment {
 
 										@Override
 										public void run() {
-
 											final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
 											getActivity().runOnUiThread(new Runnable() {
 													@Override
@@ -185,12 +196,21 @@ public class MedalFragment extends BaseIdFragment {
 			});
 	}
 
+	private Medals getAllMedals() {
+		Medals mb = Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, 1, 20);
+		for (int i=mb.data.pageinfo.curPage;i < mb.data.pageinfo.totalpages;++i) {
+			Medals tm=Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, i, 20);
+			mb.data.fansMedalList.addAll(tm.data.fansMedalList);
+		}
+		return mb;
+	}
+	
 	private void notifyDataSetChange() {
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
 				public void run() {
-					final Medals m=Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, 1, 20);
+					final Medals m = getAllMedals();
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override

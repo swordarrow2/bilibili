@@ -107,13 +107,26 @@ public class SanaeConnect extends WebSocketClient {
 				}
 			}
 		}
-
 		if (bdp.getOpCode() == BotDataPack.opGetApp) {
 			File f=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".apk");
 			bdp.readFile(f);
 			MainActivity.instance.showToast("文件已保存至" + f.getAbsolutePath());
 		} else if (bdp.getOpCode() == BotDataPack.opTextNotify) {
 			MainActivity.instance.showToast(bdp.readString());
+		} else if (bdp.getOpCode() == BotDataPack.opGetGzApp) {
+			File f=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".gz");
+			bdp.readFile(f);
+			byte[] uncompressed=Gzip.unCompress(Tools.FileTool.readBytes(f));
+			File fa=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".apk");
+			try {
+				FileOutputStream fos = new FileOutputStream(fa);
+				fos.write(uncompressed);
+				fos.flush();
+				fos.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e.toString());
+			}
+			MainActivity.instance.showToast("文件已保存至" + f.getAbsolutePath());
 		}
 		super.onMessage(bytes);
 	}

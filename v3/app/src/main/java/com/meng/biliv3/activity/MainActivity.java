@@ -12,14 +12,15 @@ import android.text.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-import com.google.gson.*;
 import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.adapters.*;
 import com.meng.biliv3.customView.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.fragment.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
+import com.meng.biliv3.tasks.*;
 import com.meng.biliv3.update.*;
 import java.io.*;
 import java.lang.reflect.*;
@@ -29,7 +30,6 @@ import java.util.regex.*;
 import org.java_websocket.client.*;
 
 import com.meng.biliv3.R;
-import com.meng.biliv3.enums.*;
 
 
 public class MainActivity extends Activity {
@@ -113,11 +113,6 @@ public class MainActivity extends Activity {
 			sanaeConnect.addOnOpenAction(new WebSocketOnOpenAction(){
 
 					@Override
-					public int useTimes() {
-						return 1;
-					}
-
-					@Override
 					public void action(WebSocketClient wsc) {
 						try {
 							PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
@@ -131,52 +126,9 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			showToast(e.toString());
 		}
-
 		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
 		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-		threadPool.execute(new Runnable(){
-
-				@Override
-				public void run() {
-					StringBuilder sb= new StringBuilder();
-					for (int i=0;i < loginAccounts.size();++i) {
-						AccountInfo ai=loginAccounts.get(i);
-						if (!Tools.Time.getDate().equals(Tools.Time.getDate(ai.lastSign))) {
-							ai.setSigned(false);
-						}
-						if (!ai.isSigned() && !ai.isCookieExceed()) {
-							int rc =new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("code").getAsInt();
-							ai.lastSign = System.currentTimeMillis();
-							switch (rc) {
-								case -101:
-									ai.setCookieExceed(true);
-									sb.append("\n").append(ai.name).append(":cookie过期");
-									break;
-								case 0:
-									ai.lastSign = System.currentTimeMillis();
-									sb.append("\n").append(ai.name).append(":成功");
-									ai.setSigned(true);
-									break;
-								case 1011040:
-									sb.append("\n").append(ai.name).append(":已在其他设备签到");
-									ai.setSigned(true);
-									break;
-							}
-							try {
-								Thread.sleep(200);
-							} catch (InterruptedException e) {}
-						} else if (ai.isSigned()) {
-							sb.append("\n").append(ai.name).append(":今日已签到");
-						} else if (ai.isCookieExceed()) {
-							sb.append("\n").append(ai.name).append(":cookie过期");
-						} else {
-							sb.append("\n").append(ai.name).append(":未知错误");
-						}
-					}
-					showToast("自动签到:" + sb.toString());
-					saveConfig();
-				}
-			});
+		threadPool.execute(new AutoSign());
 	}
 
 	@Override
@@ -212,7 +164,6 @@ public class MainActivity extends Activity {
 		recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
 		lvRecent.addHeaderView(tvMemory);
-
 		threadPool.execute(new Runnable(){
 
 				@Override
@@ -357,7 +308,7 @@ public class MainActivity extends Activity {
 							}).show();
 						break;
 					case "管理账号":
-						showFragment(ManagerFragment.class,IDType.Accounts);
+						showFragment(ManagerFragment.class, IDType.Accounts);
 						break;
 					case "头衔":
 						String items[] = new String[MainActivity.instance.loginAccounts.size()];
@@ -375,7 +326,7 @@ public class MainActivity extends Activity {
 						showFragment(AvBvConvertFragment.class, IDType.AVBV);
 						break;
                     case "设置":
-                        showFragment(SettingsFragment.class,IDType.Settings);
+                        showFragment(SettingsFragment.class, IDType.Settings);
                         break;
 					case "动态":
 						showFragment(DynamicFragment.class, IDType.Dynamic);
@@ -482,7 +433,7 @@ public class MainActivity extends Activity {
 				Class<?> cls = Class.forName(c.getName());
 				Constructor con = cls.getConstructor(IDType.class, long.class);
 				frag = (Fragment) con.newInstance(type, id);
-				fragments.put(type.toString()+ id, frag);
+				fragments.put(type.toString() + id, frag);
 				recentAdapter.add(type , id, type.toString() + id);
 				transaction.add(R.id.main_activityLinearLayout, frag);	
 			} catch (Exception e) {

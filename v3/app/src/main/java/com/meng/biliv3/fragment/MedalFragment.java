@@ -4,23 +4,28 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
+import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
-import com.meng.biliv3.enums.*;
+
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 
 public class MedalFragment extends BaseIdFragment {
 
 	private ListView selected;
 	private Button refresh;
 	private MedalsAdapter medalsAdapter;
-	
+	private Medals medals;
+
 	public MedalFragment(IDType type, long id) {
 		super(type, id);
 	}
@@ -28,7 +33,7 @@ public class MedalFragment extends BaseIdFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		MainActivity.instance.renameFragment(IDType.Medal.toString() + id, MainActivity.instance.getAccount(id).name + "的头衔");
-		RelativeLayout rl=(RelativeLayout) inflater.inflate(R.layout.account_manager,null);
+		RelativeLayout rl=(RelativeLayout) inflater.inflate(R.layout.account_manager, null);
 		selected = (ListView) rl.findViewById(R.id.account_managerListView);
 		refresh = (Button) rl.findViewById(R.id.account_managerButton);
 		refresh.setText("刷新");
@@ -36,7 +41,84 @@ public class MedalFragment extends BaseIdFragment {
 
 				@Override
 				public void onClick(View p1) {
-					notifyDataSetChange();
+					MainActivity.instance.threadPool.execute(new Runnable(){
+
+							@Override
+							public void run() {
+								medals.data.fansMedalList.clear();
+								medals.data.fansMedalList.addAll(getAllMedals().data.fansMedalList);
+								refreshAdapter(medalsAdapter);
+								MainActivity.instance.showToast("刷新");
+							}
+						});
+				}
+			});
+		refresh.setOnLongClickListener(new OnLongClickListener(){
+
+				@Override
+				public boolean onLongClick(View p1) {
+					final AccountInfo ai = MainActivity.instance.getAccount(id);
+					String items[] = new String[medals.data.fansMedalList.size()];
+					for (int i=0;i < items.length;++i) {
+						items[i] = medals.data.fansMedalList.get(i).medal_name;
+					}
+					final boolean checkedItems[] = new boolean[items.length];
+					new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择要送满的头衔").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+								checkedItems[which] = isChecked;
+							}
+						}).setNegativeButton("取消", null).setPositiveButton("确定送满", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								MainActivity.instance.threadPool.execute(new Runnable() {
+										@Override
+										public void run() {
+											StringBuilder sb = new StringBuilder();
+											for (int i = 0; i < checkedItems.length; i++) {
+												if (checkedItems[i]) {
+													int send=0;
+													Medals.FansMedal mfm = medals.data.fansMedalList.get(i);
+													int need = mfm.day_limit - mfm.today_feed;
+													if (need == 0) {
+														sb.append("赠送").append(mfm.medal_name).append(send).append("辣条\n");
+														continue;
+													}
+													GiftBag liveBag = Tools.BilibiliTool.getGiftBag(ai.cookie);
+													if (need > liveBag.getStripCount()) {
+														MainActivity.instance.showToast("辣条不足");	
+														continue;
+													}
+													for (GiftBag.ListItem gli:liveBag.data.list) {
+														if (gli.gift_name.equals("辣条")) {
+															if (need > gli.gift_num) {
+																sendHotStrip(ai.uid, mfm.target_id, id, gli.gift_num, ai.cookie, gli);
+																need -= gli.gift_num;
+																send += gli.gift_num;
+																gli.gift_num = 0;
+															} else {
+																sendHotStrip(ai.uid, mfm.target_id, id, need, ai.cookie, gli);
+																send += need;
+																gli.gift_num -= need;
+																break;	
+															}
+														}
+													}
+													if (liveBag.getStripCount() == 0) {
+														MainActivity.instance.showToast("已送出全部辣条🎁");
+													}
+													sb.append("赠送").append(mfm.medal_name).append(send).append("辣条\n");
+													try {
+														Thread.sleep(100);
+													} catch (InterruptedException e) {}
+												}
+											}
+											MainActivity.instance.showToast(sb.toString());
+										}
+									});
+							}
+						}).show();
+					return true;
 				}
 			});
 		return rl;
@@ -49,12 +131,12 @@ public class MedalFragment extends BaseIdFragment {
 
 				@Override
 				public void run() {
-					final Medals mds = getAllMedals();
+					medals = getAllMedals();
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override
 							public void run() {
-								selected.setAdapter(medalsAdapter = new MedalsAdapter(mds));
+								selected.setAdapter(medalsAdapter = new MedalsAdapter(medals));
 							}
 						});
 				}
@@ -73,96 +155,7 @@ public class MedalFragment extends BaseIdFragment {
 
 										@Override
 										public void run() {
-											final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
-											getActivity().runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														ListView listView=new ListView(getActivity());
-														new AlertDialog.Builder(getActivity()).setView(listView).setTitle("选择(" + ai.name + ")").show();
-														final GiftAdapter giftAdapter = new GiftAdapter(getActivity(), liveBag.data.list);
-														listView.setAdapter(giftAdapter);
-														listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-																@Override
-																public void onItemClick(final AdapterView<?> parent, View view, final int p, long itemid) {
-																	final EditText editText = new EditText(getActivity());
-																	editText.setHint("要赠送的数量");
-																	new AlertDialog.Builder(getActivity()).setView(editText).setTitle("编辑").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-																			@Override
-																			public void onClick(DialogInterface p11, int p2) {
-																				MainActivity.instance.threadPool.execute(new Runnable() {
-																						@Override
-																						public void run() {
-																							int num=Integer.parseInt(editText.getText().toString());
-																							if (num > getStripCount(liveBag.data.list)) {
-																								MainActivity.instance.showToast("辣条不足");	
-																								return;
-																							}
-																							for (GiftBag.ListItem i:liveBag.data.list) {
-																								if (i.gift_name.equals("辣条")) {
-																									Medals.FansMedal mfm=(Medals.FansMedal) medalsAdapter.getItem(position);
-																									if (num > i.gift_num) {
-																										sendHotStrip(ai.uid, mfm.target_id, id, i.gift_num, ai.cookie, i);
-																										num -= i.gift_num;
-																										i.gift_num = 0;
-																									} else {
-																										sendHotStrip(ai.uid, mfm.target_id, id, num, ai.cookie, i);											
-																										i.gift_num -= num;
-																										break;	
-																									}
-																								}
-																							}
-																							if (getStripCount(liveBag.data.list) == 0) {
-																								MainActivity.instance.showToast("已送出全部礼物🎁");
-																							}
-																							for (int i=0;i < liveBag.data.list.size();++i) {
-																								if (liveBag.data.list.get(i).gift_name.equals("辣条") && liveBag.data.list.get(i).gift_num == 0) {
-																									liveBag.data.list.remove(i);
-																								}
-																							}										
-																							getActivity().runOnUiThread(new Runnable() {
-																									@Override
-																									public void run() {
-																										giftAdapter.notifyDataSetChanged();
-																									}
-																								});
-																						}
-																					});
-																			}
-																		}).setNegativeButton("取消", null)
-																		.setOnCancelListener(new DialogInterface.OnCancelListener(){
-
-																			@Override
-																			public void onCancel(DialogInterface p1) {
-																				notifyDataSetChange();
-																			}
-																		}).show();
-																}
-															});
-														listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-																@Override
-																public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
-																	MainActivity.instance.threadPool.execute(new Runnable() {
-																			@Override
-																			public void run() {
-																				sendHotStrip(ai.uid, ((Medals.FansMedal) medalsAdapter.getItem(position)).target_id, id, liveBag.data.list.get(p3).gift_num, ai.cookie, liveBag.data.list.get(p3));
-																				liveBag.data.list.remove(p3);
-																				if (liveBag.data.list.size() == 0) {
-																					MainActivity.instance.showToast("已送出全部礼物🎁");
-																				}
-																				getActivity().runOnUiThread(new Runnable() {
-																						@Override
-																						public void run() {
-																							giftAdapter.notifyDataSetChanged();
-																						}
-																					});
-																			}
-																		});
-																	return true;
-																}
-															});
-													}
-												});
+											sendPackDialog(ai, medalsAdapter.getItem(position).target_id);
 										}
 									});
 							}
@@ -182,8 +175,10 @@ public class MedalFragment extends BaseIdFragment {
 
 																@Override
 																public void run() {
-																	MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, ((Medals.FansMedal)medalsAdapter.getItem(position)).target_id, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
-																	notifyDataSetChange();
+																	MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, medalsAdapter.getItem(position).target_id, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
+																	medals.data.fansMedalList.clear();
+																	medals.data.fansMedalList.addAll(getAllMedals().data.fansMedalList);
+																	refreshAdapter(medalsAdapter);
 																}
 															});
 													}
@@ -194,31 +189,59 @@ public class MedalFragment extends BaseIdFragment {
 						}).show();
 				}
 			});
+		selected.setOnItemLongClickListener(new OnItemLongClickListener(){
+
+				@Override
+				public boolean onItemLongClick(AdapterView<?> p1, View p2, final int p3, long p4) {
+					MainActivity.instance.threadPool.execute(new Runnable() {
+							@Override
+							public void run() {
+								AccountInfo ai = MainActivity.instance.getAccount(id);
+								int send = 0;
+								Medals.FansMedal mfm = medals.data.fansMedalList.get(p3);
+								int need = mfm.day_limit - mfm.today_feed;
+								if (need == 0) {
+									MainActivity.instance.showToast("今日亲密度已满");
+									return;
+								}
+								GiftBag liveBag = Tools.BilibiliTool.getGiftBag(ai.cookie);
+								if (need > liveBag.getStripCount()) {
+									MainActivity.instance.showToast("辣条不足");	
+									return;
+								}
+								for (GiftBag.ListItem gli:liveBag.data.list) {
+									if (gli.gift_name.equals("辣条")) {
+										if (need > gli.gift_num) {
+											sendHotStrip(ai.uid, mfm.target_id, id, gli.gift_num, ai.cookie, gli);
+											need -= gli.gift_num;
+											send += gli.gift_num;
+											gli.gift_num = 0;
+										} else {
+											sendHotStrip(ai.uid, mfm.target_id, id, need, ai.cookie, gli);
+											send += need;
+											gli.gift_num -= need;
+											break;	
+										}
+									}
+								}
+								if (liveBag.getStripCount() == 0) {
+									MainActivity.instance.showToast("已送出全部辣条🎁");
+								}
+								MainActivity.instance.showToast(String.format("赠送%s%d辣条", mfm.medal_name, send));
+							}
+						});
+					return true;
+				}
+			});
 	}
 
 	private Medals getAllMedals() {
-		Medals mb = Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, 1, 20);
-		for (int i=mb.data.pageinfo.curPage;i < mb.data.pageinfo.totalpages;++i) {
-			Medals tm=Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie, i, 20);
-			mb.data.fansMedalList.addAll(tm.data.fansMedalList);
-		}
+		String cookie = MainActivity.instance.getAccount(id).cookie;
+		Medals mb = Tools.BilibiliTool.getMedal(cookie);
+		/*for (int i=mb.data.pageinfo.curPage;i < mb.data.pageinfo.totalpages;++i) {
+		 Medals tm=Tools.BilibiliTool.getMedal(cookie, i, 10);
+		 mb.data.fansMedalList.addAll(tm.data.fansMedalList);
+		 }*/
 		return mb;
-	}
-	
-	private void notifyDataSetChange() {
-		MainActivity.instance.threadPool.execute(new Runnable(){
-
-				@Override
-				public void run() {
-					final Medals m = getAllMedals();
-					MainActivity.instance.runOnUiThread(new Runnable(){
-
-							@Override
-							public void run() {
-								medalsAdapter.notifyDataSetChanged(m);
-							}
-						});
-				}
-			});
 	}
 }

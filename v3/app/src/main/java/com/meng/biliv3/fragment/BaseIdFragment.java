@@ -13,13 +13,13 @@ import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.biliv3.activity.live.*;
 import com.meng.biliv3.adapters.*;
+import com.meng.biliv3.enums.*;
 import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
 import java.util.*;
 import org.jsoup.*;
-import com.meng.biliv3.enums.*;
 
 public class BaseIdFragment extends Fragment {
 
@@ -45,12 +45,12 @@ public class BaseIdFragment extends Fragment {
 	private static ArrayList<String> spList=null;
 	private static CustomSentence customSentence;
 	private static File customSentenseFile;
-	
-	public BaseIdFragment(IDType type,long id){
+
+	public BaseIdFragment(IDType type, long id) {
 		this.type = type;
 		this.id = id;
 	}
-	
+
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -151,17 +151,11 @@ public class BaseIdFragment extends Fragment {
 							JsonObject obj = parser.parse(response).getAsJsonObject();
 							switch (obj.get("code").getAsInt()) {
 								case 0:
-									if (!obj.get("message").getAsString().equals("")) {
-										MainActivity.instance.showToast(obj.getAsJsonObject("message").getAsString());
-									} else {
-										MainActivity.instance.showToast(id + "发送成功");
-									}
+									MainActivity.instance.showToast(obj.get("message").getAsString().equals("") ?id + "发送成功": obj.getAsJsonObject("message").getAsString());
 									break;
 								case 1990000:
 									if (obj.get("message").getAsString().equals("risk")) {
-										ConnectivityManager connMgr = (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
-										NetworkInfo wifiNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-										if (wifiNetworkInfo.isConnected()) {
+										if (((ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 											Intent intent = new Intent(MainActivity.instance, LiveWebActivity.class);
 											intent.putExtra("cookie", ai.cookie);
 											intent.putExtra("url", "https://live.bilibili.com/" + id);
@@ -189,14 +183,13 @@ public class BaseIdFragment extends Fragment {
 
 															@Override
 															public void run() {
-																String content = editText.getText().toString();
 																JsonObject liveToMainInfo=null;
 																try {
 																	liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 																} catch (Exception e) {
 																	return;
 																}
-																MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, liveToMainInfo.get("uid").getAsLong(), id, Integer.parseInt(content), ai.cookie)).getAsJsonObject().get("message").getAsString());
+																MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, liveToMainInfo.get("uid").getAsLong(), id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
 															}
 														});
 												}
@@ -205,7 +198,7 @@ public class BaseIdFragment extends Fragment {
 								});
 							break;
 						case Pack:
-							sendPackDialog(ai);
+							sendPackDialog(ai, Tools.BilibiliTool.getRoomToUid(id).data.info.uid);
 							break;
 						case Sign:
 							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("message").getAsString());
@@ -242,9 +235,8 @@ public class BaseIdFragment extends Fragment {
 			});
 	}
 
-	private void sendPackDialog(final AccountInfo ai) {
-		final long uid=Tools.BilibiliTool.getRoomToUid(id).data.info.uid;
-		final GiftBag liveBag = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), ai.cookie), GiftBag.class);
+	protected void sendPackDialog(final AccountInfo ai, final long targetUid) {
+		final GiftBag liveBag =Tools.BilibiliTool.getGiftBag(ai.cookie);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -264,37 +256,33 @@ public class BaseIdFragment extends Fragment {
 													@Override
 													public void run() {
 														int num=Integer.parseInt(editText.getText().toString());
-														if (num > getStripCount(liveBag.data.list)) {
+														if (num > liveBag.getStripCount()) {
 															MainActivity.instance.showToast("辣条不足");	
 															return;
 														}
 														for (GiftBag.ListItem i:liveBag.data.list) {
 															if (i.gift_name.equals("辣条")) {
 																if (num > i.gift_num) {
-																	sendHotStrip(ai.uid, uid, id, i.gift_num, ai.cookie, i);
+																	sendHotStrip(ai.uid, targetUid, id, i.gift_num, ai.cookie, i);
 																	num -= i.gift_num;
 																	i.gift_num = 0;
 																} else {
-																	sendHotStrip(ai.uid, uid, id, num, ai.cookie, i);											
+																	sendHotStrip(ai.uid, targetUid, id, num, ai.cookie, i);											
 																	i.gift_num -= num;
 																	break;	
 																}
 															}
 														}
-														if (getStripCount(liveBag.data.list) == 0) {
-															MainActivity.instance.showToast("已送出全部礼物🎁");
-														}
-														for (int i=0;i < liveBag.data.list.size();++i) {
-															if (liveBag.data.list.get(i).gift_name.equals("辣条") && liveBag.data.list.get(i).gift_num == 0) {
-																liveBag.data.list.remove(i);
+														Iterator<GiftBag.ListItem> iterator = liveBag.data.list.iterator();
+														while (iterator.hasNext()) {
+															if (iterator.next().gift_num == 0) {
+																iterator.remove();
 															}
-														}										
-														getActivity().runOnUiThread(new Runnable() {
-																@Override
-																public void run() {
-																	giftAdapter.notifyDataSetChanged();
-																}
-															});
+														}
+														if (liveBag.getStripCount() == 0) {
+															MainActivity.instance.showToast("已送出全部辣条🎁");
+														}
+														refreshAdapter(giftAdapter);
 													}
 												});
 										}
@@ -308,17 +296,12 @@ public class BaseIdFragment extends Fragment {
 								MainActivity.instance.threadPool.execute(new Runnable() {
 										@Override
 										public void run() {
-											sendHotStrip(ai.uid, uid, id, liveBag.data.list.get(p3).gift_num, ai.cookie, liveBag.data.list.get(p3));
+											sendHotStrip(ai.uid, targetUid, id, liveBag.data.list.get(p3).gift_num, ai.cookie, liveBag.data.list.get(p3));
 											liveBag.data.list.remove(p3);
-											if (liveBag.data.list.size() == 0) {
-												MainActivity.instance.showToast("已送出全部礼物🎁");
+											if (liveBag.getStripCount() == 0) {
+												MainActivity.instance.showToast("已送出全部辣条🎁");
 											}
-											getActivity().runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														giftAdapter.notifyDataSetChanged();
-													}
-												});
+											refreshAdapter(giftAdapter);
 										}
 									});
 								return true;
@@ -328,17 +311,17 @@ public class BaseIdFragment extends Fragment {
 			});
 	}
 
-	protected int getStripCount(ArrayList<GiftBag.ListItem> list) {
-		int ii=0;
-		for (GiftBag.ListItem i:list) {
-			if (i.gift_name.equals("辣条")) {
-				ii += i.gift_num;
-			}
-		}
-		return ii;
+	protected void refreshAdapter(final BaseAdapter adapter) {
+		MainActivity.instance.runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+					adapter.notifyDataSetChanged();
+				}
+			});
 	}
 
-	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie,  GiftBag.ListItem liveBagDataList) {
+	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie, GiftBag.ListItem liveBagDataList) {
 		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
 		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
 		connection.userAgent(MainActivity.instance.userAgent)
@@ -356,9 +339,9 @@ public class BaseIdFragment extends Fragment {
 			.data("biz_code", "live")
 			.data("biz_id", roomID)
 			.data("rnd", System.currentTimeMillis() / 1000)
-			.data("storm_beat_id", "0")
+			.data("storm_beat_id", 0)
 			.data("metadata", "")
-			.data("price", "0")
+			.data("price", 0)
 			.data("csrf_token", csrf)
 			.data("csrf", csrf)
 			.data("visit_id", "");	

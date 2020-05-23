@@ -101,11 +101,6 @@ public class ManagerFragment extends Fragment {
 															rc.addOnOpenAction(new WebSocketOnOpenAction(){
 
 																	@Override
-																	public int useTimes() {
-																		return 1;
-																	}
-
-																	@Override
 																	public void action(WebSocketClient wsc) {
 																		wsc.send(BotDataPack.encode(BotDataPack.cookie).write((int)aif.uid).write(aif.cookie).getData());
 																	}

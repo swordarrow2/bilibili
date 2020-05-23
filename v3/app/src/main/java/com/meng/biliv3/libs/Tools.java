@@ -8,6 +8,7 @@ import android.provider.*;
 import android.webkit.*;
 import com.google.gson.*;
 import com.meng.biliv3.activity.*;
+import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
 import java.net.*;
@@ -16,7 +17,6 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.*;
 import org.jsoup.*;
-import com.meng.biliv3.javabean.*;
 
 public class Tools {
 	public static Map<String, String> liveHead = new HashMap<>();
@@ -209,8 +209,18 @@ public class Tools {
 			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/relation/v1/feed/feed_list?page=" + page + "&pagesize=" + pageSize, cookie), FollowingLiving.class);
 		}
 
-		public static Medals getMedal(String cookie, int page, int pageSize) {
-			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/i/api/medal?page=" + page + "&pagesize=" + pageSize, cookie), Medals.class);
+		public static Medals getMedal(String cookie) {
+			String v = "https://api.live.bilibili.com/i/api/medal?page=%d&pagesize=10";
+			Medals mb = GSON.fromJson(Tools.Network.httpGet(String.format(v, 1), cookie), Medals.class);
+			for (int i = mb.data.pageinfo.curPage;i < mb.data.pageinfo.totalpages;++i) {
+				Medals tm = GSON.fromJson(Tools.Network.httpGet(String.format(v, i), cookie), Medals.class);
+				mb.data.fansMedalList.addAll(tm.data.fansMedalList);
+			}
+			return mb;
+		}
+
+		public static GiftBag getGiftBag(String cookie) {
+			return GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=" + System.currentTimeMillis(), cookie), GiftBag.class);
 		}
 
 		public static String getMedalRank(String cookie, long uid, long roomId) {

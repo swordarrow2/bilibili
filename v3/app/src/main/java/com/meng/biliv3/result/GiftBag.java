@@ -40,4 +40,14 @@ public class GiftBag {
 	public String toString() {
 		return GSON.toJson(this);
 	}
+
+	public int getStripCount() {
+		int i=0;
+		for (ListItem item:data.list) {
+			if (item.gift_name.equals("辣条")) {
+				i += item.gift_num;
+			}
+		}
+		return i;
+	}
 }

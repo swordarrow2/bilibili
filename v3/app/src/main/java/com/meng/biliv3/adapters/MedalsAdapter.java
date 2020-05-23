@@ -5,7 +5,6 @@ import android.view.*;
 import android.widget.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.javabean.*;
 import com.meng.biliv3.libs.*;
 import com.meng.biliv3.result.*;
 import java.io.*;
@@ -17,17 +16,11 @@ public class MedalsAdapter extends BaseAdapter {
         this.medals = medals;
     }
 
-	public void notifyDataSetChanged(Medals medals) {
-		this.medals = medals;
-		super.notifyDataSetChanged();
-	}
-
-
     public int getCount() {
         return medals.data.fansMedalList.size();
     }
 
-    public Object getItem(int position) {
+    public Medals.FansMedal getItem(int position) {
         return medals.data.fansMedalList.get(position);
     }
 
@@ -51,7 +44,6 @@ public class MedalsAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 		final Medals.FansMedal mfm=medals.data.fansMedalList.get(position);
-
 		holder.tvMedalName.setText(mfm.medal_name);
 		holder.tvMedalName.setTextColor(mfm.color | 0xFF000000);
 		holder.tvMasterName.setText(mfm.target_name);

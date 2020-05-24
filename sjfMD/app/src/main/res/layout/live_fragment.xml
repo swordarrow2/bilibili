@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/live_fragmentLinearLayout_main"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<FrameLayout
+		android:id="@+id/videoLayout"
+		android:layout_width="fill_parent"
+		android:layout_height="250dp"
+		android:background="@android:color/black">
+
+		<com.universalvideoview.UniversalVideoView
+			android:id="@+id/videoView"
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_gravity="center"
+			app:uvv_autoRotation="true"
+			app:uvv_fitXY="false"/>
+
+		<com.universalvideoview.UniversalMediaController
+			android:id="@+id/media_controller"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			app:uvv_scalable="true"/>
+
+		<ImageView
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:id="@+id/live_fragmentImageView"/>
+
+	</FrameLayout>
+
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:id="@+id/live_fragmentLinearLayout_b">
+
+		<TextView
+			android:textAppearance="?android:attr/textAppearanceListItemSmall"
+			android:id="@+id/live_fragmentTextView_info"
+			android:focusable="true"
+			android:longClickable="true"
+			android:textIsSelectable="true"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"/>
+
+		<Button
+			android:layout_below="@id/live_fragmentTextView_info"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="保存直播视频"
+			android:id="@+id/livefragmentButtonDownload"
+			android:background="@null"
+			android:visibility="gone"/>
+
+		<ListView
+			android:layout_below="@id/livefragmentButtonDownload"
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:id="@+id/livefragmentListView_danmaku"/>
+
+	</RelativeLayout>
+
+</LinearLayout>
+

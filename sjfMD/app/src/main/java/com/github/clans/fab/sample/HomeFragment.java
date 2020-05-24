@@ -1,9 +1,9 @@
 package com.github.clans.fab.sample;
 
+import android.app.*;
 import android.os.*;
 import android.support.annotation.*;
 import android.support.design.widget.*;
-import android.support.v4.app.*;
 import android.view.*;
 import android.view.animation.*;
 import android.widget.*;

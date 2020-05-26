@@ -58,6 +58,10 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
         tvBMain = (TextView) findViewById(R.id.main_account_list_headerTextView_bmain);
 		tvBLive = (TextView) findViewById(R.id.main_account_list_headerTextView_blive);
 		MainActivity.instance.colorManager.addView(findViewById(R.id.main_account_list_headerLinearLayout_main),ColorType.DrawerHeader);
+		btnStart = (Button) findViewById(R.id.main_account_list_headerButton_start);
+		btnRename = (Button) findViewById(R.id.main_account_list_headerButton_rename);
+		newName = (EditText) findViewById(R.id.main_account_list_headerEditText_new_name);
+		btnCopy = (Button) findViewById(R.id.main_account_list_headerButton_copy);
 		long mainUID = MainActivity.instance.sjfSettings.getMainAccount();
 		if (mainUID == -1) {
 			tvName.setVisibility(View.VISIBLE);
@@ -116,11 +120,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 							@Override
 							public void run() {
-								btnStart = (Button) findViewById(R.id.main_account_list_headerButton_start);
-								btnRename = (Button) findViewById(R.id.main_account_list_headerButton_rename);
-								newName = (EditText) findViewById(R.id.main_account_list_headerEditText_new_name);
-								btnCopy = (Button) findViewById(R.id.main_account_list_headerButton_copy);
-								if (liveStream != null) {
+										if (liveStream != null) {
 									btnCopy.setEnabled(true);
 									btnCopy.setText("复制推流码");
 								}

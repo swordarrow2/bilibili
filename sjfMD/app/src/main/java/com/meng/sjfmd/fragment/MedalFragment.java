@@ -33,7 +33,7 @@ public class MedalFragment extends BaseIdFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		MainActivity.instance.renameFragment(IDType.Medal.toString() + id, MainActivity.instance.getAccount(id).name + "的头衔");
-		RelativeLayout rl=(RelativeLayout) inflater.inflate(R.layout.account_manager, null);
+		RelativeLayout rl=(RelativeLayout) inflater.inflate(R.layout.medals_view, null);
 		selected = (ListView) rl.findViewById(R.id.account_managerListView);
 		refresh = (Button) rl.findViewById(R.id.account_managerButton);
 		refresh.setText("刷新");

@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 	public static final String regUid = "space\\D{0,}(\\d{1,})";
 	public static final String regUid2 = "UID\\D{0,}(\\d{1,})";
 
+	private NavigationView navigationView;
 
 	private int themeId;
 
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.maina_activity2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-		colorManager.addView(toolbar,ColorType.ToolBar);
+		colorManager.addView(toolbar, ColorType.ToolBar);
 		tvMemory = new TextView(this);
         rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
 		lvRecent = (ListView) findViewById(R.id.right_list);
@@ -92,24 +93,23 @@ public class MainActivity extends AppCompatActivity {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+		navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
-		navigationView.addHeaderView(new UserInfoHeaderView(this));
-		
+
 		ColorStateList csl = getResources().getColorStateList(R.color.navigation_menu_item_color_blue);
         navigationView.setItemTextColor(csl);
         navigationView.setItemIconTintList(csl);
-		
+
 		jsonPath = getFilesDir() + "/account.json";
 		ExceptionCatcher.getInstance().init(getApplicationContext());
 		//  DataBaseHelper.init(getBaseContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//&& checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
-		colorManager.addView(new TextView(this),ColorType.StatusBar);
-		colorManager.addView(rightDrawer,ColorType.RightDrawer);
+		colorManager.addView(new TextView(this), ColorType.StatusBar);
+		colorManager.addView(rightDrawer, ColorType.RightDrawer);
         setListener();
-		
+
     }
 
 	@Override
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 						loginAccounts = new ArrayList<>();
 					}
 					mainAccountAdapter = new AccountAdapter(this);
+					navigationView.addHeaderView(new UserInfoHeaderView(this));
 					for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
 						File ff = new File(mainDic + s);
 						if (!ff.exists()) {
@@ -576,17 +577,18 @@ public class MainActivity extends AppCompatActivity {
 
 				@Override
 				public void run() {
-					//Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-					Snackbar.make(mainLinearLayout, msg, Snackbar.LENGTH_SHORT).setAction("确定",
-//					new View.OnClickListener(){
-//
-//							@Override
-//							public void onClick(View v) {
-//								Toast.makeText(getActivity(), "点击确认了", Toast.LENGTH_SHORT).show();
-//							}
-//						}
-						null).show();
-					}
+					Snackbar.make(mainLinearLayout, msg, Snackbar.LENGTH_SHORT).setAction("查看全文", new View.OnClickListener(){
+
+							@Override
+							public void onClick(View v) {
+								new AlertDialog.Builder(MainActivity.this)
+									.setIcon(R.drawable.ic_launcher)
+									.setTitle("全文")
+									.setMessage(msg)
+									.setPositiveButton("确定", null).show();
+							}
+						}).show();
+				}
 			});
     }
     @Override

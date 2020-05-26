@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-
-	<Button
-		android:id="@+id/account_managerButton"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:text="添加"
-		android:layout_alignParentBottom="true"/>
+	android:layout_height="fill_parent"
+	xmlns:fab="http://schemas.android.com/apk/res-auto"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
 
 	<ListView
 		android:id="@+id/account_managerListView"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:layout_above="@id/account_managerButton"/>
+		android:layout_height="fill_parent"/>
 
-</RelativeLayout>
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/account_managerButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="bottom|end"
+		android:layout_margin="@dimen/fab_margin"
+		android:src="@drawable/fab_add"/>
+
+</android.support.design.widget.CoordinatorLayout>
 

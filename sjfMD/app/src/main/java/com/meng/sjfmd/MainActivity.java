@@ -18,15 +18,15 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.github.clans.fab.sample.*;
 import com.google.gson.reflect.*;
-import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.customView.*;
-import com.meng.biliv3.enums.*;
-import com.meng.biliv3.fragment.*;
-import com.meng.biliv3.javabean.*;
-import com.meng.biliv3.libs.*;
-import com.meng.biliv3.tasks.*;
-import com.meng.biliv3.update.*;
 import com.meng.sjfmd.*;
+import com.meng.sjfmd.adapters.*;
+import com.meng.sjfmd.customView.*;
+import com.meng.sjfmd.enums.*;
+import com.meng.sjfmd.fragment.*;
+import com.meng.sjfmd.javabean.*;
+import com.meng.sjfmd.libs.*;
+import com.meng.sjfmd.tasks.*;
+import com.meng.sjfmd.update.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -41,6 +41,7 @@ import com.meng.sjfmd.R;
 public class MainActivity extends AppCompatActivity {
 	public static MainActivity instance;
 
+	private LinearLayout mainLinearLayout;
     private DrawerLayout mDrawerLayout;
 	private RelativeLayout rightDrawer;
     public ListView lvRecent;
@@ -77,17 +78,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		instance = this;
-		colorManager = new ColorManager(themeId);
-		colorManager.doRun(this);
-
+		colorManager = new ColorManager();
+		colorManager.setColor(themeId);
         setContentView(R.layout.maina_activity2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+		colorManager.addView(toolbar,ColorType.ToolBar);
 		tvMemory = new TextView(this);
         rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
 		lvRecent = (ListView) findViewById(R.id.right_list);
-
+		mainLinearLayout = (LinearLayout) findViewById(R.id.main_linear_layout);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.setDrawerListener(toggle);
@@ -106,9 +106,10 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//&& checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
         }
-		rightDrawer.setBackgroundColor(colorManager.getColorBackground());
+		colorManager.addView(new TextView(this),ColorType.StatusBar);
+		colorManager.addView(rightDrawer,ColorType.RightDrawer);
         setListener();
-
+		
     }
 
 	@Override
@@ -119,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 		super.onWindowFocusChanged(hasFocus);
 	}
-
 
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -576,8 +576,17 @@ public class MainActivity extends AppCompatActivity {
 
 				@Override
 				public void run() {
-					Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-				}
+					//Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+					Snackbar.make(mainLinearLayout, msg, Snackbar.LENGTH_SHORT).setAction("确定",
+//					new View.OnClickListener(){
+//
+//							@Override
+//							public void onClick(View v) {
+//								Toast.makeText(getActivity(), "点击确认了", Toast.LENGTH_SHORT).show();
+//							}
+//						}
+						null).show();
+					}
 			});
     }
     @Override

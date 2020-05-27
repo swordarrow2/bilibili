@@ -7,13 +7,14 @@ import android.view.*;
 import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import com.github.clans.fab.*;
+import com.meng.sjfmd.*;
+import com.meng.sjfmd.activity.*;
 import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
 import com.meng.sjfmd.update.*;
-import com.meng.sjfmd.*;
-import com.meng.sjfmd.activity.*;
 import org.java_websocket.client.*;
 
 import android.view.View.OnClickListener;
@@ -21,6 +22,11 @@ import android.view.View.OnClickListener;
 public class ManagerFragment extends Fragment {
 
 	private AlertDialog selectOpDialog;
+
+	private FloatingActionMenu menuYellow;
+	private FloatingActionButton fabCookie;
+    private FloatingActionButton fabLogin;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,6 +36,8 @@ public class ManagerFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+		menuYellow = (FloatingActionMenu) view.findViewById(R.id.account_managerButton);
+
         ListView list = (ListView) view.findViewById(R.id.account_managerListView);
         list.setAdapter(MainActivity.instance.mainAccountAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -38,7 +46,13 @@ public class ManagerFragment extends Fragment {
 					MainActivity.instance.showFragment(UidFragment.class, IDType.UID, MainActivity.instance.loginAccounts.get(position).uid);
 				}
 			});
-        list.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+		fabCookie = (FloatingActionButton) view.findViewById(R.id.account_manager_fab_cookie);
+		fabLogin = (FloatingActionButton) view.findViewById(R.id.account_manager_fab_login);
+		fabCookie.setOnClickListener(onClick);
+		fabLogin.setOnClickListener(onClick);
+
+		list.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 				@Override
 				public boolean onItemLongClick(final AdapterView<?> p11, View p2, final int position, long p4) {
@@ -137,56 +151,52 @@ public class ManagerFragment extends Fragment {
 					return true;
 				}
 			});
-		view.findViewById(R.id.account_managerButton).setOnClickListener(new OnClickListener(){
+    }
 
-				@Override
-				public void onClick(View p1) {
-					new AlertDialog.Builder(getActivity()).setTitle("添加账号").setPositiveButton("登录", new DialogInterface.OnClickListener() {
+	OnClickListener onClick=new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.account_manager_fab_cookie:
+					final EditText et = new EditText(getActivity());
+					new AlertDialog.Builder(getActivity()).setTitle("输入cookie").setView(et)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface p1, int p2) {
-								startActivity(new Intent(getActivity(), Login.class));
-							}
-						}).setNegativeButton("输入cookie", new DialogInterface.OnClickListener(){
+								MainActivity.instance.threadPool.execute(new Runnable(){
 
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								final EditText et = new EditText(getActivity());
-								new AlertDialog.Builder(getActivity()).setTitle("输入cookie").setView(et)
-									.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 										@Override
-										public void onClick(DialogInterface p1, int p2) {
-											MainActivity.instance.threadPool.execute(new Runnable(){
+										public void run() {
+											MyInfo myInfo=Tools.BilibiliTool.getMyInfo(et.getText().toString());
+											for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+												if (ai.uid == myInfo.data.mid) {
+													MainActivity.instance.showToast("已添加过此帐号");
+													return;
+												}
+											}
+											AccountInfo accountInfo=new AccountInfo();
+											accountInfo.cookie = et.getText().toString();
+											accountInfo.name = myInfo.data.name;
+											accountInfo.uid = myInfo.data.mid;
+											MainActivity.instance.loginAccounts.add(accountInfo);
+											MainActivity.instance.saveConfig();
+											MainActivity.instance.runOnUiThread(new Runnable(){
 
 													@Override
 													public void run() {
-														MyInfo myInfo=Tools.BilibiliTool.getMyInfo(et.getText().toString());
-														for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-															if (ai.uid == myInfo.data.mid) {
-																MainActivity.instance.showToast("已添加过此帐号");
-																return;
-															}
-														}
-														AccountInfo accountInfo=new AccountInfo();
-														accountInfo.cookie = et.getText().toString();
-														accountInfo.name = myInfo.data.name;
-														accountInfo.uid = myInfo.data.mid;
-														MainActivity.instance.loginAccounts.add(accountInfo);
-														MainActivity.instance.saveConfig();
-														MainActivity.instance.runOnUiThread(new Runnable(){
-
-																@Override
-																public void run() {
-																	MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
-																	BaseIdFragment.createSpinnerList();
-																}
-															});
+														MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+														BaseIdFragment.createSpinnerList();
 													}
 												});
 										}
-									}).show();
+									});
 							}
 						}).show();
-				}
-			});
-    }
+                    break;
+                case R.id.account_manager_fab_login:
+                    startActivity(new Intent(getActivity(), Login.class));
+                    break;
+            }
+        }
+    };
 }

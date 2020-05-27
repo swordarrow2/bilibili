@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
 
-	public SanaeConnect sanaeConnect;
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
 	private boolean autoDrawerOperated=false;
@@ -78,6 +77,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
+        } else {
+			init();
+		}
+    }
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		if (!autoDrawerOperated && hasFocus && sjfSettings.getOpenDrawer() && !mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+			mDrawerLayout.openDrawer(GravityCompat.START);
+			autoDrawerOperated = true;
+		}
+		super.onWindowFocusChanged(hasFocus);
+	}
+
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 321) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    showToast("缺失权限会使应用工作不正常");
+                } else {
+					init();
+				}
+            }
+        }
+    }
+
+	public void init() {
 		instance = this;
 		colorManager = new ColorManager();
 		colorManager.setColor(themeId);
@@ -103,81 +133,37 @@ public class MainActivity extends AppCompatActivity {
 		jsonPath = getFilesDir() + "/account.json";
 		ExceptionCatcher.getInstance().init(getApplicationContext());
 		//  DataBaseHelper.init(getBaseContext());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//&& checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
-        }
 		colorManager.addView(new TextView(this), ColorType.StatusBar);
 		colorManager.addView(rightDrawer, ColorType.RightDrawer);
         setListener();
-
-    }
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		if (!autoDrawerOperated && hasFocus && sjfSettings.getOpenDrawer() && !mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-			mDrawerLayout.openDrawer(GravityCompat.START);
-			autoDrawerOperated = true;
+		File f = new File(jsonPath);
+		if (!f.exists()) {
+			saveConfig();
 		}
-		super.onWindowFocusChanged(hasFocus);
+		loginAccounts = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
+		if (loginAccounts == null) {
+			loginAccounts = new ArrayList<>();
+		}
+		mainAccountAdapter = new AccountAdapter(this);
+		navigationView.addHeaderView(new UserInfoHeaderView(this));
+		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
+			File ff = new File(mainDic + s);
+			if (!ff.exists()) {
+				ff.mkdirs();
+			}
+		}
+		File f4 = new File(mainDic + ".nomedia");
+		if (!f4.exists()) {
+			try {
+				f4.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//mDrawerList.addHeaderView(new UserInfoHeaderView(this));
+		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+		threadPool.execute(new AutoSign());
 	}
-
-	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 321) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showToast("缺失权限会使应用工作不正常");
-                } else {
-					File f = new File(jsonPath);
-					if (!f.exists()) {
-						saveConfig();
-					}
-					loginAccounts = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
-					if (loginAccounts == null) {
-						loginAccounts = new ArrayList<>();
-					}
-					mainAccountAdapter = new AccountAdapter(this);
-					navigationView.addHeaderView(new UserInfoHeaderView(this));
-					for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
-						File ff = new File(mainDic + s);
-						if (!ff.exists()) {
-							ff.mkdirs();
-						}
-					}
-					File f4 = new File(mainDic + ".nomedia");
-					if (!f4.exists()) {
-						try {
-							f4.createNewFile();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					try {
-						sanaeConnect = new SanaeConnect();
-						sanaeConnect.addOnOpenAction(new WebSocketOnOpenAction(){
-
-								@Override
-								public void action(WebSocketClient wsc) {
-									try {
-										PackageInfo packageInfo = MainActivity.instance.getPackageManager().getPackageInfo(MainActivity.instance.getPackageName(), 0);
-										wsc.send(GSON.toJson(new CheckNewBean(packageInfo.packageName, packageInfo.versionCode)));
-									} catch (PackageManager.NameNotFoundException e) {
-										MainActivity.instance.showToast(e.toString());
-									}
-								}
-							});
-						sanaeConnect.connect();
-					} catch (Exception e) {
-						showToast(e.toString());
-					}
-					//mDrawerList.addHeaderView(new UserInfoHeaderView(this));
-					onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-					threadPool.execute(new AutoSign());
-				}
-            }
-        }
-    }
 
 	private void setListener() {
         recentAdapter = new RecentAdapter();
@@ -336,11 +322,6 @@ public class MainActivity extends AppCompatActivity {
 					}
 					break;
 			}
-
-
-
-
-
             return true;
         }
     };
@@ -572,25 +553,57 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-    public void showToast(final String msg) {
+	public void showToast(final String msgAbbr, final String msgOrigin) {
         runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
-					Snackbar.make(mainLinearLayout, msg, Snackbar.LENGTH_SHORT).setAction("查看全文", new View.OnClickListener(){
+					Snackbar.make(mainLinearLayout, msgAbbr, 5000).setAction("查看全文", new View.OnClickListener(){
 
 							@Override
 							public void onClick(View v) {
 								new AlertDialog.Builder(MainActivity.this)
 									.setIcon(R.drawable.ic_launcher)
 									.setTitle("全文")
-									.setMessage(msg)
+									.setMessage(msgOrigin)
 									.setPositiveButton("确定", null).show();
 							}
 						}).show();
 				}
 			});
     }
+
+    public void showToast(final String msg) {
+        runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					Snackbar.make(mainLinearLayout, msg, 5000)
+						.setAction("查看全文", getLines(msg) < 2 ?null: new View.OnClickListener(){
+
+									   @Override
+									   public void onClick(View v) {
+										   new AlertDialog.Builder(MainActivity.this)
+											   .setIcon(R.drawable.ic_launcher)
+											   .setTitle("全文")
+											   .setMessage(msg)
+											   .setPositiveButton("确定", null).show();
+									   }
+								   }).show();
+				}
+			});
+    }
+	
+	public int getLines(String s) {
+		int l=0;
+		for (char c:s.toCharArray()) {
+			if (c == '\n') {
+				++l;
+			}
+		}
+		return l;
+	}
+	
     @Override
     public void onBackPressed() {
         if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {

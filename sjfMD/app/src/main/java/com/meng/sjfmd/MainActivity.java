@@ -558,17 +558,18 @@ public class MainActivity extends AppCompatActivity {
 
 				@Override
 				public void run() {
-					Snackbar.make(mainLinearLayout, msgAbbr, 5000).setAction("查看全文", new View.OnClickListener(){
+					Snackbar.make(mainLinearLayout, msgAbbr, 5000)
+						.setAction("查看全文", msgOrigin.trim().length() == 0 ?null: new View.OnClickListener(){
 
-							@Override
-							public void onClick(View v) {
-								new AlertDialog.Builder(MainActivity.this)
-									.setIcon(R.drawable.ic_launcher)
-									.setTitle("全文")
-									.setMessage(msgOrigin)
-									.setPositiveButton("确定", null).show();
-							}
-						}).show();
+									   @Override
+									   public void onClick(View v) {
+										   new AlertDialog.Builder(MainActivity.this)
+											   .setIcon(R.drawable.ic_launcher)
+											   .setTitle("全文")
+											   .setMessage(msgOrigin)
+											   .setPositiveButton("确定", null).show();
+									   }
+								   }).show();
 				}
 			});
     }
@@ -593,7 +594,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			});
     }
-	
+
 	public int getLines(String s) {
 		int l=0;
 		for (char c:s.toCharArray()) {
@@ -603,7 +604,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 		return l;
 	}
-	
+
     @Override
     public void onBackPressed() {
         if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {

@@ -4,7 +4,6 @@ import android.graphics.*;
 import android.view.*;
 import android.widget.*;
 import com.meng.sjfmd.*;
-import com.meng.sjfmd.activity.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
 import java.io.*;

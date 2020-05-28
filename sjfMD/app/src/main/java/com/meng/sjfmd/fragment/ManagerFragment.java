@@ -23,7 +23,7 @@ public class ManagerFragment extends Fragment {
 
 	private AlertDialog selectOpDialog;
 
-	private FloatingActionMenu menuYellow;
+	private FloatingActionMenu menuGroup;
 	private FloatingActionButton fabCookie;
     private FloatingActionButton fabLogin;
 
@@ -36,7 +36,8 @@ public class ManagerFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-		menuYellow = (FloatingActionMenu) view.findViewById(R.id.account_managerButton);
+		menuGroup = (FloatingActionMenu) view.findViewById(R.id.account_managerButton);
+		menuGroup.setClosedOnTouchOutside(true);
 
         ListView list = (ListView) view.findViewById(R.id.account_managerListView);
         list.setAdapter(MainActivity.instance.mainAccountAdapter);
@@ -153,9 +154,10 @@ public class ManagerFragment extends Fragment {
 			});
     }
 
-	OnClickListener onClick=new OnClickListener() {
+	OnClickListener onClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
+			menuGroup.close(true);
             switch (v.getId()) {
                 case R.id.account_manager_fab_cookie:
 					final EditText et = new EditText(getActivity());

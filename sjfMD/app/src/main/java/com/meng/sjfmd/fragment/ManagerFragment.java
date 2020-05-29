@@ -165,40 +165,68 @@ public class ManagerFragment extends Fragment {
 						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface p1, int p2) {
-								MainActivity.instance.threadPool.execute(new Runnable(){
-
-										@Override
-										public void run() {
-											MyInfo myInfo=Tools.BilibiliTool.getMyInfo(et.getText().toString());
-											for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-												if (ai.uid == myInfo.data.mid) {
-													MainActivity.instance.showToast("已添加过此帐号");
-													return;
-												}
-											}
-											AccountInfo accountInfo=new AccountInfo();
-											accountInfo.cookie = et.getText().toString();
-											accountInfo.name = myInfo.data.name;
-											accountInfo.uid = myInfo.data.mid;
-											MainActivity.instance.loginAccounts.add(accountInfo);
-											MainActivity.instance.saveConfig();
-											MainActivity.instance.runOnUiThread(new Runnable(){
-
-													@Override
-													public void run() {
-														MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
-														BaseIdFragment.createSpinnerList();
-													}
-												});
-										}
-									});
+								addByCookie(et.getText().toString());						
 							}
 						}).show();
                     break;
                 case R.id.account_manager_fab_login:
-                    startActivity(new Intent(getActivity(), Login.class));
+					final AccountInfo aci=new AccountInfo();
+					final EditText et1=new EditText(getActivity());
+					new AlertDialog.Builder(getActivity()).setTitle("账号").setView(et1).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface p1, int p2) {
+								aci.phone = Long.parseLong(et1.getText().toString());
+								final EditText et2=new EditText(getActivity());
+								new AlertDialog.Builder(getActivity())
+									.setTitle("密码").setView(et2).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface p1, int p2) {
+											aci.password = et2.getText().toString();
+											MainActivity.instance.threadPool.execute(new Runnable(){
+
+													@Override
+													public void run() {
+														UserLoginApi ula=new UserLoginApi();
+														addByCookie(ula.Login(aci.phone+"",aci.password));
+													}
+												});
+										}
+									}).show();
+							}
+						}).show();
+                //    startActivity(new Intent(getActivity(), Login.class));
                     break;
             }
         }
     };
+	
+	private void addByCookie(final String cookie) {
+		MainActivity.instance.threadPool.execute(new Runnable(){
+
+				@Override
+				public void run() {
+					MyInfo myInfo=Tools.BilibiliTool.getMyInfo(cookie);
+					for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+						if (ai.uid == myInfo.data.mid) {
+							MainActivity.instance.showToast("已添加过此帐号");
+							return;
+						}
+					}
+					AccountInfo accountInfo=new AccountInfo();
+					accountInfo.cookie = cookie;
+					accountInfo.name = myInfo.data.name;
+					accountInfo.uid = myInfo.data.mid;
+					MainActivity.instance.loginAccounts.add(accountInfo);
+					MainActivity.instance.saveConfig();
+					MainActivity.instance.runOnUiThread(new Runnable(){
+
+							@Override
+							public void run() {
+								MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+								BaseIdFragment.createSpinnerList();
+							}
+						});
+				}
+			});
+	}
 }

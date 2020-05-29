@@ -26,13 +26,11 @@ import com.meng.sjfmd.fragment.*;
 import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.tasks.*;
-import com.meng.sjfmd.update.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
-import org.java_websocket.client.*;
 
 import android.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -580,7 +578,7 @@ public class MainActivity extends AppCompatActivity {
 				@Override
 				public void run() {
 					Snackbar.make(mainLinearLayout, msg, 5000)
-						.setAction("查看全文", getLines(msg) < 2 ?null: new View.OnClickListener(){
+						.setAction("查看全文", getLines(msg) < 2 && msg.length() < 40 ?null: new View.OnClickListener(){
 
 									   @Override
 									   public void onClick(View v) {

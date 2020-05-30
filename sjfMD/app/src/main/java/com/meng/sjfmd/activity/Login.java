@@ -40,7 +40,7 @@ public class Login extends Activity {
 				public void onPageFinished(final WebView view, final String url) {
 					super.onPageFinished(view, url);
 					//	MainActivity.instance.showToast(url);
-					view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete.js"), null);
+					//	view.evaluateJavascript(Tools.AndroidContent.readAssetsString("patchDelete.js"), null);
 					if (url.equals(loginUrl)) {
 						int po=getIntent().getIntExtra("pos", -1);
 						if (po == -1) {

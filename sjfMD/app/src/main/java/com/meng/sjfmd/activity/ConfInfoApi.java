@@ -10,7 +10,7 @@ import java.security.*;
 import java.util.*;
 
 public class ConfInfoApi {
-    public static final String USER_AGENT_DEF = "Mozilla/5.0 BiliDroid/4.34.0 (bbcallen@gmail.com)";
+//    public static final String USER_AGENT_DEF = "Mozilla/5.0 BiliDroid/4.34.0 (bbcallen@gmail.com)";
     public static final String USER_AGENT_OWN = "Wrist Bilibili Client/2.6 (liupeiran0313@163.com; https://luern0313.cn)";
     public static final String USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
     private static final HashMap<String, String> conf = new HashMap<String, String>(){{

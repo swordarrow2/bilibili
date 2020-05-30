@@ -421,8 +421,10 @@ public class Tools {
 			if (headers != null) {
 				connection.headers(headers);
 			}
+			if (cookie != null) {
+				connection.cookies(Tools.Network.cookieToMap(cookie));
+			}
 			connection.ignoreContentType(true)
-                .cookies(Tools.Network.cookieToMap(cookie))
                 .method(Connection.Method.POST)
 			    .data(params);
 			Connection.Response response=null;

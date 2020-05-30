@@ -5,9 +5,10 @@ package com.meng.sjfmd.activity;
  * 各位大佬好
  */
 
-import android.graphics.*;
 import android.util.*;
 import com.meng.sjfmd.*;
+import com.meng.sjfmd.libs.*;
+import com.meng.sjfmd.result.*;
 import java.io.*;
 import java.net.*;
 import java.security.*;
@@ -18,20 +19,23 @@ import java.util.concurrent.*;
 import javax.crypto.*;
 import okhttp3.*;
 import org.json.*;
-import android.app.*;
 
 public class UserLoginApi {
-    private String oauthKey;
-    private String sid;
+	//  private String oauthKey;
+    private static String sid = String.valueOf(Math.round(Math.random() * 100000000));
     private static ArrayList<String> defaultHeaders = new ArrayList<String>();
 
-    public UserLoginApi() {
-        sid = String.valueOf(Math.round(Math.random() * 100000000));
-        defaultHeaders = new ArrayList<String>()
-        {{
+	static{
+		defaultHeaders = new ArrayList<String>(){
+			{
 				add("User-Agent");
 				add(ConfInfoApi.USER_AGENT_OWN);
-			}};
+			}
+		};
+	}
+
+    private UserLoginApi() {
+
     }
 
 //    public Bitmap getLoginQR() throws Exception {
@@ -47,12 +51,12 @@ public class UserLoginApi {
 //        return QRCodeUtil.createQRCodeBitmap((String) loginUrlJson.get("url"), 120, 120);
 //    }
 
-    public Response getLoginState() throws IOException {
-        return NetWorkUtil.post("https://passport.bilibili.com/qrcode/getLoginInfo", "oauthKey=" + oauthKey + "&gourl=https://www.bilibili.com/", defaultHeaders);
-    }
+//    public static Response getLoginState() throws IOException {
+//        return NetWorkUtil.post("https://passport.bilibili.com/qrcode/getLoginInfo", "oauthKey=" + oauthKey + "&gourl=https://www.bilibili.com/", defaultHeaders);
+//    }
 
-    public String Login(String name, String pw) {
-        try {
+	public static LoginResult login(String name, String pw) {
+		try {
             JSONObject value = getRequestKey();
             String key = value.getString("key");
             String hash = value.getString("hash");
@@ -61,56 +65,94 @@ public class UserLoginApi {
             pw = URLEncoder.encode(pw, "UTF-8");
 
             String url = "https://passport.bilibili.com/api/oauth2/login";
-            ArrayList<String> headers = new ArrayList<String>()
-            {{
-					add("Referer"); add("http://www.bilibili.com/");
-					add("Cookie"); add("sid=" + sid);
-					add("User-Agent"); add("");
-				}};
+            ArrayList<String> headers = new ArrayList<String>() {
+				{
+					add("Referer");
+					add("http://www.bilibili.com/");
+					add("Cookie");
+					add("sid=" + sid);
+					add("User-Agent");
+					add("");
+				}
+			};
             String temp_params = "appkey=" + ConfInfoApi.getBConf("appkey") + "&build=" + ConfInfoApi.getBConf("build") +
 				"&captcha=&mobi_app=" + ConfInfoApi.getBConf("mobi_app") + "&password=" + pw + "&platform=" +
 				ConfInfoApi.getBConf("platform") + "&ts=" + (int) (System.currentTimeMillis() / 1000) + "&username=" + name;
             String sign = ConfInfoApi.calc_sign(temp_params, ConfInfoApi.getBConf("app_secret"));
-            JSONObject loginResult = new JSONObject(NetWorkUtil.post(url, temp_params + "&sign=" + sign, headers).body().string());
-			//	MainActivity.instance.showToast(loginResult.toString());
-//            if (loginResult.getInt("code") == -629) return "账号或密码错误";
-//            else if (loginResult.getInt("code") == -105) return "重试次数达到上线，请使用扫码登录或稍后再试";
-//            else if (loginResult.getInt("code") != 0) return loginResult.getInt("code") + "错误，请使用扫码登录";
-			if (loginResult.getInt("code") != 0) {
-				return loginResult.toString();
-			}
-            JSONObject resultJSON = loginResult.optJSONObject("data");
-            String access_token = resultJSON.getString("access_token");
-            String cookie = getCookie(access_token);
-            if (cookie.equals(""))
-                return "空cookie " + loginResult.toString();
-			//	MainActivity.instance.showToast(cookie);
-//            MainActivity.editor.putString("access_key", access_token);
-//            MainActivity.editor.putString("cookies", cookie);
-//            MainActivity.editor.commit();
-            return cookie;
+			Response post = NetWorkUtil.post(url, temp_params + "&sign=" + sign, headers);
+			return GSON.fromJson(post.body().string(), LoginResult.class);
         } catch (Exception e) {
-			return "cookie获取失败:" + e.toString();
+			MainActivity.instance.showToast("出现了一个错误:" + e.toString());
+			return null;
 		}
-    }
+	}
 
-    private String getCookie(String access_key) {
+//    public String Login(String name, String pw) {
+//        try {
+//            JSONObject value = getRequestKey();
+//            String key = value.getString("key");
+//            String hash = value.getString("hash");
+//            pw = encrypt(hash + pw, key);
+//            name = URLEncoder.encode(name, "UTF-8");
+//            pw = URLEncoder.encode(pw, "UTF-8");
+//
+//            String url = "https://passport.bilibili.com/api/oauth2/login";
+//            ArrayList<String> headers = new ArrayList<String>()
+//            {{
+//					add("Referer"); add("http://www.bilibili.com/");
+//					add("Cookie"); add("sid=" + sid);
+//					add("User-Agent"); add("");
+//				}};
+//            String temp_params = "appkey=" + ConfInfoApi.getBConf("appkey") + "&build=" + ConfInfoApi.getBConf("build") +
+//				"&captcha=&mobi_app=" + ConfInfoApi.getBConf("mobi_app") + "&password=" + pw + "&platform=" +
+//				ConfInfoApi.getBConf("platform") + "&ts=" + (int) (System.currentTimeMillis() / 1000) + "&username=" + name;
+//            String sign = ConfInfoApi.calc_sign(temp_params, ConfInfoApi.getBConf("app_secret"));
+//            JSONObject loginResult = new JSONObject(NetWorkUtil.post(url, temp_params + "&sign=" + sign, headers).body().string());
+//			//	MainActivity.instance.showToast(loginResult.toString());
+////            if (loginResult.getInt("code") == -629) return "账号或密码错误";
+////            else if (loginResult.getInt("code") == -105) return "重试次数达到上线，请使用扫码登录或稍后再试";
+////            else if (loginResult.getInt("code") != 0) return loginResult.getInt("code") + "错误，请使用扫码登录";
+//			if (loginResult.getInt("code") != 0) {
+//				return loginResult.toString();
+//			}
+//            JSONObject resultJSON = loginResult.optJSONObject("data");
+//            String access_token = resultJSON.getString("access_token");
+//            String cookie = getCookie(access_token);
+//            if (cookie.equals(""))
+//                return "空cookie " + loginResult.toString();
+//			//	MainActivity.instance.showToast(cookie);
+////            MainActivity.editor.putString("access_key", access_token);
+////            MainActivity.editor.putString("cookies", cookie);
+////            MainActivity.editor.commit();
+//            return cookie;
+//        } catch (Exception e) {
+//			return "cookie获取失败:" + e.toString();
+//		}
+//    }
+
+    public static String getCookie(String access_key) {
         try {
             String url = "https://passport.bilibili.com/api/login/sso";
-            ArrayList<String> headers = new ArrayList<String>()
-            {{
-					add("Content-type"); add("application/x-www-form-urlencoded; charset=UTF-8");
-					add("Cookie"); add("sid=" + sid);
-					add("user-agent"); add("Mozilla/5.0 BiliDroid/4.34.0 (bbcallen@gmail.com)");
-					add("Referer"); add("http://www.bilibili.com/");
-					add("Connection"); add("Keep-Alive");
-				}};
+            ArrayList<String> headers = new ArrayList<String>(){
+				{
+					add("Content-type");
+					add("application/x-www-form-urlencoded; charset=UTF-8");
+					add("Cookie");
+					add("sid=" + sid);
+					add("user-agent");
+					add(MainActivity.instance.userAgent);
+					add("Referer");
+					add("http://www.bilibili.com/");
+					add("Connection");
+					add("Keep-Alive");
+				}
+			};
             String temp_params = "access_key=" + access_key + "&appkey=" + ConfInfoApi.getBConf("appkey") +
 				"&build=" + ConfInfoApi.getBConf("build") + "&gourl=" + URLEncoder.encode("https://account.bilibili.com/account/home", "utf-8") +
 				"&mobi_app=" + ConfInfoApi.getBConf("mobi_app") + "&platform=" + ConfInfoApi.getBConf("platform") +
 				"&ts=" + (int) (System.currentTimeMillis() / 1000);
             String sign = ConfInfoApi.calc_sign(temp_params, ConfInfoApi.getBConf("app_secret"));
-			
+
             OkHttpClient client = new OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
 				.followRedirects(false).readTimeout(15, TimeUnit.SECONDS).build();
             Request.Builder requestBuilder = new Request.Builder().url(url + "?" + temp_params + "&sign=" + sign).get();
@@ -142,14 +184,16 @@ public class UserLoginApi {
         return Base64.encodeToString(cipher.doFinal(str.getBytes("UTF-8")), Base64.NO_PADDING);
     }
 
-    private JSONObject getRequestKey() throws IOException {
+    private static JSONObject getRequestKey() throws IOException {
         try {
-            ArrayList<String> headers = new ArrayList<String>()
-            {{
-					add("Referer"); add("https://passport.bilibili.com/login");
-					add("User-Agent"); add(ConfInfoApi.USER_AGENT_WEB);
-				}};
-
+            ArrayList<String> headers = new ArrayList<String>(){
+				{
+					add("Referer");
+					add("https://passport.bilibili.com/login");
+					add("User-Agent");
+					add(MainActivity.instance.userAgent);
+				}
+			};
             String url = "https://passport.bilibili.com/api/oauth2/getKey";
             String temp_per = "appkey=" + ConfInfoApi.getBConf("appkey");
             String sign = ConfInfoApi.calc_sign(temp_per, ConfInfoApi.getBConf("app_secret"));
@@ -162,21 +206,25 @@ public class UserLoginApi {
         return null;
     }
 
-    public String getAccessKey(final String cookie) throws IOException {
+    public static String getAccessKey(final String cookie) throws IOException {
         try {
-            ArrayList<String> headers1 = new ArrayList<String>()
-            {{
-					add("Cookie"); add(cookie);
-					add("Host"); add("passport.bilibili.com");
-					add("Referer"); add("http://www.bilibili.com/");
-					add("User-Agent"); add(ConfInfoApi.USER_AGENT_OWN);
-				}};
+            ArrayList<String> headers1 = new ArrayList<String>(){
+				{
+					add("Cookie");
+					add(cookie);
+					add("Host");
+					add("passport.bilibili.com");
+					add("Referer");
+					add("http://www.bilibili.com/");
+					add("User-Agent");
+					add(ConfInfoApi.USER_AGENT_OWN);
+				}
+			};
             String url = "https://passport.bilibili.com/login/app/third";
             String temp_per = "api=http://link.acg.tv/forum.php&appkey=27eb53fc9058f8c3&sign=67ec798004373253d60114caaad89a8c";
             Response response = NetWorkUtil.get(url + "?" + temp_per, headers1);
 
-            ArrayList<String> headers2 = new ArrayList<String>()
-            {{
+            ArrayList<String> headers2 = new ArrayList<String>(){{
 					add("Cookie"); add(cookie);
 					add("User-Agent"); add(ConfInfoApi.USER_AGENT_WEB);
 				}};
@@ -199,7 +247,7 @@ public class UserLoginApi {
         return "";
     }
 
-    public String getOauthKey() {
-        return oauthKey;
-    }
+//    public String getOauthKey() {
+//        return oauthKey;
+//    }
 }

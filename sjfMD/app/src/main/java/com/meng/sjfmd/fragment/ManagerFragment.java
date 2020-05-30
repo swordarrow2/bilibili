@@ -154,6 +154,25 @@ public class ManagerFragment extends Fragment {
 			});
     }
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode != 0x9961) {
+			super.onActivityResult(requestCode, resultCode, data);
+			return;
+		}
+		if (resultCode == Activity.RESULT_OK && data != null) {
+			final AccountInfo aci=GSON.fromJson(data.getStringExtra("aci"), AccountInfo.class);
+			MainActivity.instance.loginAccounts.add(aci);
+			MainActivity.instance.saveConfig();
+			MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+			BaseIdFragment.createSpinnerList();
+		} else if (resultCode == Activity.RESULT_CANCELED) {
+			MainActivity.instance.showToast("取消登录");
+		} else if (data == null) {
+			MainActivity.instance.showToast("一个错误导致无结果");
+		}
+	}
+
 	OnClickListener onClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -170,36 +189,37 @@ public class ManagerFragment extends Fragment {
 						}).show();
                     break;
                 case R.id.account_manager_fab_login:
-					final AccountInfo aci=new AccountInfo();
-					final EditText et1=new EditText(getActivity());
-					new AlertDialog.Builder(getActivity()).setTitle("账号").setView(et1).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								aci.phone = Long.parseLong(et1.getText().toString());
-								final EditText et2=new EditText(getActivity());
-								new AlertDialog.Builder(getActivity())
-									.setTitle("密码").setView(et2).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface p1, int p2) {
-											aci.password = et2.getText().toString();
-											MainActivity.instance.threadPool.execute(new Runnable(){
-
-													@Override
-													public void run() {
-														UserLoginApi ula=new UserLoginApi();
-														addByCookie(ula.Login(aci.phone+"",aci.password));
-													}
-												});
-										}
-									}).show();
-							}
-						}).show();
-                //    startActivity(new Intent(getActivity(), Login.class));
+					Intent i=new Intent(getActivity(), LoginActivity.class);
+					startActivityForResult(i, 0x9961);
+//					final AccountInfo aci=new AccountInfo();
+//					final EditText et1=new EditText(getActivity());
+//					new AlertDialog.Builder(getActivity()).setTitle("账号").setView(et1).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//							@Override
+//							public void onClick(DialogInterface p1, int p2) {
+//								aci.phone = Long.parseLong(et1.getText().toString());
+//								final EditText et2=new EditText(getActivity());
+//								new AlertDialog.Builder(getActivity())
+//									.setTitle("密码").setView(et2).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//										@Override
+//										public void onClick(DialogInterface p1, int p2) {
+//											aci.password = et2.getText().toString();
+//											MainActivity.instance.threadPool.execute(new Runnable(){
+//
+//													@Override
+//													public void run() {
+//														UserLoginApi ula=new UserLoginApi();
+//														addByCookie(ula.Login(aci.phone + "", aci.password));
+//													}
+//												});
+//										}
+//									}).show();
+//							}
+//						}).show();
                     break;
             }
         }
     };
-	
+
 	private void addByCookie(final String cookie) {
 		MainActivity.instance.threadPool.execute(new Runnable(){
 

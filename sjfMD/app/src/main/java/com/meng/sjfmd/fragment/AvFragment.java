@@ -6,22 +6,32 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import com.github.clans.fab.*;
 import com.meng.sjfmd.*;
-import com.meng.sjfmd.activity.*;
 import com.meng.sjfmd.adapters.*;
 import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
+import android.view.animation.*;
 
 public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
-	private Button send,editPre,preset,zan,coin1,coin2,favorite;
+	private Button editPre,preset;
+	private ImageButton send;
+
+	private FloatingActionMenu menuGroup;
+	private FloatingActionButton fabZan;
+    private FloatingActionButton fabCoin1;
+	private FloatingActionButton fabCoin2;
+    private FloatingActionButton fabFavoriate;
+
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
 	private VideoInfo videoInfo;
 	private ImageView ivPreview;
 	private Bitmap preview;
+	private LinearLayout llInput;
 	//private ArrayList<DanmakuBean> danmakuList=null;
 	private TabHost tab;
 
@@ -46,13 +56,16 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		layoutInflater.inflate(R.layout.av_fragment2, tab.getTabContentView());
 		tab.addTab(tab.newTabSpec("tab1").setIndicator("视频" , null).setContent(R.id.av_fragmentLinearLayout));
         tab.addTab(tab.newTabSpec("tab2").setIndicator("评论" , null).setContent(R.id.av_fragment2LinearLayout));
-		send = (Button) view.findViewById(R.id.av_fragmentButton_send);
+		send = (ImageButton) view.findViewById(R.id.av_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
-		zan = (Button) view.findViewById(R.id.av_fragmentButton_zan);
-		coin1 = (Button) view.findViewById(R.id.av_fragmentButton_coin1);
-		coin2 = (Button) view.findViewById(R.id.av_fragmentButton_coin2);
-		favorite = (Button) view.findViewById(R.id.av_fragmentButton_favorite);
+		llInput = (LinearLayout) view.findViewById(R.id.av_fragmentLinearLayout_input);
+		llInput.setVisibility(View.GONE);
+		menuGroup = (FloatingActionMenu) view.findViewById(R.id.av_float_menu);
+		fabZan = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_zan);
+		fabCoin1 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin1);
+		fabCoin2 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin2);
+		fabFavoriate = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_favorite);
 		et = (EditText) view.findViewById(R.id.av_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
@@ -60,15 +73,29 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		judgeList = (ExpandableListView) view.findViewById(R.id.av_fragment2ListView);
 		judgeList.setGroupIndicator(null);
 		preset.setOnClickListener(this);
-		zan.setOnClickListener(this);
-		coin1.setOnClickListener(this);
-		coin2.setOnClickListener(this);
-		favorite.setOnClickListener(this);
+		fabZan.setOnClickListener(this);
+		fabCoin1.setOnClickListener(this);
+		fabCoin2.setOnClickListener(this);
+		fabFavoriate.setOnClickListener(this);
+		fabFavoriate.setEnabled(false);
 		send.setOnClickListener(this);
 		//editPre.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		ivPreview.setOnLongClickListener(this);
-
+		final Animation animShow = AnimationUtils.loadAnimation(getActivity(),R.anim.jump_from_down);
+		final Animation animHide = AnimationUtils.loadAnimation(getActivity(),R.anim.jump_to_down);
+		menuGroup.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+				@Override
+				public void onMenuToggle(boolean opened) {
+					if(opened){
+						llInput.startAnimation(animShow);
+						llInput.setVisibility(View.VISIBLE);
+					}else{
+						llInput.startAnimation(animHide);
+						llInput.setVisibility(View.GONE);
+					}
+				}
+			});
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override

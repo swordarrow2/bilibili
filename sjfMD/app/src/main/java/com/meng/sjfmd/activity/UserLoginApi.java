@@ -87,49 +87,6 @@ public class UserLoginApi {
 		}
 	}
 
-//    public String Login(String name, String pw) {
-//        try {
-//            JSONObject value = getRequestKey();
-//            String key = value.getString("key");
-//            String hash = value.getString("hash");
-//            pw = encrypt(hash + pw, key);
-//            name = URLEncoder.encode(name, "UTF-8");
-//            pw = URLEncoder.encode(pw, "UTF-8");
-//
-//            String url = "https://passport.bilibili.com/api/oauth2/login";
-//            ArrayList<String> headers = new ArrayList<String>()
-//            {{
-//					add("Referer"); add("http://www.bilibili.com/");
-//					add("Cookie"); add("sid=" + sid);
-//					add("User-Agent"); add("");
-//				}};
-//            String temp_params = "appkey=" + ConfInfoApi.getBConf("appkey") + "&build=" + ConfInfoApi.getBConf("build") +
-//				"&captcha=&mobi_app=" + ConfInfoApi.getBConf("mobi_app") + "&password=" + pw + "&platform=" +
-//				ConfInfoApi.getBConf("platform") + "&ts=" + (int) (System.currentTimeMillis() / 1000) + "&username=" + name;
-//            String sign = ConfInfoApi.calc_sign(temp_params, ConfInfoApi.getBConf("app_secret"));
-//            JSONObject loginResult = new JSONObject(NetWorkUtil.post(url, temp_params + "&sign=" + sign, headers).body().string());
-//			//	MainActivity.instance.showToast(loginResult.toString());
-////            if (loginResult.getInt("code") == -629) return "账号或密码错误";
-////            else if (loginResult.getInt("code") == -105) return "重试次数达到上线，请使用扫码登录或稍后再试";
-////            else if (loginResult.getInt("code") != 0) return loginResult.getInt("code") + "错误，请使用扫码登录";
-//			if (loginResult.getInt("code") != 0) {
-//				return loginResult.toString();
-//			}
-//            JSONObject resultJSON = loginResult.optJSONObject("data");
-//            String access_token = resultJSON.getString("access_token");
-//            String cookie = getCookie(access_token);
-//            if (cookie.equals(""))
-//                return "空cookie " + loginResult.toString();
-//			//	MainActivity.instance.showToast(cookie);
-////            MainActivity.editor.putString("access_key", access_token);
-////            MainActivity.editor.putString("cookies", cookie);
-////            MainActivity.editor.commit();
-//            return cookie;
-//        } catch (Exception e) {
-//			return "cookie获取失败:" + e.toString();
-//		}
-//    }
-
     public static String getCookie(String access_key) {
         try {
             String url = "https://passport.bilibili.com/api/login/sso";

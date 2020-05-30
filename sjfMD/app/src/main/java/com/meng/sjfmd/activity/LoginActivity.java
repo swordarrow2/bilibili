@@ -51,6 +51,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 				@Override
 				public void run() {
 					loginResult = UserLoginApi.login(userName, password);
+					if (loginResult == null) {
+						LoginActivity.this.runOnUiThread(new Runnable(){
+
+								@Override
+								public void run() {
+									Snackbar.make(progressBar, "登录出现了一个错误", 3000).show();
+									progressBar.setVisibility(View.GONE);
+								}
+							});
+						return;
+					}
 					switch (loginResult.code) {
 						case 0:
 							String cookie = UserLoginApi.getCookie(loginResult.data.access_token);
@@ -90,6 +101,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 									@Override
 									public void run() {
 										Snackbar.make(progressBar, "账号或密码错误", 3000).show();
+										progressBar.setVisibility(View.GONE);
 									}
 								});
 							break;
@@ -99,6 +111,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 									@Override
 									public void run() {
 										Snackbar.make(progressBar, "重试次数达到上线，请使用扫码登录或稍后再试", 3000).show();
+										progressBar.setVisibility(View.GONE);
 									}
 								});
 							break;

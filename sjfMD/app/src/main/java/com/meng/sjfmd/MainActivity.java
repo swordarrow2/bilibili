@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(MenuItem item) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
 			switch (item.getItemId()) {
-                case R.id.home:
+              /*  case R.id.home:
 					showFragment(HomeFragment.class, IDType.egHome);
                     break;
                 case R.id.menus:
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.progress:
 					showFragment(ProgressFragment.class, IDType.egProgress);
-                    break;
+                    break;*/
      			case R.id.input_id:
 					final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
 					final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);

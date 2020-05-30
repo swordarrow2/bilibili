@@ -6,9 +6,10 @@
         android:checkableBehavior="none">
 		<item
 			android:id="@+id/first_page"
+			android:icon="@drawable/ic_console"
 			android:title="首页(大概)" />
 		<!--android:icon="@drawable/ic_nav_item"-->
-        <item
+        <!--<item
             android:id="@+id/home"
             android:title="Home" />
         <item
@@ -16,27 +17,34 @@
             android:title="Menus" />
         <item
             android:id="@+id/progress"
-            android:title="Progress" />
+            android:title="Progress" />-->
 		<item
 			android:id="@+id/input_id"
+			android:icon="@drawable/ic_console"
 			android:title="输入ID" />
 		<item
 			android:id="@+id/dynamic"
+			android:icon="@drawable/ic_console"
 			android:title="动态" />
 		<item
 			android:id="@+id/medal"
+			android:icon="@drawable/ic_console"
 			android:title="头衔" />
 		<item
 			android:id="@+id/accounts"
+			android:icon="@drawable/ic_console"
 			android:title="账号" />
 		<item
 			android:id="@+id/avbv"
+			android:icon="@drawable/ic_console"
 			android:title="AVBV转换" />
 		<item
 			android:id="@+id/settings"
+			android:icon="@drawable/ic_console"
 			android:title="设置" />
 		<item
 			android:id="@+id/exit"
+			android:icon="@drawable/ic_console"
 			android:title="退出" />
     </group>
 

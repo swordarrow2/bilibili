@@ -33,13 +33,22 @@
 		android:paddingRight="5dp"/>
 
 	<TextView
+		android:id="@+id/medal_list_itemTextView_rank"
+		android:textAppearance="?android:attr/textAppearanceListItemSmall"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="排名"
+		android:layout_toRightOf="@id/medal_list_itemTextView_medal_level"
+		android:layout_alignBottom="@id/medal_list_itemTextView_medal_level"/>
+
+	<TextView
 		android:textAppearance="?android:attr/textAppearanceListItemSmall"
 		android:id="@+id/medal_list_itemTextView_level_limit"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="等级亲密度"
 		android:gravity="center"
-		android:layout_toRightOf="@id/medal_list_itemTextView_medal_level"
+		android:layout_toRightOf="@id/medal_list_itemTextView_rank"
 		android:layout_alignParentRight="true"/>
 
 	<TextView
@@ -49,9 +58,9 @@
 		android:text="今日亲密度"
 		android:gravity="center"
 		android:id="@+id/medal_list_itemTextView_today_limit"
-		android:layout_toRightOf="@id/medal_list_itemTextView_medal_level"
 		android:layout_alignParentRight="true"
-		android:layout_below="@id/medal_list_itemTextView_level_limit"/>
+		android:layout_below="@id/medal_list_itemTextView_level_limit"
+		android:layout_alignLeft="@id/medal_list_itemTextView_level_limit"/>
 
 	<TextView
 		android:textAppearance="?android:attr/textAppearanceListItemSmall"

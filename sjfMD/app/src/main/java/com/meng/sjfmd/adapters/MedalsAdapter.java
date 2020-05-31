@@ -38,15 +38,19 @@ public class MedalsAdapter extends BaseAdapter {
 			holder.tvLevelLimit = (TextView) convertView.findViewById(R.id.medal_list_itemTextView_level_limit);
 			holder.tvTodayLimit = (TextView) convertView.findViewById(R.id.medal_list_itemTextView_today_limit);
 			holder.ivHead = (ImageView) convertView.findViewById(R.id.medal_list_itemImageView_head);
+			holder.tvRank = (TextView) convertView.findViewById(R.id.medal_list_itemTextView_rank);
 			convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-		final Medals.FansMedal mfm=medals.data.fansMedalList.get(position);
+		final Medals.FansMedal mfm = medals.data.fansMedalList.get(position);
 		holder.tvMedalName.setText(mfm.medal_name);
-		holder.tvMedalName.setTextColor(mfm.color | 0xFF000000);
+		int color = mfm.color | 0xFF000000;
+		holder.tvMedalName.setTextColor(color);
+		holder.tvLevel.setTextColor(color);
 		holder.tvMasterName.setText(mfm.target_name);
 		holder.tvLevel.setText("lv." + mfm.level);
+		holder.tvRank.setText("No." + mfm.rank);
 		holder.tvTodayLimit.setText(String.format("今日%d/%d", mfm.today_feed, mfm.day_limit));
 		holder.tvLevelLimit.setText(String.format("当前等级%d/%d", mfm.intimacy, mfm.next_intimacy));
 		File bilibiliImageFile = new File(MainActivity.instance.mainDic + "bilibili/" + mfm.target_id + ".jpg");
@@ -75,5 +79,6 @@ public class MedalsAdapter extends BaseAdapter {
 		private TextView tvLevel;
 		private TextView tvTodayLimit;
 		private TextView tvLevelLimit;
+		private TextView tvRank;
     }
 }

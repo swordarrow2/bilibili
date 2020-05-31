@@ -109,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
 		instance = this;
 		colorManager = new ColorManager();
 		colorManager.setColor(themeId);
-        setContentView(R.layout.maina_activity2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setContentView(R.layout.main_activity);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 		colorManager.addView(toolbar, ColorType.ToolBar);
 		tvMemory = new TextView(this);
@@ -213,15 +213,15 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(MenuItem item) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
 			switch (item.getItemId()) {
-              /*  case R.id.home:
-					showFragment(HomeFragment.class, IDType.egHome);
-                    break;
-                case R.id.menus:
-					showFragment(MenusFragment.class, IDType.egMenu);
-                    break;
-                case R.id.progress:
-					showFragment(ProgressFragment.class, IDType.egProgress);
-                    break;*/
+					/*  case R.id.home:
+					 showFragment(HomeFragment.class, IDType.egHome);
+					 break;
+					 case R.id.menus:
+					 showFragment(MenusFragment.class, IDType.egMenu);
+					 break;
+					 case R.id.progress:
+					 showFragment(ProgressFragment.class, IDType.egProgress);
+					 break;*/
      			case R.id.input_id:
 					final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
 					final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
@@ -605,8 +605,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (mDrawerLayout != null && !mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }

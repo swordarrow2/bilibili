@@ -210,10 +210,9 @@ public class Tools {
 		}
 
 		public static Medals getMedal(String cookie) {
-			String v = "https://api.live.bilibili.com/i/api/medal?page=%d&pagesize=10";
-			Medals mb = GSON.fromJson(Tools.Network.httpGet(String.format(v, 1), cookie), Medals.class);
-			for (int i = mb.data.pageinfo.curPage;i < mb.data.pageinfo.totalpages;++i) {
-				Medals tm = GSON.fromJson(Tools.Network.httpGet(String.format(v, i), cookie), Medals.class);
+			Medals mb = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/i/api/medal?page=" + 1 + "&pagesize=10", cookie), Medals.class);
+			for (int i = mb.data.pageinfo.curPage + 1;i < mb.data.pageinfo.totalpages;++i) {
+				Medals tm = GSON.fromJson(Tools.Network.httpGet("https://api.live.bilibili.com/i/api/medal?page=" + i + "&pagesize=10", cookie), Medals.class);
 				mb.data.fansMedalList.addAll(tm.data.fansMedalList);
 			}
 			return mb;

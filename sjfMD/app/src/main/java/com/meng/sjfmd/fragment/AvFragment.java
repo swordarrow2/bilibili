@@ -16,7 +16,7 @@ import android.view.animation.*;
 
 public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
-	private Button editPre,preset;
+	private Button preset;
 	private ImageButton send;
 
 	private FloatingActionMenu menuGroup;
@@ -33,7 +33,6 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private Bitmap preview;
 	private LinearLayout llInput;
 	//private ArrayList<DanmakuBean> danmakuList=null;
-	private TabHost tab;
 
 	public ExpandableListView judgeList;
 
@@ -43,24 +42,17 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.tab_fragment, container, false);
+		return inflater.inflate(R.layout.av_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tab = (TabHost) view.findViewById(android.R.id.tabhost);
-		tab.setup();
-        LayoutInflater layoutInflater=LayoutInflater.from(getActivity()); 
-		layoutInflater.inflate(R.layout.av_fragment, tab.getTabContentView()); 
-		layoutInflater.inflate(R.layout.av_fragment2, tab.getTabContentView());
-		tab.addTab(tab.newTabSpec("tab1").setIndicator("视频" , null).setContent(R.id.av_fragmentLinearLayout));
-        tab.addTab(tab.newTabSpec("tab2").setIndicator("评论" , null).setContent(R.id.av_fragment2LinearLayout));
-		send = (ImageButton) view.findViewById(R.id.av_fragmentButton_send);
-		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
+  		send = (ImageButton) view.findViewById(R.id.av_fragmentButton_send);
 		preset = (Button) view.findViewById(R.id.av_fragmentButton_preset);
 		llInput = (LinearLayout) view.findViewById(R.id.av_fragmentLinearLayout_input);
 		llInput.setVisibility(View.GONE);
+		llInput.setBackgroundColor(0xffffffff);
 		menuGroup = (FloatingActionMenu) view.findViewById(R.id.av_float_menu);
 		fabZan = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_zan);
 		fabCoin1 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin1);
@@ -70,7 +62,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.av_fragmentSpinner);
-		judgeList = (ExpandableListView) view.findViewById(R.id.av_fragment2ListView);
+		judgeList = (ExpandableListView) view.findViewById(R.id.av_fragment_ListView);
 		judgeList.setGroupIndicator(null);
 		preset.setOnClickListener(this);
 		fabZan.setOnClickListener(this);
@@ -79,18 +71,17 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		fabFavoriate.setOnClickListener(this);
 		fabFavoriate.setEnabled(false);
 		send.setOnClickListener(this);
-		//editPre.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		ivPreview.setOnLongClickListener(this);
-		final Animation animShow = AnimationUtils.loadAnimation(getActivity(),R.anim.jump_from_down);
-		final Animation animHide = AnimationUtils.loadAnimation(getActivity(),R.anim.jump_to_down);
+		final Animation animShow = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_in_from_right);
+		final Animation animHide = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_out_to_right);
 		menuGroup.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
 				@Override
 				public void onMenuToggle(boolean opened) {
-					if(opened){
+					if (opened) {
 						llInput.startAnimation(animShow);
 						llInput.setVisibility(View.VISIBLE);
-					}else{
+					} else {
 						llInput.startAnimation(animHide);
 						llInput.setVisibility(View.GONE);
 					}
@@ -139,7 +130,9 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		try {
 			saveBitmap(type.toString() + id, preview);
 			MainActivity.instance.showToast("图片已保存至" + MainActivity.instance.mainDic + type + id + ".png");
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			MainActivity.instance.showToast("保存出错:" + e.toString());
+		}
 		return true;
 	}
 

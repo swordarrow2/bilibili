@@ -14,6 +14,7 @@ public class AccountAdapter extends BaseAdapter {
 
     public AccountAdapter(MainActivity context) {
         activity = context;
+		
     }
 
     public int getCount() {

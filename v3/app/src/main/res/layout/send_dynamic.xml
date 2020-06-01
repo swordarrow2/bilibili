@@ -25,6 +25,7 @@
 				android:layout_weight="2"/>
 
 			<Button
+				style="?android:attr/buttonBarButtonStyle"
 				android:id="@+id/send_dynamicButton_pic"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
@@ -33,6 +34,7 @@
 				android:layout_gravity="center"/>
 
 			<Button
+				style="?android:attr/buttonBarButtonStyle"
 				android:id="@+id/send_dynamicButton_send"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
@@ -43,13 +45,16 @@
 		</LinearLayout>
 
 	</LinearLayout>
-
+	<android.support.design.widget.TextInputLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
 	<EditText
+		android:hint="输入要发送的内容"
 		android:id="@+id/send_dynamicEditText"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_above="@id/send_dynamicLinearLayout"/>
-
+	</android.support.design.widget.TextInputLayout>
 	<ListView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

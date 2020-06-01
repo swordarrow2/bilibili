@@ -7,21 +7,25 @@ import android.content.pm.*;
 import android.content.res.*;
 import android.net.*;
 import android.os.*;
+import android.support.design.widget.*;
+import android.support.v4.view.*;
 import android.support.v4.widget.*;
+import android.support.v7.app.*;
+import android.support.v7.widget.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
-import com.meng.biliv3.adapters.*;
-import com.meng.biliv3.customView.*;
-import com.meng.biliv3.enums.*;
-import com.meng.biliv3.fragment.*;
-import com.meng.biliv3.javabean.*;
-import com.meng.biliv3.libs.*;
-import com.meng.biliv3.tasks.*;
 import com.meng.biliv3.update.*;
+import com.meng.sjfmd.adapters.*;
+import com.meng.sjfmd.customView.*;
+import com.meng.sjfmd.enums.*;
+import com.meng.sjfmd.fragment.*;
+import com.meng.sjfmd.javabean.*;
+import com.meng.sjfmd.libs.*;
+import com.meng.sjfmd.tasks.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -29,18 +33,19 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 import org.java_websocket.client.*;
 
+import android.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import com.meng.biliv3.R;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
+	public static MainActivity instance;
 
-    public static MainActivity instance;
+	private LinearLayout mainLinearLayout;
     private DrawerLayout mDrawerLayout;
-    public ListView mDrawerList;
-    private RelativeLayout rightDrawer;
+	private RelativeLayout rightDrawer;
     public ListView lvRecent;
-    private ActionBarDrawerToggle mDrawerToggle;
-    public HashMap<String,Fragment> fragments = new HashMap<>();
+	public HashMap<String,Fragment> fragments = new HashMap<>();
     public TextView tvMemory;
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
     public ArrayList<AccountInfo> loginAccounts;
@@ -54,8 +59,8 @@ public class MainActivity extends Activity {
 	private RecentAdapter recentAdapter;
 
 	public ExecutorService threadPool = Executors.newCachedThreadPool();
-
 	public SanaeConnect sanaeConnect;
+
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
 	private boolean autoDrawerOperated=false;
@@ -66,48 +71,99 @@ public class MainActivity extends Activity {
 	public static final String regUid = "space\\D{0,}(\\d{1,})";
 	public static final String regUid2 = "UID\\D{0,}(\\d{1,})";
 
+	private NavigationView navigationView;
 
 	private int themeId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
-        instance = this;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
+        } else {
+			init();
+		}
+    }
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		if (!autoDrawerOperated && hasFocus && sjfSettings.getOpenDrawer() && !mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+			mDrawerLayout.openDrawer(GravityCompat.START);
+			autoDrawerOperated = true;
+		}
+		super.onWindowFocusChanged(hasFocus);
+	}
+
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 321) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    showToast("缺失权限会使应用工作不正常");
+                } else {
+					init();
+				}
+            }
+        }
+    }
+
+	public void init() {
+		instance = this;
+		colorManager = new ColorManager();
+		colorManager.setColor(themeId);
+		setContentView(R.layout.main_activity);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+		colorManager.addView(toolbar, ColorType.ToolBar);
+		tvMemory = new TextView(this);
+        rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
+		lvRecent = (ListView) findViewById(R.id.right_list);
+		mainLinearLayout = (LinearLayout) findViewById(R.id.main_linear_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+		navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+
+		ColorStateList csl = getResources().getColorStateList(R.color.navigation_menu_item_color_blue);
+        navigationView.setItemTextColor(csl);
+        navigationView.setItemIconTintList(csl);
+
 		jsonPath = getFilesDir() + "/account.json";
 		ExceptionCatcher.getInstance().init(getApplicationContext());
 		//  DataBaseHelper.init(getBaseContext());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 321);
-        }
-        findViews();
-		colorManager = new ColorManager(themeId);
-		colorManager.doRun(this);
-		mDrawerList.setBackgroundColor(colorManager.getColorBackground());
-		rightDrawer.setBackgroundColor(colorManager.getColorBackground());
+		colorManager.addView(new TextView(this), ColorType.StatusBar);
+		colorManager.addView(rightDrawer, ColorType.RightDrawer);
         setListener();
-        File f = new File(jsonPath);
-        if (!f.exists()) {
-            saveConfig();
+		File f = new File(jsonPath);
+		if (!f.exists()) {
+			saveConfig();
 		}
 		loginAccounts = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
 		if (loginAccounts == null) {
 			loginAccounts = new ArrayList<>();
 		}
-        mainAccountAdapter = new AccountAdapter(this);
+		mainAccountAdapter = new AccountAdapter(this);
+		navigationView.addHeaderView(new UserInfoHeaderView(this));
 		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
 			File ff = new File(mainDic + s);
 			if (!ff.exists()) {
 				ff.mkdirs();
 			}
 		}
-	    File f4 = new File(mainDic + ".nomedia");
-        if (!f4.exists()) {
-            try {
-                f4.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+		File f4 = new File(mainDic + ".nomedia");
+		if (!f4.exists()) {
+			try {
+				f4.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//mDrawerList.addHeaderView(new UserInfoHeaderView(this));
+		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+		threadPool.execute(new AutoSign());
 		try {
 			sanaeConnect = new SanaeConnect();
 			sanaeConnect.addOnOpenAction(new WebSocketOnOpenAction(){
@@ -126,42 +182,10 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			showToast(e.toString());
 		}
-		mDrawerList.addHeaderView(new UserInfoHeaderView(this));
-		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-		threadPool.execute(new AutoSign());
 	}
 
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		if (!autoDrawerOperated && hasFocus && sjfSettings.getOpenDrawer() && !mDrawerLayout.isDrawerOpen(mDrawerList)) {
-			mDrawerLayout.openDrawer(mDrawerList);
-			autoDrawerOperated = true;
-		}
-		super.onWindowFocusChanged(hasFocus);
-	}
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 321) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showToast("缺失权限会使应用工作不正常");
-                }
-            }
-        }
-    }
-
-    private void setListener() {
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, new DrawerArrowDrawable(this), R.string.open, R.string.close);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
-        mDrawerList.setAdapter(
-			new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, new String[]{
-										 "输入ID", "动态","头衔","管理账号","AVBV转换", "设置", "退出"
-									 }));
-		recentAdapter = new RecentAdapter();
+	private void setListener() {
+        recentAdapter = new RecentAdapter();
         lvRecent.setAdapter(recentAdapter);
 		lvRecent.addHeaderView(tvMemory);
 		threadPool.execute(new Runnable(){
@@ -204,147 +228,151 @@ public class MainActivity extends Activity {
 					showToast(s);
 				}
 			});
-        mDrawerList.setOnItemClickListener(itemClickListener);
-        lvRecent.setOnItemClickListener(itemClickListener);
 	}
+    NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = new NavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(MenuItem item) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+			switch (item.getItemId()) {
+					/*  case R.id.home:
+					 showFragment(HomeFragment.class, IDType.egHome);
+					 break;
+					 case R.id.menus:
+					 showFragment(MenusFragment.class, IDType.egMenu);
+					 break;
+					 case R.id.progress:
+					 showFragment(ProgressFragment.class, IDType.egProgress);
+					 break;*/
+     			case R.id.input_id:
+					final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
+					final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
+					final RadioButton uid,av,live,cv;
+					uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
+					av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
+					live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
+					cv = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_cv);
+					et.addTextChangedListener(new TextWatcher(){
 
+							@Override
+							public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
+								// TODO: Implement this method
+							}
+
+							@Override
+							public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
+								// TODO: Implement this method
+							}
+
+							@Override
+							public void afterTextChanged(Editable p1) {
+								String typeReg=getIdType(p1.toString());
+								if (typeReg == null) {
+									return;
+								}
+								switch (typeReg) {
+									case regAv:
+									case regBv:
+										av.setChecked(true);
+										break;
+									case regCv:
+										cv.setChecked(true);
+										break;
+									case regLive:
+										live.setChecked(true);
+										break;
+									case regUid:
+									case regUid2:
+										uid.setChecked(true);
+										break;
+								}
+							}
+						});
+					new AlertDialog.Builder(MainActivity.this)
+						.setTitle("输入ID")
+						.setView(seView)
+						.setNegativeButton("取消", null)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								String content = et.getText().toString();
+								String typeReg=getIdType(content);
+								long conId=getId(content, typeReg);
+								if (uid.isChecked()) {
+									showFragment(UidFragment.class, IDType.UID , conId);
+								} else if (av.isChecked()) {
+									showFragment(AvFragment.class, IDType.Video , conId);
+								} else if (live.isChecked()) {
+									showFragment(LiveFragment.class, IDType.Live , conId);
+								} else if (cv.isChecked()) {
+									showFragment(CvFragment.class, IDType.Article , conId);
+								}
+							}
+						}).show();
+					break;
+				case R.id.accounts:
+					showFragment(ManagerFragment.class, IDType.Accounts);
+					break;
+				case R.id.medal:
+					String items[] = new String[MainActivity.instance.loginAccounts.size()];
+					for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {
+						items[i] = MainActivity.instance.loginAccounts.get(i).name;
+					}
+					new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setItems(items, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								showFragment(MedalFragment.class, IDType.Medal, MainActivity.instance.loginAccounts.get(which).uid);
+							}
+						}).show();
+					break;
+				case R.id.avbv:
+					showFragment(AvBvConvertFragment.class, IDType.AVBV);
+					break;
+				case R.id.settings:
+					showFragment(SettingsFragment.class, IDType.Settings);
+					break;
+				case R.id.dynamic:
+					showFragment(DynamicFragment.class, IDType.Dynamic);
+					break;
+				case R.id.exit:
+					if (sjfSettings.getExit0()) {
+						System.exit(0);
+					} else {
+						finish();
+					}
+					break;
+			}
+            return true;
+        }
+    };
 	@Override
 	public void setTheme(int resid) {
 		themeId = resid;
 		sjfSettings = new SJFSettings(this);
 		NetworkCacher.setJsonCacheMode(NetworkCacher.Mode.valueOf(sjfSettings.getJsonCacheMode()));
 		NetworkCacher.setPicCacheMode(NetworkCacher.Mode.valueOf(sjfSettings.getPicCacheMode()));
-		switch (sjfSettings.getTheme()) {
-            case "Holo":
-				super.setTheme(themeId = R.style.AppThemeHolo);
-				break;
-			case "Holo Wallpaper":
-				super.setTheme(themeId = R.style.AppThemeHoloWallpaper);
-				break;
-            case "MD":
-				super.setTheme(themeId = R.style.AppThemeLight);
-				break;
-			case "MD dark":
-				super.setTheme(themeId = R.style.AppThemeDark);
-				break;
-			case "Holo light":
-				super.setTheme(themeId = R.style.AppThemeHoloL);
-				break;
-            default:
-				super.setTheme(themeId = R.style.AppThemeHolo);
-				break;
-		}
+//		switch (sjfSettings.getTheme()) {
+//            case "Holo":
+//				super.setTheme(themeId = R.style.AppThemeHolo);
+//				break;
+//			case "Holo Wallpaper":
+//				super.setTheme(themeId = R.style.AppThemeHoloWallpaper);
+//				break;
+//            case "MD":
+//				super.setTheme(themeId = R.style.AppThemeLight);
+//				break;
+//			case "MD dark":
+//				super.setTheme(themeId = R.style.AppThemeDark);
+//				break;
+//			case "Holo light":
+//				super.setTheme(themeId = R.style.AppThemeHoloL);
+//				break;
+//            default:
+//				super.setTheme(themeId = R.style.AppThemeHolo);
+//				break;
+//		}
+		super.setTheme(themeId);
 	}
 
-    AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (view instanceof TextView) {
-                switch (((TextView) view).getText().toString()) {
-					case "输入ID":
-						final View seView = getLayoutInflater().inflate(R.layout.input_id_selecter, null);
-						final EditText et = (EditText) seView.findViewById(R.id.input_id_selecterEditText_id);
-						final RadioButton uid,av,live,cv;
-						uid = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_uid);
-						av = (RadioButton)seView.findViewById(R.id.input_id_selecterRadioButton_av);
-						live = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_live);
-						cv = (RadioButton) seView.findViewById(R.id.input_id_selecterRadioButton_cv);
-						et.addTextChangedListener(new TextWatcher(){
-
-								@Override
-								public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {
-									// TODO: Implement this method
-								}
-
-								@Override
-								public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {
-									// TODO: Implement this method
-								}
-
-								@Override
-								public void afterTextChanged(Editable p1) {
-									String typeReg=getIdType(p1.toString());
-									if (typeReg == null) {
-										return;
-									}
-									switch (typeReg) {
-										case regAv:
-										case regBv:
-											av.setChecked(true);
-											break;
-										case regCv:
-											cv.setChecked(true);
-											break;
-										case regLive:
-											live.setChecked(true);
-											break;
-										case regUid:
-										case regUid2:
-											uid.setChecked(true);
-											break;
-									}
-								}
-							});
-						new AlertDialog.Builder(MainActivity.this)
-							.setTitle("输入ID")
-							.setView(seView)
-							.setNegativeButton("取消", null)
-							.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									String content = et.getText().toString();
-									String typeReg=getIdType(content);
-									long conId=getId(content, typeReg);
-									if (uid.isChecked()) {
-										showFragment(UidFragment.class, IDType.UID , conId);
-									} else if (av.isChecked()) {
-										showFragment(AvFragment.class, IDType.Video , conId);
-									} else if (live.isChecked()) {
-										showFragment(LiveFragment.class, IDType.Live , conId);
-									} else if (cv.isChecked()) {
-										showFragment(CvFragment.class, IDType.Article , conId);
-									}
-								}
-							}).show();
-						break;
-					case "管理账号":
-						showFragment(ManagerFragment.class, IDType.Accounts);
-						break;
-					case "头衔":
-						String items[] = new String[MainActivity.instance.loginAccounts.size()];
-						for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {
-							items[i] = MainActivity.instance.loginAccounts.get(i).name;
-						}
-						new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setItems(items, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									showFragment(MedalFragment.class, IDType.Medal, MainActivity.instance.loginAccounts.get(which).uid);
-								}
-							}).show();
-						break;
-					case "AVBV转换":
-						showFragment(AvBvConvertFragment.class, IDType.AVBV);
-						break;
-                    case "设置":
-                        showFragment(SettingsFragment.class, IDType.Settings);
-                        break;
-					case "动态":
-						showFragment(DynamicFragment.class, IDType.Dynamic);
-						break;
-                    case "退出":
-                        if (sjfSettings.getExit0()) {
-                            System.exit(0);
-                        } else {
-                            finish();
-                        }
-                        break;
-                }
-            }
-            mDrawerToggle.syncState();
-            mDrawerLayout.closeDrawer(mDrawerList);
-            mDrawerLayout.closeDrawer(rightDrawer);
-        }
-    };
 
 	private String getIdType(String s) {
 		if (s.matches(regAv)) {
@@ -386,15 +414,6 @@ public class MainActivity extends Activity {
 		return -1;
 	}
 
-    private void findViews() {
-        tvMemory = new TextView(this);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.navdrawer);
-        rightDrawer = (RelativeLayout) findViewById(R.id.right_drawer);
-        lvRecent = (ListView) findViewById(R.id.right_list);
-    }
-
-
 	public void showFragment(String id) {
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		Fragment frag = fragments.get(id);
@@ -415,7 +434,7 @@ public class MainActivity extends Activity {
 				frag = (Fragment) cls.newInstance();
 				fragments.put(type.toString(), frag);
 				recentAdapter.add(type, 0, type.toString());
-				transaction.add(R.id.main_activityLinearLayout, frag);	
+				transaction.add(R.id.fragment, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());
 			}
@@ -435,7 +454,7 @@ public class MainActivity extends Activity {
 				frag = (Fragment) con.newInstance(type, id);
 				fragments.put(type.toString() + id, frag);
 				recentAdapter.add(type , id, type.toString() + id);
-				transaction.add(R.id.main_activityLinearLayout, frag);	
+				transaction.add(R.id.fragment, frag);	
 			} catch (Exception e) {
 				throw new RuntimeException("反射爆炸:" + e.toString());
 			}
@@ -477,38 +496,7 @@ public class MainActivity extends Activity {
 		fragments.remove(id);
 	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
-            } else {
-                mDrawerLayout.openDrawer(mDrawerList);
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-	/*  public void doVibrate(long time) {
-	 Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-	 if (vibrator != null) {
-	 vibrator.vibrate(time);
-	 }
-	 }*/
-
-    public String getCookie(long bid) {
+	public String getCookie(long bid) {
         for (AccountInfo l : loginAccounts) {
             if (bid == l.uid) {
                 return l.cookie;
@@ -584,17 +572,25 @@ public class MainActivity extends Activity {
 		}
 	}
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
-            } else {
-                mDrawerLayout.openDrawer(mDrawerList);
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+	public void showToast(final String msgAbbr, final String msgOrigin) {
+        runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					Snackbar.make(mainLinearLayout, msgAbbr, 5000)
+						.setAction("查看全文", msgOrigin.trim().length() == 0 ?null: new View.OnClickListener(){
+
+									   @Override
+									   public void onClick(View v) {
+										   new AlertDialog.Builder(MainActivity.this)
+											   .setIcon(R.drawable.ic_launcher)
+											   .setTitle("全文")
+											   .setMessage(msgOrigin)
+											   .setPositiveButton("确定", null).show();
+									   }
+								   }).show();
+				}
+			});
     }
 
     public void showToast(final String msg) {
@@ -602,8 +598,38 @@ public class MainActivity extends Activity {
 
 				@Override
 				public void run() {
-					Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+					Snackbar.make(mainLinearLayout, msg, 5000)
+						.setAction("查看全文", getLines(msg) < 2 && msg.length() < 40 ?null: new View.OnClickListener(){
+
+									   @Override
+									   public void onClick(View v) {
+										   new AlertDialog.Builder(MainActivity.this)
+											   .setIcon(R.drawable.ic_launcher)
+											   .setTitle("全文")
+											   .setMessage(msg)
+											   .setPositiveButton("确定", null).show();
+									   }
+								   }).show();
 				}
 			});
+    }
+
+	public int getLines(String s) {
+		int l=0;
+		for (char c:s.toCharArray()) {
+			if (c == '\n') {
+				++l;
+			}
+		}
+		return l;
+	}
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout != null && !mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

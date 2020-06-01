@@ -11,11 +11,17 @@
 		android:layout_height="match_parent"
 		android:layout_weight="1.0">
 
-		<EditText
-			android:id="@+id/av_bvEditTextav"
-			android:hint="av"
+		<android.support.design.widget.TextInputLayout
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/av_bvEditTextav"
+				android:hint="输入av号"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"/>
+
+		</android.support.design.widget.TextInputLayout>
 
 		<TextView
 			android:textAppearance="?android:attr/textAppearanceListItemSmall"
@@ -34,11 +40,17 @@
 		android:layout_height="match_parent"
 		android:layout_weight="1.0">
 
-		<EditText
-			android:id="@+id/av_bvEditTextbv"
-			android:hint="bv"
+		<android.support.design.widget.TextInputLayout
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/av_bvEditTextbv"
+				android:hint="输入bv号"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"/>
+
+		</android.support.design.widget.TextInputLayout>
 
 		<TextView
 			android:textAppearance="?android:attr/textAppearanceListItemSmall"

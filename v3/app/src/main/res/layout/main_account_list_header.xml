@@ -51,12 +51,18 @@
 		android:layout_height="match_parent"
 		android:orientation="vertical">
 
-		<EditText
-			android:id="@+id/main_account_list_headerEditText_new_name"
-			android:background="@null"
+		<android.support.design.widget.TextInputLayout
 			android:layout_width="match_parent"
-			android:layout_height="55dp"
-			android:hint="@string/new_room_name"/>
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/main_account_list_headerEditText_new_name"
+				android:background="@null"
+				android:layout_width="match_parent"
+				android:layout_height="55dp"
+				android:hint="@string/new_room_name"/>
+
+		</android.support.design.widget.TextInputLayout>
 
 		<Button
 			android:id="@+id/main_account_list_headerButton_rename"
@@ -71,6 +77,7 @@
 			android:orientation="horizontal">
 
 			<Button
+				style="?android:attr/buttonBarButtonStyle"
 				android:id="@+id/main_account_list_headerButton_start"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
@@ -78,6 +85,7 @@
 				android:text="打开直播间"/>
 
 			<Button
+				style="?android:attr/buttonBarButtonStyle"
 				android:enabled="false"
 				android:id="@+id/main_account_list_headerButton_copy"
 				android:layout_width="0dp"

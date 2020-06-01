@@ -13,7 +13,7 @@
 		android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppThemeHolo">
+        android:theme="@style/AppTheme">
 		<meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
@@ -29,17 +29,18 @@
         </activity>
 		<activity 
 			android:label="AVBV"
-			android:name=".activity.ABquickConvert" >
+			android:name="com.meng.sjfmd.activity.ABquickConvert" >
             <intent-filter >
                 <action android:name="android.intent.action.PROCESS_TEXT"/>
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+		<activity android:name="com.meng.sjfmd.activity.LoginActivity" />
 		
-        <activity android:name=".activity.main.Login" />
+        <activity android:name="com.meng.sjfmd.activity.Login" />
 		<activity
-            android:name=".activity.live.LiveWebActivity"
+            android:name="com.meng.sjfmd.activity.LiveWebActivity"
             android:launchMode="singleTop" />
     </application>
 

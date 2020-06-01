@@ -9,7 +9,7 @@
 		android:dialogTitle="选择颜色"
 		android:entries="@array/color_list"
 		android:entryValues="@array/color_list"
-		android:defaultValue="Holo"
+		android:defaultValue="Material Design"
 		android:key="theme"
 		android:summary="重启生效"
 		android:title="主题" />

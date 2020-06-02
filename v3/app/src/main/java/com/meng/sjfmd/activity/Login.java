@@ -1,6 +1,7 @@
 package com.meng.sjfmd.activity;
 
 import android.app.*;
+import android.content.*;
 import android.os.*;
 import android.webkit.*;
 import com.meng.biliv3.activity.*;
@@ -77,29 +78,19 @@ public class Login extends Activity {
 							public void run() {
 								UserInfo bilibiliPersonInfo = GSON.fromJson(Tools.Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), UserInfo.class);
 								int po=getIntent().getIntExtra("pos", -1);
-								AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
+								final AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
 								account.cookie = cookieStr;
 								account.name = bilibiliPersonInfo.data.name;
 								account.uid = bilibiliPersonInfo.data.mid;
 								account.setCookieExceed(false);
 								account.setSigned(false);
-								int i,j;
-								for (i = 0,j = MainActivity.instance.loginAccounts.size();i < j; ++i) {
-									if (MainActivity.instance.loginAccounts.get(i).uid == account.uid) {
-										break;
-									}
-								}
-								if (i != MainActivity.instance.loginAccounts.size()) {
-									MainActivity.instance.loginAccounts.set(i, account);
-								} else {
-									MainActivity.instance.loginAccounts.add(account);
-								}
-								MainActivity.instance.saveConfig();
-								runOnUiThread(new Runnable() {
+								Login.this.runOnUiThread(new Runnable(){
 
 										@Override
 										public void run() {
-											MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
+											Intent in = new Intent();
+											in.putExtra("aci", account.toString());
+											setResult(RESULT_OK, in);
 											finish();
 										}
 									});

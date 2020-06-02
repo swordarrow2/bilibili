@@ -16,6 +16,7 @@ import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
 import java.io.*;
+import android.support.design.widget.*;
 
 
 public class UserInfoHeaderView extends LinearLayout implements View.OnClickListener {
@@ -24,7 +25,8 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
     private TextView tvName;
     private TextView tvBMain;
 	private TextView tvBLive;
-
+	private TextInputLayout til;
+	
 	private Button btnStart;
 	private Button btnCopy;
 	private Button btnRename;
@@ -53,6 +55,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 	private void initView(Context context) {
 		LayoutInflater.from(context).inflate(R.layout.main_account_list_header, this);
+		til = (TextInputLayout) findViewById(R.id.main_account_list_header_TextInputLayout);
 		ivHead = (ImageView) findViewById(R.id.main_account_list_headerImageView_header);
         tvName = (TextView) findViewById(R.id.main_account_list_headerTextView_name);
         tvBMain = (TextView) findViewById(R.id.main_account_list_headerTextView_bmain);
@@ -124,7 +127,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 									btnCopy.setEnabled(true);
 									btnCopy.setText("复制推流码");
 								}
-								newName.setHint("房间名:" + utr.data.title);
+								til.setHint("房间名:" + utr.data.title);
 								mainlistview = new ExpandableListView(MainActivity.instance);
 								mainlistview.setOnChildClickListener(new OnChildClickListener(){
 
@@ -179,7 +182,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 																public void run() {
 																	btnCopy.setEnabled(true);
 																	btnCopy.setText("复制推流码");
-																	newName.setHint("房间名:" + utr.data.title);
+																	til.setHint("房间名:" + utr.data.title);
 																	btnStart.setText("关闭直播间");
 																}
 															});
@@ -217,7 +220,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 									if (utr.data.liveStatus == 0) {
 										btnStart.setText("打开直播间");
 									} else {
-										newName.setHint("房间名:" + utr.data.title);
+										til.setHint("房间名:" + utr.data.title);
 										btnStart.setText("关闭直播间");                                                     
 									}
 								}

@@ -111,7 +111,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
 									@Override
 									public void run() {
-										Snackbar.make(progressBar, "重试次数达到上线，请使用扫码登录或稍后再试", 3000).show();
+										Snackbar.make(progressBar, "重试次数达到上线，请稍后再试", 3000).show();
 										progressBar.setVisibility(View.GONE);
 									}
 								});
@@ -126,8 +126,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
 												@Override
 												public void onClick(View p1) {
-													startActivity(new Intent(LoginActivity.this, Login.class));
-													finish();
+													startActivityForResult(new Intent(LoginActivity.this, Login.class), 0x9961);
 												}
 											}).show();
 									}
@@ -142,8 +141,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
 												@Override
 												public void onClick(View p1) {
-													startActivity(new Intent(LoginActivity.this, Login.class));
-													finish();
+													startActivityForResult(new Intent(LoginActivity.this, Login.class), 0x9961);
 												}
 											}).show();
 									}
@@ -157,5 +155,28 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 			inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode != 0x9961) {
+			super.onActivityResult(requestCode, resultCode, data);
+			finish();
+			return;
+		}
+		if (resultCode == Activity.RESULT_OK && data != null) {
+			setResult(RESULT_OK, data);
+			finish();
+		} else if (resultCode == Activity.RESULT_CANCELED) {
+			MainActivity.instance.showToast("取消登录");
+			setResult(RESULT_CANCELED);
+			finish();
+		} else if (data == null) {
+			setResult(RESULT_CANCELED);
+			MainActivity.instance.showToast("一个错误导致无结果");
+			finish();
+		}
+	}
+
+
 }
 

@@ -4,8 +4,10 @@ import android.app.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
+import android.view.animation.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import com.github.clans.fab.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.sjfmd.enums.*;
@@ -14,7 +16,15 @@ import com.meng.sjfmd.result.*;
 
 public class CvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
-	private Button send,editPre,preset,zan,coin1,coin2,favorite;
+	private Button editPre,preset;
+	private ImageButton send;
+	private FloatingActionMenu menuGroup;
+	private FloatingActionButton fabZan;
+    private FloatingActionButton fabCoin1;
+	private FloatingActionButton fabCoin2;
+    private FloatingActionButton fabFavorite;
+	private LinearLayout llInput;
+	
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
@@ -34,27 +44,46 @@ public class CvFragment extends BaseIdFragment implements View.OnClickListener,V
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		send = (Button) view.findViewById(R.id.cv_fragmentButton_send);
+		send = (ImageButton) view.findViewById(R.id.cv_fragmentButton_send);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.cv_fragmentButton_preset);
-		zan = (Button) view.findViewById(R.id.cv_fragmentButton_zan);
-		coin1 = (Button) view.findViewById(R.id.cv_fragmentButton_coin1);
-		coin2 = (Button) view.findViewById(R.id.cv_fragmentButton_coin2);
-		favorite = (Button) view.findViewById(R.id.cv_fragmentButton_favorite);
+		menuGroup = (FloatingActionMenu) view.findViewById(R.id.cv_float_menu);
+		fabZan = (FloatingActionButton) view.findViewById(R.id.cv_fragmentButton_zan);
+		fabCoin1 = (FloatingActionButton) view.findViewById(R.id.cv_fragmentButton_coin1);
+		fabCoin2 = (FloatingActionButton) view.findViewById(R.id.cv_fragmentButton_coin2);
+		fabFavorite = (FloatingActionButton) view.findViewById(R.id.cv_fragmentButton_favorite);
+		llInput = (LinearLayout) view.findViewById(R.id.cv_fragmentLinearLayout_input);
+		llInput.setVisibility(View.GONE);
+		llInput.setBackgroundColor(0xffffffff);
+		fabFavorite.setEnabled(false);
 		et = (EditText) view.findViewById(R.id.cv_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.cv_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.cv_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.cv_fragmentSpinner);
 		preset.setOnClickListener(this);
-		zan.setOnClickListener(this);
-		coin1.setOnClickListener(this);
-		coin2.setOnClickListener(this);
-		favorite.setOnClickListener(this);
+		fabZan.setOnClickListener(this);
+		fabCoin1.setOnClickListener(this);
+		fabCoin2.setOnClickListener(this);
+		fabFavorite.setOnClickListener(this);
 		send.setOnClickListener(this);
 		//editPre.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		ivPreview.setOnLongClickListener(this);
-
+		final Animation animShow = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_in_from_right);
+		final Animation animHide = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_out_to_right);
+		menuGroup.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+				@Override
+				public void onMenuToggle(boolean opened) {
+					if (opened) {
+						llInput.startAnimation(animShow);
+						llInput.setVisibility(View.VISIBLE);
+					} else {
+						llInput.startAnimation(animHide);
+						llInput.setVisibility(View.GONE);
+					}
+				}
+			});
+		
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override

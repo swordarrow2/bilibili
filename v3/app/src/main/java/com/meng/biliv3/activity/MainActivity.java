@@ -64,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
 	public SJFSettings sjfSettings;
 	public ColorManager colorManager;
 	private boolean autoDrawerOperated=false;
-	public static final String regAv = "[Aa][Vv](\\d{1,})\\D{0,}";
+	public static final String regAv = ".{0,}[Aa][Vv](\\d{1,})\\D{0,}";
 	public static final String regBv = ".{0,}([Bb][Vv]1.{2}4.{1}1.{1}7.{2}).{0,}";
-	public static final String regLive = "\\D{0,}live\\D{0,}(\\d{1,})\\D{0,}";
-	public static final String regCv = "[Cc][Vv](\\d{1,})";
-	public static final String regUid = "space\\D{0,}(\\d{1,})";
-	public static final String regUid2 = "UID\\D{0,}(\\d{1,})";
+	public static final String regLive = ".{0,}live\\D{0,}(\\d{1,})\\D{0,}";
+	public static final String regCv = ".{0,}[Cc][Vv](\\d{1,})";
+	public static final String regUid = ".{0,}space\\D{0,}(\\d{1,})";
+	public static final String regUid2 = ".{0,}UID\\D{0,}(\\d{1,})";
 
 	private NavigationView navigationView;
 

@@ -283,6 +283,10 @@ public class Tools {
 			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/v2/reply/add", cookie, "Referer", "https://www.bilibili.com/", "type", 12, "message", msg, "plat", 1, "jsonp", "jsonp", "csrf", Tools.BilibiliTool.getCsrf(cookie));
 		}
 
+		public static String setMyInfo(String cookie, String newName, String newSign, String newSex, String newBirthday) {
+			return Tools.Network.bilibiliMainPost("https://api.bilibili.com/x/member/web/update", cookie, "uname", newName, "usersign", newSign, "sex", newSex, "birthday", newBirthday, "csrf", BilibiliTool.getCsrf(cookie));
+		}
+
 		public static StartLive startLive(long roomID, String partID, String cookie) {
 			if (partID == null) {
 				partID = "235";

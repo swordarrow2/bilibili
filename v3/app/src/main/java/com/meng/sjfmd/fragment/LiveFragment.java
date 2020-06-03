@@ -8,8 +8,10 @@ import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
+import android.view.animation.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import com.github.clans.fab.*;
 import com.google.gson.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
@@ -32,7 +34,18 @@ import android.view.View.OnLongClickListener;
 
 public class LiveFragment extends BaseIdFragment implements View.OnClickListener, UniversalVideoView.VideoViewCallback {
 
-	private Button send,editPre,preset,silver,pack,download,milk;
+	private Button editPre,preset;
+	
+	private ImageButton send;
+	private FloatingActionMenu menuGroup;
+	private FloatingActionButton fabSilver;
+    private FloatingActionButton fabPack;
+	private FloatingActionButton fabDownload;
+    private FloatingActionButton fabMilk;
+	private LinearLayout llInput;
+	
+	
+	
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
@@ -52,7 +65,6 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 	private boolean isFullscreen;
 	private JsonObject liveInfo;
-	private TabHost tab;
 
 	public ArrayList<String> recieved = new ArrayList<>();
 	public ArrayAdapter<String> adapter;
@@ -66,38 +78,45 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.tab_fragment, container, false);
+		return inflater.inflate(R.layout.live_fragment, container, false);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		tab = (TabHost) view.findViewById(android.R.id.tabhost);
-		tab.setup();
-        LayoutInflater layoutInflater=LayoutInflater.from(getActivity()); 
-		layoutInflater.inflate(R.layout.live_fragment, tab.getTabContentView()); 
-		layoutInflater.inflate(R.layout.live_fragment2, tab.getTabContentView());
-		tab.addTab(tab.newTabSpec("tab1").setIndicator("直播" , null).setContent(R.id.live_fragmentLinearLayout_main));
-        tab.addTab(tab.newTabSpec("tab2").setIndicator("弹幕" , null).setContent(R.id.live_fragment2RelativeLayout));
-
-
-		send = (Button) view.findViewById(R.id.live_fragment2Button_send);
-		silver = (Button) view.findViewById(R.id.live_fragment2Button_silver);
-		pack = (Button) view.findViewById(R.id.live_fragment2Button_pack);
+		llInput=(LinearLayout) view.findViewById(R.id.live_fragmentLinearLayout_input);
+		send = (ImageButton) view.findViewById(R.id.live_fragment2Button_send);
+		fabSilver = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_silver);
+		fabPack = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_pack);
+		menuGroup =(FloatingActionMenu) view.findViewById(R.id.lv_float_menu);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.live_fragment2Button_preset);
 		img = (ImageView) view.findViewById(R.id.live_fragmentImageView);  
 		et = (EditText) view.findViewById(R.id.live_fragment2EditText_danmaku);
 		info = (TextView) view.findViewById(R.id.live_fragmentTextView_info);
 		selectAccount = (Spinner) view.findViewById(R.id.live_fragment2Spinner);
-		milk = (Button) view.findViewById(R.id.livefragmentButtonSerialMilk);
-		download = (Button) view.findViewById(R.id.livefragmentButtonDownload);
+		fabMilk = (FloatingActionButton) view.findViewById(R.id.livefragmentButtonSerialMilk);
+		fabDownload = (FloatingActionButton) view.findViewById(R.id.livefragmentButtonDownload);
+		fabDownload.setEnabled(false);
 		mVideoLayout = view.findViewById(R.id.videoLayout);
         mBottomLayout = view.findViewById(R.id.live_fragmentLinearLayout_b);
 		mVideoView = (UniversalVideoView) view.findViewById(R.id.videoView);
         mMediaController = (UniversalMediaController) view.findViewById(R.id.media_controller);
 		danmakuList = (ListView) view.findViewById(R.id.livefragmentListView_danmaku);
-
+		final Animation animShow = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_in_from_right);
+		final Animation animHide = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_out_to_right);
+		menuGroup.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+				@Override
+				public void onMenuToggle(boolean opened) {
+					if (opened) {
+						llInput.startAnimation(animShow);
+						llInput.setVisibility(View.VISIBLE);
+					} else {
+						llInput.startAnimation(animHide);
+						llInput.setVisibility(View.GONE);
+					}
+				}
+			});
 		adapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, recieved);
 		danmakuList.setAdapter(adapter);
 		danmakuList.setOnItemClickListener(new OnItemClickListener(){
@@ -116,13 +135,13 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 		mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
         mVideoView.setVideoViewCallback(this);
-		download.setOnClickListener(this);
+		fabDownload.setOnClickListener(this);
 		preset.setOnClickListener(this);
 		send.setOnClickListener(this);
-		silver.setOnClickListener(this);
-		pack.setOnClickListener(this);
+		fabSilver.setOnClickListener(this);
+		fabPack.setOnClickListener(this);
 		//editPre.setOnClickListener(onclick);
-		milk.setOnClickListener(this);
+		fabMilk.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		img.setOnClickListener(new OnClickListener(){
 
@@ -261,12 +280,14 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
             mVideoLayout.setLayoutParams(layoutParams);
             mBottomLayout.setVisibility(View.GONE);
+			menuGroup.hideMenuButton(true);
         } else {
             ViewGroup.LayoutParams layoutParams = mVideoLayout.getLayoutParams();
             layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
             layoutParams.height = this.cachedHeight;
             mVideoLayout.setLayoutParams(layoutParams);
             mBottomLayout.setVisibility(View.VISIBLE);
+			menuGroup.showMenuButton(true);
         }
 		switchTitleBar(!isFullscreen);
     }

@@ -24,7 +24,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private FloatingActionButton fabZan;
     private FloatingActionButton fabCoin1;
 	private FloatingActionButton fabCoin2;
-    private FloatingActionButton fabFavoriate;
+    private FloatingActionButton fabFavorite;
 
 	private EditText et;
 	private TextView info;
@@ -58,7 +58,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		fabZan = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_zan);
 		fabCoin1 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin1);
 		fabCoin2 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin2);
-		fabFavoriate = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_favorite);
+		fabFavorite = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_favorite);
 		et = (EditText) view.findViewById(R.id.av_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
@@ -69,8 +69,8 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		fabZan.setOnClickListener(this);
 		fabCoin1.setOnClickListener(this);
 		fabCoin2.setOnClickListener(this);
-		fabFavoriate.setOnClickListener(this);
-		fabFavoriate.setEnabled(false);
+		fabFavorite.setOnClickListener(this);
+		fabFavorite.setEnabled(false);
 		send.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
 		ivPreview.setOnLongClickListener(this);

@@ -57,7 +57,7 @@ public class BaseIdFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		customSentenseFile = new File(Environment.getExternalStorageDirectory() + "/sjf.json");
 		if (customSentenseFile.exists() && customSentence != null) {
-			customSentence = GSON.fromJson(Tools.FileTool.readString(customSentenseFile), CustomSentence.class);
+			customSentence = GSON.fromJson(FileTool.readString(customSentenseFile), CustomSentence.class);
 		} else {
 			customSentence = new CustomSentence();
 			String[] strings = new String[]{ "此生无悔入东方,来世愿生幻想乡","红魔地灵夜神雪,永夜风神星莲船","非想天则文花贴,萃梦神灵绯想天","冥界地狱异变起,樱下华胥主谋现","净罪无改渡黄泉,华鸟风月是非辨","境界颠覆入迷途,幻想花开啸风弄","二色花蝶双生缘,前缘未尽今生还","星屑洒落雨霖铃,虹彩彗光银尘耀","无寿迷蝶彼岸归,幻真如画妖如月","永劫夜宵哀伤起,幼社灵中幻似梦","追忆往昔巫女缘,须弥之间冥梦现","仁榀华诞井中天,歌雅风颂心无念" };
@@ -147,7 +147,7 @@ public class BaseIdFragment extends Fragment {
 				public void run() {
 					switch (opValue) {
 						case SendDanmaku:
-							String response=Tools.BilibiliTool.sendLiveDanmaku(msg, ai.cookie, id);
+							String response=Bilibili.sendLiveDanmaku(msg, ai.cookie, id);
 							JsonParser parser = new JsonParser();
 							JsonObject obj = parser.parse(response).getAsJsonObject();
 							switch (obj.get("code").getAsInt()) {
@@ -184,13 +184,13 @@ public class BaseIdFragment extends Fragment {
 
 															@Override
 															public void run() {
-																JsonObject liveToMainInfo=null;
+																RoomToUid liveToMainInfo=null;
 																try {
-																	liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+																	liveToMainInfo = Bilibili.getRoomToUid(id);
 																} catch (Exception e) {
 																	return;
 																}
-																MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, liveToMainInfo.get("uid").getAsLong(), id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
+																MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendHotStrip(ai.uid, liveToMainInfo.data.info.uid, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
 															}
 														});
 												}
@@ -199,37 +199,37 @@ public class BaseIdFragment extends Fragment {
 								});
 							break;
 						case Pack:
-							sendPackDialog(ai, Tools.BilibiliTool.getRoomToUid(id).data.info.uid);
+							sendPackDialog(ai, Bilibili.getRoomToUid(id).data.info.uid);
 							break;
 						case Sign:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendLiveSign(ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case SendVideoJudge:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge(msg, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendVideoJudge(msg, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case LikeVideo:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendAvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case VideoCoin1:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendAvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case VideoCoin2:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendAvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendAvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case Favorite:
 							MainActivity.instance.showToast("未填坑");
 							break;
 						case SendCvJudge:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendArticalJudge(id, msg, ai.cookie)).getAsJsonObject().get("code").getAsInt() == 0 ?"发送成功": "发送失败");
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendArticalJudge(id, msg, ai.cookie)).getAsJsonObject().get("code").getAsInt() == 0 ?"发送成功": "发送失败");
 							break;
 						case CvCoin1:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendCvCoin(1, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case CvCoin2:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendCvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case LikeArtical:
-							MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendCvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
+							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendCvLike(id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 					}
 				}
@@ -237,7 +237,7 @@ public class BaseIdFragment extends Fragment {
 	}
 
 	protected void sendPackDialog(final AccountInfo ai, final long targetUid) {
-		final GiftBag liveBag =Tools.BilibiliTool.getGiftBag(ai.cookie);
+		final GiftBag liveBag =Bilibili.getGiftBag(ai.cookie);
 		getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -324,12 +324,12 @@ public class BaseIdFragment extends Fragment {
 
 	protected void sendHotStrip(long uid, long ruid, long roomID, int num, String cookie, GiftBag.ListItem liveBagDataList) {
 		Connection connection = Jsoup.connect("https://api.live.bilibili.com/gift/v2/live/bag_send");
-		String csrf = Tools.Network.cookieToMap(cookie).get("bili_jct");
+		String csrf = Bilibili.getCsrf(cookie);
 		connection.userAgent(MainActivity.instance.userAgent)
-			.headers(Tools.liveHead)
+			.headers(Bilibili.liveHead)
 			.ignoreContentType(true)
 			.referrer("https://live.bilibili.com/" + roomID)
-			.cookies(Tools.Network.cookieToMap(cookie))
+			.cookies(com.meng.sjfmd.libs.Network.cookieToMap(cookie))
 			.method(Connection.Method.POST)
 			.data("uid", uid)
 			.data("gift_id", liveBagDataList.gift_id)

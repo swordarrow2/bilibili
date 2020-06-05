@@ -3,9 +3,10 @@ package com.meng.sjfmd.libs;
 import java.io.*;
 import java.security.*;
 import java.nio.charset.*;
+import java.util.*;
 
 public abstract class Hash {
-	
+
 	private static MD5 md5Instance = null;
 	
 	public static MD5 getMd5Instance() {

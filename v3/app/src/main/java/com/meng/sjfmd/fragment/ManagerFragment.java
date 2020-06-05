@@ -202,14 +202,14 @@ public class ManagerFragment extends Fragment {
 
 				@Override
 				public void run() {
-					MyInfo myInfo=Tools.BilibiliTool.getMyInfo(cookie);
+					MyInfo myInfo = Bilibili.getMyInfo(cookie);
 					for (AccountInfo ai:MainActivity.instance.loginAccounts) {
 						if (ai.uid == myInfo.data.mid) {
 							MainActivity.instance.showToast("已添加过此帐号");
 							return;
 						}
 					}
-					AccountInfo accountInfo=new AccountInfo();
+					AccountInfo accountInfo = new AccountInfo();
 					accountInfo.cookie = cookie;
 					accountInfo.name = myInfo.data.name;
 					accountInfo.uid = myInfo.data.mid;

@@ -48,7 +48,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 		final ViewHolder holder;
 		if (convertView == null) {
 			convertView = MainActivity.instance.getLayoutInflater().inflate(R.layout.video_judge, null);
-			convertView.setPadding(Tools.AndroidContent.sp2px(25), 0, 0, 0);
+			convertView.setPadding(AndroidContent.sp2px(25), 0, 0, 0);
 			holder = new ViewHolder();
 			holder.tvName = (TextView) convertView.findViewById(R.id.video_judgeTextView_uname);
 			holder.tvTime = (TextView) convertView.findViewById(R.id.video_judgeTextView_time);
@@ -77,7 +77,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 					});
             }
         }
-		holder.tvTime.setText(Tools.Time.getTime(parentReply.ctime * 1000));
+		holder.tvTime.setText(TimeFormater.getTime(parentReply.ctime * 1000));
 		holder.tvName.setText(parentReply.member.uname);
 		holder.tvContent.setText(parentReply.content.message);
 		holder.canDelete = MainActivity.instance.getAccount(Long.parseLong(parentReply.member.mid));
@@ -98,7 +98,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 
 											@Override
 											public void run() {
-												int result = new JsonParser().parse(Tools.BilibiliTool.deleteReply(parentReply.oid, parentReply.rpid, holder.canDelete.cookie)).getAsJsonObject().get("code").getAsInt();
+												int result = new JsonParser().parse(Bilibili.deleteReply(parentReply.oid, parentReply.rpid, holder.canDelete.cookie)).getAsJsonObject().get("code").getAsInt();
 												MainActivity.instance.showToast(String.valueOf(result));
 												if (result != 0) {
 													return;
@@ -137,8 +137,8 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 										@Override
 										public void run() {
 											VideoReply.Reply rootReply = videoReply.data.replies.get(groupPosition);
-											MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge("回复 @" + parentReply.member.uname + " :" + et.getText().toString(), rootReply.oid, rootReply.rpid, parentReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
-											videoReply = Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid);
+											MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendVideoJudge("回复 @" + parentReply.member.uname + " :" + et.getText().toString(), rootReply.oid, rootReply.rpid, parentReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
+											videoReply = Bilibili.getVideoJudge(videoReply.data.replies.get(0).oid);
 											MainActivity.instance.runOnUiThread(new Runnable(){
 
 													@Override
@@ -213,7 +213,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 					});
             }
         }
-		holder.tvTime.setText(Tools.Time.getTime(rootReply.ctime * 1000));
+		holder.tvTime.setText(TimeFormater.getTime(rootReply.ctime * 1000));
 		holder.tvName.setText(rootReply.member.uname);
 		holder.tvContent.setText(rootReply.content.message);
 		holder.canDelete = MainActivity.instance.getAccount(Long.parseLong(rootReply.member.mid));
@@ -230,7 +230,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 
 											@Override
 											public void run() {
-												int result = new JsonParser().parse(Tools.BilibiliTool.deleteReply(rootReply.oid, rootReply.rpid, holder.canDelete.cookie)).getAsJsonObject().get("code").getAsInt();
+												int result = new JsonParser().parse(Bilibili.deleteReply(rootReply.oid, rootReply.rpid, holder.canDelete.cookie)).getAsJsonObject().get("code").getAsInt();
 												MainActivity.instance.showToast(String.valueOf(result));
 												if (result != 0) {
 													return;
@@ -270,8 +270,8 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 
 										@Override
 										public void run() {
-											MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendVideoJudge(et.getText().toString(), rootReply.oid, rootReply.rpid, rootReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
-											videoReply = Tools.BilibiliTool.getVideoJudge(videoReply.data.replies.get(0).oid);
+											MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendVideoJudge(et.getText().toString(), rootReply.oid, rootReply.rpid, rootReply.rpid, ((AccountInfo)sp.getSelectedItem()).cookie)).getAsJsonObject().get("message").getAsString());
+											videoReply = Bilibili.getVideoJudge(videoReply.data.replies.get(0).oid);
 											MainActivity.instance.runOnUiThread(new Runnable(){
 
 													@Override
@@ -308,7 +308,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 
 				@Override
 				public void run() {
-					VideoReply aj = Tools.BilibiliTool.getVideoJudge(root.oid, root.rpid);
+					VideoReply aj = Bilibili.getVideoJudge(root.oid, root.rpid);
 					root.replies.clear();
 					root.replies.addAll(aj.data.replies);
 					MainActivity.instance.runOnUiThread(new Runnable(){

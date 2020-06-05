@@ -35,7 +35,7 @@ import android.view.View.OnLongClickListener;
 public class LiveFragment extends BaseIdFragment implements View.OnClickListener, UniversalVideoView.VideoViewCallback {
 
 	private Button editPre,preset;
-	
+
 	private ImageButton send;
 	private FloatingActionMenu menuGroup;
 	private FloatingActionButton fabSilver;
@@ -43,9 +43,9 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 	private FloatingActionButton fabDownload;
     private FloatingActionButton fabMilk;
 	private LinearLayout llInput;
-	
-	
-	
+
+
+
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
@@ -84,11 +84,11 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		llInput=(LinearLayout) view.findViewById(R.id.live_fragmentLinearLayout_input);
+		llInput = (LinearLayout) view.findViewById(R.id.live_fragmentLinearLayout_input);
 		send = (ImageButton) view.findViewById(R.id.live_fragment2Button_send);
 		fabSilver = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_silver);
 		fabPack = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_pack);
-		menuGroup =(FloatingActionMenu) view.findViewById(R.id.lv_float_menu);
+		menuGroup = (FloatingActionMenu) view.findViewById(R.id.lv_float_menu);
 		//editPre = (Button) view.findViewById(R.id.live_fragmentButton_edit_pre);
 		preset = (Button) view.findViewById(R.id.live_fragment2Button_preset);
 		img = (ImageView) view.findViewById(R.id.live_fragmentImageView);  
@@ -123,7 +123,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-					Tools.AndroidContent.copyToClipboard(recieved.get(p3));
+					AndroidContent.copyToClipboard(recieved.get(p3));
 				}
 			});
 		try {
@@ -181,7 +181,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 				@Override
 				public void run() {
 					JsonParser parser = new JsonParser();
-					liveInfo = parser.parse(Tools.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
+					liveInfo = parser.parse(com.meng.sjfmd.libs.Network.httpGet("https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + id + "&quality=4&platform=web")).getAsJsonObject();
 					if (liveInfo.get("code").getAsInt() == 19002003) {
 						MainActivity.instance.showToast("不存在的房间");
 						return;
@@ -189,14 +189,14 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
 					JsonObject liveToMainInfo=null;
 					try {
-						liveToMainInfo = new JsonParser().parse(Tools.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
+						liveToMainInfo = new JsonParser().parse(com.meng.sjfmd.libs.Network.httpGet("https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=" + id)).getAsJsonObject().get("data").getAsJsonObject().get("info").getAsJsonObject();
 					} catch (Exception e) {
 						return;
 					}
 					long uid=liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(uid);
-					final byte[] imgbs = NetworkCacher.getNetPicture(Tools.BilibiliTool.getUidToRoom(uid).data.cover);
+					final UidToRoom sjb = Bilibili.getUidToRoom(uid);
+					final byte[] imgbs = NetworkCacher.getNetPicture(Bilibili.getUidToRoom(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){
 
@@ -399,7 +399,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 	public void onBufferingEnd(MediaPlayer mediaPlayer) {
 		// TODO: Implement this method
 	}
-	
+
 	private class DanmakuListener extends WebSocketClient {
 
 		private long roomId;
@@ -434,7 +434,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 		@Override
 		public void onOpen(ServerHandshake serverHandshake) {
-			send(encode(initJoin, String.format(Tools.AndroidContent.readAssetsString("bliveInit.json"), roomId)).data);
+			send(encode(initJoin, String.format(AndroidContent.readAssetsString("bliveInit.json"), roomId)).data);
 			MainActivity.instance.threadPool.execute(new Runnable(){
 
 					@Override
@@ -547,7 +547,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 						}
 					});
 			} catch (JsonSyntaxException je) {
-				MainActivity.instance.showToast("json解析失败:"+ dp.body);
+				MainActivity.instance.showToast("json解析失败:" + dp.body);
 			}
 		}
 
@@ -615,7 +615,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 				version = readShort();
 				op = readInt();
 				seq = readInt();
-				body = new String(data, offset + 16, length - 16,StandardCharsets.UTF_8);
+				body = new String(data, offset + 16, length - 16, StandardCharsets.UTF_8);
 				data = null;
 			}
 
@@ -627,32 +627,32 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 			private byte[] getBytes(int i) {
 				return BitConverter.getInstanceBigEndian().getBytes(i);
-			/*	byte[] bs=new byte[4];
-				bs[0] = (byte) ((i >> 24) & 0xff);
-				bs[1] = (byte) ((i >> 16) & 0xff);
-				bs[2] = (byte) ((i >> 8) & 0xff);
-				bs[3] = (byte) (i & 0xff);
-				return bs;	*/
+				/*	byte[] bs=new byte[4];
+				 bs[0] = (byte) ((i >> 24) & 0xff);
+				 bs[1] = (byte) ((i >> 16) & 0xff);
+				 bs[2] = (byte) ((i >> 8) & 0xff);
+				 bs[3] = (byte) (i & 0xff);
+				 return bs;	*/
 			}
 
 			private byte[] getBytes(short s) {
 				return BitConverter.getInstanceBigEndian().getBytes(s);
-			/*	byte[] bs=new byte[2];
-				bs[0] = (byte) ((s >> 8) & 0xff);
-				bs[1] = (byte) (s & 0xff) ;
-				return bs;	*/
+				/*	byte[] bs=new byte[2];
+				 bs[0] = (byte) ((s >> 8) & 0xff);
+				 bs[1] = (byte) (s & 0xff) ;
+				 return bs;	*/
 			}
 			/*大端模式*/
 			public short readShort() {
-				short s= BitConverter.getInstanceBigEndian().toShort(data,pos);
-				pos+=2;
+				short s= BitConverter.getInstanceBigEndian().toShort(data, pos);
+				pos += 2;
 				return s;
-			//	return (short) ((data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0);
+				//	return (short) ((data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0);
 			}
 
 			public int readInt() {
-				int i=BitConverter.getInstanceBigEndian().toInt(data,pos);
-				pos+=4;
+				int i=BitConverter.getInstanceBigEndian().toInt(data, pos);
+				pos += 4;
 				return i;
 				//return (data[pos++] & 0xff) << 24 | (data[pos++] & 0xff) << 16 | (data[pos++] & 0xff) << 8 | (data[pos++] & 0xff) << 0;
 			}

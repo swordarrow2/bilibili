@@ -4,7 +4,6 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import com.meng.biliv3.activity.*;
-import com.meng.biliv3.update.*;
 import com.meng.sjfmd.libs.*;
 import java.io.*;
 import java.net.*;
@@ -117,7 +116,7 @@ public class SanaeConnect extends WebSocketClient {
 		} else if (bdp.getOpCode() == BotDataPack.opGetGzApp) {
 			File f=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".gz");
 			bdp.readFile(f);
-			byte[] uncompressed=Gzip.unCompress(Tools.FileTool.readBytes(f));
+			byte[] uncompressed=Gzip.unCompress(FileTool.readBytes(f));
 			File fa=new File(Environment.getExternalStorageDirectory() + "/download/" + MainActivity.instance.getPackageName() + ".apk");
 			try {
 				FileOutputStream fos = new FileOutputStream(fa);

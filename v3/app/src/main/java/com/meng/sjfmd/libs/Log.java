@@ -1,4 +1,5 @@
 package com.meng.sjfmd.libs;
+
 import android.os.*;
 import com.meng.biliv3.activity.*;
 import java.io.*;
@@ -13,7 +14,7 @@ public class Log {
 		File f=new File(Environment.getExternalStorageDirectory() + "/sjfLogNetwork.log");
 		try {  
 			BufferedWriter writer  = new BufferedWriter(new FileWriter(f, true));  
-			writer.write(Tools.Time.getTime());
+			writer.write(TimeFormater.getTime());
 			writer.write(method == Connection.Method.GET ?" get\n": " post\n");
 			writer.write(link);
 			if (args != null && args.length > 0) {

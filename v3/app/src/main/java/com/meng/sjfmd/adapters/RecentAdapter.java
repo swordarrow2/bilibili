@@ -26,7 +26,7 @@ public class RecentAdapter extends BaseAdapter {
         if (!f.exists()) {
             saveConfig();
 		}
-		recents = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<Recent>>(){}.getType());
+		recents = GSON.fromJson(FileTool.readString(jsonPath), new TypeToken<ArrayList<Recent>>(){}.getType());
 		if (recents == null) {
 			recents = new ArrayList<>();
 		}

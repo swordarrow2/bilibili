@@ -48,7 +48,7 @@ public class UidFragment extends BaseIdFragment {
 					if (p3 == 0) {
 						return;
 					}
-					Tools.AndroidContent.copyToClipboard((String)p1.getItemAtPosition(p3));
+					AndroidContent.copyToClipboard((String)p1.getItemAtPosition(p3));
 				}
 			});
 		MainActivity.instance.threadPool.execute(new Runnable(){
@@ -57,14 +57,14 @@ public class UidFragment extends BaseIdFragment {
 				public void run() {
 					try {
 						if (containsID(id)) {
-							final MyInfo info = Tools.BilibiliTool.getMyInfo(MainActivity.instance.getAccount(id).cookie);
+							final MyInfo info = Bilibili.getMyInfo(MainActivity.instance.getAccount(id).cookie);
 							addData("ID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
 							addData("签名", info.data.sign);
 							addData("等级", info.data.level);
 							addData("经验", info.data.level_exp.current_exp + "/" + info.data.level_exp.next_exp);
-							addData("注册时间", Tools.Time.getTime(info.data.jointime * 1000));
+							addData("注册时间",TimeFormater.getTime(info.data.jointime * 1000));
 							addData("节操", info.data.moral);
 							addData("绑定邮箱", info.data.email_status == 1 ? "是" : "否");
 							addData("绑定手机", info.data.tel_status == 1 ? "是" : "否");
@@ -79,7 +79,7 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						} else {
-							final UserInfo info = Tools.BilibiliTool.getUserInfo(id);
+							final UserInfo info = Bilibili.getUserInfo(id);
 							addData("UID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -97,18 +97,18 @@ public class UidFragment extends BaseIdFragment {
 									}
 								});
 						}
-						UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(id);
+						UidToRoom sjb = Bilibili.getUidToRoom(id);
 						addData("直播URL", sjb.data.url);
 						addData("标题", sjb.data.title);
 						addData("状态", sjb.data.liveStatus == 1 ? "正在直播" : "未直播");
 						addData("房间号", sjb.data.roomid);
 						notifyList();
-						Relation r = Tools.BilibiliTool.getRelation(id);
+						Relation r = Bilibili.getRelation(id);
 						addData("粉丝", r.data.follower);
 						addData("关注", r.data.following);
 						//addData("黑名单", r.data.black);
 						notifyList();
-						Upstat u = Tools.BilibiliTool.getUpstat(id);
+						Upstat u = Bilibili.getUpstat(id);
 						addData("播放量", u.data.archive.view);
 						addData("阅读量", u.data.article.view);
 						notifyList();

@@ -14,12 +14,12 @@ public class AutoSign implements Runnable {
 		int failed=0;
 		int noAction=0;
 		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-			if (!Tools.Time.getDate().equals(Tools.Time.getDate(ai.lastSign))) {
+			if (!TimeFormater.getDate().equals(TimeFormater.getDate(ai.lastSign))) {
 				ai.setSigned(false);
 				++noAction;
 			}
 			if (!ai.isSigned() && !ai.isCookieExceed()) {
-				int rc =new JsonParser().parse(Tools.BilibiliTool.sendLiveSign(ai.cookie)).getAsJsonObject().get("code").getAsInt();
+				int rc =new JsonParser().parse(Bilibili.sendLiveSign(ai.cookie)).getAsJsonObject().get("code").getAsInt();
 				ai.lastSign = System.currentTimeMillis();
 				switch (rc) {
 					case -101:

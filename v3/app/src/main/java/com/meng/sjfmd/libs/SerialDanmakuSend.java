@@ -21,7 +21,7 @@ public class SerialDanmakuSend implements Runnable {
 		while (position < cookieList.size()) {
 			String cookie=cookieList.get(position);
 			if (System.currentTimeMillis() - sendHistory.get(cookie) > 2000) {
-				Tools.BilibiliTool.sendLiveDanmaku(msgList.get(position), cookie, id);
+				Bilibili.sendLiveDanmaku(msgList.get(position), cookie, id);
 				sendHistory.put(cookie, System.currentTimeMillis());
 				++position;
 			} else {

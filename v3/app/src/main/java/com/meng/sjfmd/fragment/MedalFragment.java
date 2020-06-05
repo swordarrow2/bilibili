@@ -57,7 +57,7 @@ public class MedalFragment extends BaseIdFragment {
 
 				@Override
 				public void run() {
-					medals = Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie);
+					medals = Bilibili.getMedal(MainActivity.instance.getAccount(id).cookie);
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override
@@ -102,9 +102,9 @@ public class MedalFragment extends BaseIdFragment {
 
 																@Override
 																public void run() {
-																	MainActivity.instance.showToast(new JsonParser().parse(Tools.BilibiliTool.sendHotStrip(ai.uid, medalsAdapter.getItem(p3).target_id, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
+																	MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendHotStrip(ai.uid, medalsAdapter.getItem(p3).target_id, id, Integer.parseInt(editText.getText().toString()), ai.cookie)).getAsJsonObject().get("message").getAsString());
 																	medals.data.fansMedalList.clear();
-																	medals.data.fansMedalList.addAll(Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie).data.fansMedalList);
+																	medals.data.fansMedalList.addAll(Bilibili.getMedal(MainActivity.instance.getAccount(id).cookie).data.fansMedalList);
 																	MainActivity.instance.runOnUiThread(new Runnable(){
 
 																			@Override
@@ -140,7 +140,7 @@ public class MedalFragment extends BaseIdFragment {
 												MainActivity.instance.showToast("今日亲密度已满");
 												return;
 											}
-											GiftBag liveBag = Tools.BilibiliTool.getGiftBag(ai.cookie);
+											GiftBag liveBag = Bilibili.getGiftBag(ai.cookie);
 											if (need > liveBag.getStripCount()) {
 												MainActivity.instance.showToast("辣条不足");	
 												return;
@@ -207,7 +207,7 @@ public class MedalFragment extends BaseIdFragment {
 														sb.append("赠送").append(mfm.medal_name).append(send).append("辣条\n");
 														continue;
 													}
-													GiftBag liveBag = Tools.BilibiliTool.getGiftBag(ai.cookie);
+													GiftBag liveBag = Bilibili.getGiftBag(ai.cookie);
 													if (need > liveBag.getStripCount()) {
 														MainActivity.instance.showToast("辣条不足");	
 														continue;
@@ -249,7 +249,7 @@ public class MedalFragment extends BaseIdFragment {
 							@Override
 							public void run() {
 								medals.data.fansMedalList.clear();
-								medals.data.fansMedalList.addAll(Tools.BilibiliTool.getMedal(MainActivity.instance.getAccount(id).cookie).data.fansMedalList);
+								medals.data.fansMedalList.addAll(Bilibili.getMedal(MainActivity.instance.getAccount(id).cookie).data.fansMedalList);
 								MainActivity.instance.runOnUiThread(new Runnable(){
 
 										@Override

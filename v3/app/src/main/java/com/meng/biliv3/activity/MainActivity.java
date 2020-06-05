@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 		if (!f.exists()) {
 			saveConfig();
 		}
-		loginAccounts = GSON.fromJson(Tools.FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
+		loginAccounts = GSON.fromJson(FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
 		if (loginAccounts == null) {
 			loginAccounts = new ArrayList<>();
 		}

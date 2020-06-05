@@ -112,9 +112,9 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 					if (mainUid == -1) {
 						return;
 					}
-					utr = Tools.BilibiliTool.getUidToRoom(mainUid);
-					liveStream = Tools.BilibiliTool.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
-					final LivePart livePartList = GSON.fromJson(Tools.AndroidContent.readAssetsString("livePart.json"), LivePart.class);
+					utr = Bilibili.getUidToRoom(mainUid);
+					liveStream = Bilibili.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+					final LivePart livePartList = GSON.fromJson(AndroidContent.readAssetsString("livePart.json"), LivePart.class);
 					if (utr == null | liveStream == null || livePartList == null) {
 						MainActivity.instance.showToast("直播间连接失败");
 						return;
@@ -141,7 +141,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 																@Override
 																public void run() {
-																	liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, child.id, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+																	liveStart = Bilibili.startLive(utr.data.roomid, child.id, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 																	if (liveStart.code != 0) {
 																		return;
 																	}
@@ -172,7 +172,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 													@Override
 													public void run() {
-														liveStart = Tools.BilibiliTool.startLive(utr.data.roomid, "235", MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+														liveStart = Bilibili.startLive(utr.data.roomid, "235", MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 														if (liveStart.code != 0) {
 															return;
 														}
@@ -240,12 +240,12 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 		MainActivity.instance.threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					final UserInfo info = Tools.BilibiliTool.getUserInfo(ai.uid);
+					final UserInfo info = Bilibili.getUserInfo(ai.uid);
 					if (info.code != 0) {
 						MainActivity.instance.showToast("cookie过期");
 						return;
 					}
-					final UidToRoom sjb = Tools.BilibiliTool.getUidToRoom(info.data.mid);
+					final UidToRoom sjb = Bilibili.getUidToRoom(info.data.mid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -254,7 +254,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 							}
 						});
 
-					final RoomToUid rtu=Tools.BilibiliTool.getRoomToUid(sjb.data.roomid);
+					final RoomToUid rtu=Bilibili.getRoomToUid(sjb.data.roomid);
 					MainActivity.instance.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -289,7 +289,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 										@Override
 										public void run() {
-											if (Tools.BilibiliTool.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
+											if (Bilibili.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
 												return;
 											}
 											MainActivity.instance.showToast("关播成功");
@@ -315,16 +315,16 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 				MainActivity.instance.threadPool.execute(new Runnable() {
 						@Override
 						public void run() {
-							Tools.BilibiliTool.renameLive(utr.data.roomid, name, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+							Bilibili.renameLive(utr.data.roomid, name, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 						}
 					});
 				break;
 			case R.id.main_account_list_headerButton_copy:
 				if (liveStart != null) {
-					Tools.AndroidContent.copyToClipboard("服务器:\n" + liveStart.data.rtmp.addr + "\n推流码:\n" + liveStart.data.rtmp.code);
+					AndroidContent.copyToClipboard("服务器:\n" + liveStart.data.rtmp.addr + "\n推流码:\n" + liveStart.data.rtmp.code);
 					MainActivity.instance.showToast("已复制推流码到剪贴板");
 				} else if (liveStream != null) {
-					Tools.AndroidContent.copyToClipboard("服务器:\n" + liveStream.data.rtmp.addr + "\n推流码:\n" + liveStream.data.rtmp.code);
+					AndroidContent.copyToClipboard("服务器:\n" + liveStream.data.rtmp.addr + "\n推流码:\n" + liveStream.data.rtmp.code);
 					MainActivity.instance.showToast("已复制推流码到剪贴板");
 				} else {
 					MainActivity.instance.showToast("未知错误");

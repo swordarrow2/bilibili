@@ -92,12 +92,12 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 
 				@Override
 				public void run() {
-					videoInfo = GSON.fromJson(Tools.Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
+					videoInfo = GSON.fromJson(Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + id), VideoInfo.class);	
 					if (videoInfo.code != 0) {
 						MainActivity.instance.showToast(videoInfo.message);
 						return;
 					}
-					final VideoReply aj = Tools.BilibiliTool.getVideoJudge(id);
+					final VideoReply aj = Bilibili.getVideoJudge(id);
 					getActivity().runOnUiThread(new Runnable(){
 
 							@Override

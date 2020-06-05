@@ -1,7 +1,6 @@
 package com.meng.sjfmd.libs;
 
 import com.meng.biliv3.activity.*;
-import com.meng.sjfmd.libs.*;
 import java.io.*;
 import java.nio.charset.*;
 import org.jsoup.*;
@@ -38,10 +37,10 @@ public class NetworkCacher {
 				if (!file.exists()) {
 					return null;
 				}
-				return Tools.FileTool.readBytes(file);
+				return FileTool.readBytes(file);
 			case CachePrefer:
 				if (file.exists()) {
-					return Tools.FileTool.readBytes(file);
+					return FileTool.readBytes(file);
 				} else {
 					try {
 						byte[] img = Jsoup.connect(url).ignoreContentType(true).execute().bodyAsBytes();
@@ -56,7 +55,7 @@ public class NetworkCacher {
 				}
 			case CacheRefresh:
 				if (file.exists()) {
-					byte[] s = Tools.FileTool.readBytes(file);
+					byte[] s = FileTool.readBytes(file);
 					MainActivity.instance.threadPool.execute(new Runnable(){
 
 							@Override
@@ -121,13 +120,13 @@ public class NetworkCacher {
 				if (!file.exists()) {
 					return null;
 				}
-				return Tools.FileTool.readString(file);
+				return FileTool.readString(file);
 			case CachePrefer:
 				if (file.exists()) {
-					return Tools.FileTool.readString(file);
+					return FileTool.readString(file);
 				} else {
 					try {
-						String json=Tools.Network.httpGet(url, cookie, referer);
+						String json=Network.httpGet(url, cookie, referer);
 						FileOutputStream fos=new FileOutputStream(file);
 						fos.write(json.getBytes(StandardCharsets.UTF_8));
 						fos.flush();
@@ -140,13 +139,13 @@ public class NetworkCacher {
 				}
 			case CacheRefresh:
 				if (file.exists()) {
-					String s = Tools.FileTool.readString(file);
+					String s = FileTool.readString(file);
 					MainActivity.instance.threadPool.execute(new Runnable(){
 
 							@Override
 							public void run() {
 								try {
-									String json=Tools.Network.httpGet(url, cookie, referer);
+									String json=Network.httpGet(url, cookie, referer);
 									FileOutputStream fos=new FileOutputStream(file);
 									fos.write(json.getBytes(StandardCharsets.UTF_8));
 									fos.flush();
@@ -159,7 +158,7 @@ public class NetworkCacher {
 					return s;
 				} else {
 					try {
-						String json=Tools.Network.httpGet(url, cookie, referer);
+						String json=Network.httpGet(url, cookie, referer);
 						FileOutputStream fos=new FileOutputStream(file);
 						fos.write(json.getBytes(StandardCharsets.UTF_8));
 						fos.flush();
@@ -170,7 +169,7 @@ public class NetworkCacher {
 					}
 				}
 			case NoCache:
-				return Tools.Network.httpGet(url, cookie, referer);
+				return Network.httpGet(url, cookie, referer);
 		}
 		return null;
 	}

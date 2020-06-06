@@ -161,6 +161,16 @@ public class MainActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		}
+		File logF=new File(Environment.getExternalStorageDirectory()+"/log.txt");
+		File logFe=new File(Environment.getExternalStorageDirectory()+"/log.txt");
+		try {
+			PrintStream ps=new PrintStream(new FileOutputStream(logF));
+			System.setOut(ps);
+			PrintStream pse=new PrintStream(new FileOutputStream(logFe));
+			System.setErr(pse);
+		} catch (FileNotFoundException e) {
+			showToast("log文件创建失败");
+		}
 		//mDrawerList.addHeaderView(new UserInfoHeaderView(this));
 		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 		threadPool.execute(new AutoSign());
@@ -311,6 +321,9 @@ public class MainActivity extends AppCompatActivity {
 					break;
 				case R.id.accounts:
 					showFragment(ManagerFragment.class, IDType.Accounts);
+					break;
+				case R.id.download:
+					showFragment(DownloadFragment.class,IDType.Download);
 					break;
 				case R.id.medal:
 					String items[] = new String[MainActivity.instance.loginAccounts.size()];

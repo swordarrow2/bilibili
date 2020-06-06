@@ -6,12 +6,13 @@ import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.result.*;
 import java.io.*;
 import java.util.*;
+import org.json.*;
 import org.jsoup.*;
 
 public class Bilibili {
-	
+
 	public static String REFERER = "Referer";
-	
+
 	public static Map<String, String> liveHead = new HashMap<String,String>(){
 		{
 			put("Host", "api.live.bilibili.com");
@@ -30,7 +31,7 @@ public class Bilibili {
 			put("Origin", "https://www.bilibili.com");
 		}
 	};
-	
+
 	public static CvInfo getCvInfo(long cvId) {
 		return GSON.fromJson(Network.httpGet("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp"), CvInfo.class);
 	}
@@ -210,43 +211,34 @@ public class Bilibili {
 	}
 
 	//收藏,未完成
-//		public static void sendFavorite(int count, long AID, String cookie) {
-//
-//			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
-//			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
-//			//rid=55340268&type=2&add_media_ids=101411121&del_media_ids=&jsonp=jsonp&csrf=14f4956b04e6775a3a32ca47a30b5d54
-//			/*String favoriteJson=Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",cookie);
-//			 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
-//			 JsonArray fja=fjobj.get("list").getAsJsonArray();
-//			 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
-//
-//			 */
-//			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
-//			connection.userAgent(MainActivity.instance.userAgent)
-//                .headers(mainHead)
-//                .ignoreContentType(true)
-//                .referrer("https://www.bilibili.com/video/av" + AID)
-//                .cookies(Network.cookieToMap(cookie))
-//                .method(Connection.Method.POST)
-//                .data("rid", String.valueOf(AID))
-//                .data("multiply", String.valueOf(count))
-//                .data("select_like", "0")
-//                .data("cross_domain", "true")
-//                .data("csrf", getCsrf(cookie));
-//			Connection.Response response=null;
-//			try {
-//				response = connection.execute();
-//			} catch (IOException e) {
-//				MainActivity.instance.showToast("连接出错");
-//				return;
-//			}
-//			if (response.statusCode() != 200) {
-//				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
-//			}
-//			JsonParser parser = new JsonParser();
-//			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
-//			MainActivity.instance.showToast(obj.get("message").getAsString());
-//		}
+	public static void sendFavorite(long uid, long aid, String cookie) {
+		FavoriteList flist=GSON.fromJson(Network.httpGet("http://space.bilibili.com/ajax/fav/getBoxList?mid=" + uid, cookie), FavoriteList.class);
+		System.out.println("flist:" + flist.toString());
+		try {
+			String url = "https://api.bilibili.com/medialist/gateway/coll/resource/deal";
+			String csrf = "rid=" + aid + "&type=2&add_media_ids=" + flist.data.list.get(0).fav_box + "31" + "&del_media_ids=&jsonp=jsonp&csrf=" + getCsrf(cookie);
+			System.out.println("post:" + csrf);
+			Connection.Response cr=Jsoup.connect(url).method(Connection.Method.POST).cookies(Network.cookieToMap(cookie))
+				.ignoreContentType(true)
+				/*	.data("rid", aid)
+				 .data("type", 2)
+				 .data("add_media_ids", flist.data.list.get(0).fav_box + "21")
+				 .data("del_media_ids", "")
+				 .data("csrf", getCsrf(cookie))*/
+
+				.requestBody(csrf)
+				.execute();
+			System.out.println("cookie:" + cookie);
+			System.out.println("csrf:" + getCsrf(cookie));
+
+			System.out.println(cr.body());
+			String bilibiliMainPost = cr.body();// Network.bilibiliPost(url, cookie, "rid", aid, "type", 2, "add_media_ids", flist.data.list.get(0).fav_box + "21", "del_media_ids", "", "csrf", getCsrf(cookie));
+			JSONObject result = new JSONObject(bilibiliMainPost);
+			MainActivity.instance.showToast(result.optInt("code") == 0 ?"收藏成功": bilibiliMainPost);
+		} catch (JSONException | NullPointerException | IOException e) {
+			e.printStackTrace();
+		}	
+	}
 
 	public static String sendCvCoin(int count, long CvId, String cookie) {
 		return Network.bilibiliMainPost("https://api.bilibili.com/x/web-interface/coin/add", cookie, REFERER, "https://www.bilibili.com/read/cv" + CvId, "aid", CvId, "multiply", count, "upid", String.valueOf(Bilibili.getCvInfo(CvId).data.mid), "avtype", 2, "csrf", getCsrf(cookie));

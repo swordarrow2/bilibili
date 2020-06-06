@@ -14,6 +14,7 @@ import com.meng.sjfmd.adapters.*;
 import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
+import com.meng.sjfmd.javabean.*;
 
 public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
@@ -165,7 +166,14 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 				sendBili((String) selectAccount.getSelectedItem(), VideoCoin2, "");
 				break;
 			case R.id.av_fragmentButton_favorite:
-				sendBili((String) selectAccount.getSelectedItem(), Favorite, "");
+				final AccountInfo aicf=MainActivity.instance.loginAccounts.get(0);
+				MainActivity.instance.threadPool.execute(new Runnable(){
+
+						@Override
+						public void run() {
+							Bilibili.sendFavorite(aicf.uid, id, aicf.cookie);
+						}
+					});
 				break;
 //			case R.id.av_fragment2_ButtonGetDanmakuSender:
 //				p1.setVisibility(View.GONE);

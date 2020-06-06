@@ -13,15 +13,15 @@ public class ConfInfoApi {
 //    public static final String USER_AGENT_DEF = "Mozilla/5.0 BiliDroid/4.34.0 (bbcallen@gmail.com)";
 //    public static final String USER_AGENT_OWN = "Wrist Bilibili Client/2.6 (liupeiran0313@163.com; https://luern0313.cn)";
 //    public static final String USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
-//    private static final HashMap<String, String> conf = new HashMap<String, String>(){{
-//			put("appkey", "1d8b6e7d45233436");
-//			put("actionKey", "appkey");
-//			put("build", "520001");
-//			put("device", "android");
-//			put("mobi_app", "android");
-//			put("platform", "android");
-//			put("app_secret", "560c52ccd288fed045859ed18bffd973");
-//		}};
+    private static final HashMap<String, String> conf = new HashMap<String, String>(){{
+			put("appkey", "1d8b6e7d45233436");
+			put("actionKey", "appkey");
+			put("build", "520001");
+			put("device", "android");
+			put("mobi_app", "android");
+			put("platform", "android");
+			put("app_secret", "560c52ccd288fed045859ed18bffd973");
+		}};
 //
 //    private static final HashMap<String, String> tvConf = new HashMap<String, String>(){{
 //			put("appkey", "4409e2ce8ffd12b8");
@@ -43,19 +43,19 @@ public class ConfInfoApi {
 			put("app_secret", "25bdede4e1581c836cab73a48790ca6e");
 		}};
 
-//    static String getConf(String key) {
-//        return conf.get(key);
-//    }
-//
-//    static String getTVConf(String key) {
+	public  static String getConf(String key) {
+        return conf.get(key);
+    }
+
+	//   static String getTVConf(String key) {
 //        return tvConf.get(key);
 //    }
 
-    static String getBConf(String key) {
+	public static String getBConf(String key) {
         return bConf.get(key);
     }
 
-    static String calc_sign(String str, String salt) {
+	public static String calc_sign(String str, String salt) {
         str += salt;
         return md5(str);
     }

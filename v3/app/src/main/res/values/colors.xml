@@ -13,4 +13,7 @@
     <color name="uvv_titlebar_bg">#7f000000</color>
 	<color name="colorAccent">#FFC400</color>
     <color name="white">#FFFFFF</color>
+	<color name="gray_44">#444444</color>
+    <color name="alpha">#00000000</color>
+    
 </resources>

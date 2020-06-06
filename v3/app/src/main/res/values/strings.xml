@@ -17,4 +17,7 @@
 	<string name="login_user_name_hint">手机号</string>
     <string name="login_user_name_password">密码</string>
     <string name="action_sign_in">登录</string>
+	<string name="dl_tip_1">视频储存位置：</string>
+    <string name="dl_tip_2">\n\n点击暂停或开始，长按删除本地文件。\n\n创建任务后时间过长链接会失效，请尝试删除后重新下载。</string>
+	
 </resources>

@@ -217,7 +217,7 @@ public class BaseIdFragment extends Fragment {
 							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendAvCoin(2, id, ai.cookie)).getAsJsonObject().get("message").getAsString());
 							break;
 						case Favorite:
-							MainActivity.instance.showToast("未填坑");
+							
 							break;
 						case SendCvJudge:
 							MainActivity.instance.showToast(new JsonParser().parse(Bilibili.sendArticalJudge(id, msg, ai.cookie)).getAsJsonObject().get("code").getAsInt() == 0 ?"发送成功": "发送失败");

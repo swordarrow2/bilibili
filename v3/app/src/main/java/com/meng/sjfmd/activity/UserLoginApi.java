@@ -144,33 +144,33 @@ public class UserLoginApi {
         return null;
     }
 
-//    public static String getAccessKey(final String cookie) throws IOException {
-//        try {
-//            String url = "https://passport.bilibili.com/login/app/third";
-//            String temp_per = "api=http://link.acg.tv/forum.php&appkey=27eb53fc9058f8c3&sign=67ec798004373253d60114caaad89a8c";
-//			Connection connection=Jsoup.connect(url + "?" + temp_per);
-//			connection.method(Connection.Method.GET)
-//				.header("Cookie", cookie)
-//				.header("Host", "passport.bilibili.com")
-//				.header("Referer", "http://www.bilibili.com/")
-//				.header("User-Agent", MainActivity.instance.userAgent)
-//				.ignoreContentType(true);
-//			Connection.Response response=connection.execute();	
-//			url = new JSONObject(response.body()).getJSONObject("data").getString("confirm_uri");
-//			Connection connection2=Jsoup.connect(url);
-//			connection2.method(Connection.Method.GET)
-//				.followRedirects(false)
-//				.header("Cookie", cookie)
-//				.header("User-Agent", MainActivity.instance.userAgent)
-//				.ignoreContentType(true);
-//			Connection.Response response2=connection2.execute();
-//			String url_location = response2.header("location");
-//            return url_location.substring(url_location.indexOf("access_key=") + 11, url_location.indexOf("&", url_location.indexOf("access_key=")));
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return "";
-//    }
+    public static String getAccessKey(final String cookie) throws IOException {
+        try {
+            String url = "https://passport.bilibili.com/login/app/third";
+            String temp_per = "api=http://link.acg.tv/forum.php&appkey=27eb53fc9058f8c3&sign=67ec798004373253d60114caaad89a8c";
+			Connection connection=Jsoup.connect(url + "?" + temp_per);
+			connection.method(Connection.Method.GET)
+				.header("Cookie", cookie)
+				.header("Host", "passport.bilibili.com")
+				.header("Referer", "http://www.bilibili.com/")
+				.header("User-Agent", MainActivity.instance.userAgent)
+				.ignoreContentType(true);
+			Connection.Response response=connection.execute();	
+			url = new JSONObject(response.body()).getJSONObject("data").getString("confirm_uri");
+			Connection connection2=Jsoup.connect(url);
+			connection2.method(Connection.Method.GET)
+				.followRedirects(false)
+				.header("Cookie", cookie)
+				.header("User-Agent", MainActivity.instance.userAgent)
+				.ignoreContentType(true);
+			Connection.Response response2=connection2.execute();
+			String url_location = response2.header("location");
+            return url_location.substring(url_location.indexOf("access_key=") + 11, url_location.indexOf("&", url_location.indexOf("access_key=")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
 //    public String getOauthKey() {
 //        return oauthKey;

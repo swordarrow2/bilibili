@@ -10,5 +10,6 @@ public enum IDType {
 	Accounts,
 	Dynamic,
 	Settings,
-	egHome,egMenu,egProgress
-	}
+	egHome,egMenu,egProgress,
+	Download
+}

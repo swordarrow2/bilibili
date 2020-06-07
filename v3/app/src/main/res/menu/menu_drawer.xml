@@ -19,10 +19,6 @@
             android:id="@+id/progress"
             android:title="Progress" />-->
 		<item
-			android:id="@+id/download"
-			android:icon="@drawable/ic_console"
-			android:title="下载" />
-		<item
 			android:id="@+id/input_id"
 			android:icon="@drawable/ic_console"
 			android:title="输入ID" />

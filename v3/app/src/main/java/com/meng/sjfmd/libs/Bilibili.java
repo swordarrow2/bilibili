@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 import org.jsoup.*;
+import com.meng.*;
 
 public class Bilibili {
 
@@ -36,6 +37,14 @@ public class Bilibili {
 		return GSON.fromJson(Network.httpGet("http://api.bilibili.com/x/article/viewinfo?id=" + cvId + "&mobi_app=pc&jsonp=jsonp"), CvInfo.class);
 	}
 
+	public static VideoInfo getVideoInfo(long aid) {
+		return GSON.fromJson(Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + aid) , VideoInfo.class);
+	}
+
+	public static VideoUrl getVideoUrl(long aid,long cid){
+		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/player/playurl?avid=" + aid + "&cid=" + cid + "&qn=64&type=flv",MainActivity.instance.loginAccounts.get(0).cookie,"https://www.bilibili.com/video/av"+aid),VideoUrl.class);
+	}
+	
 	public static VideoReply getVideoJudge(long aid) {
 		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid), VideoReply.class);
 	}
@@ -216,10 +225,11 @@ public class Bilibili {
 		System.out.println("flist:" + flist.toString());
 		try {
 			String url = "https://api.bilibili.com/medialist/gateway/coll/resource/deal";
-			String csrf = "rid=" + aid + "&type=2&add_media_ids=" + flist.data.list.get(0).fav_box + "31" + "&del_media_ids=&jsonp=jsonp&csrf=" + getCsrf(cookie);
+			String csrf = "rid=" + aid + "&type=2&add_media_ids=" + flist.data.list.get(0).fav_box + "21" + "&del_media_ids=&jsonp=jsonp&csrf=" + getCsrf(cookie);
 			System.out.println("post:" + csrf);
 			Connection.Response cr=Jsoup.connect(url).method(Connection.Method.POST).cookies(Network.cookieToMap(cookie))
 				.ignoreContentType(true)
+				.header("Referer", "https://www.bilibili.com/anime")
 				/*	.data("rid", aid)
 				 .data("type", 2)
 				 .data("add_media_ids", flist.data.list.get(0).fav_box + "21")
@@ -238,6 +248,40 @@ public class Bilibili {
 		} catch (JSONException | NullPointerException | IOException e) {
 			e.printStackTrace();
 		}	
+//			//https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321
+//			//https://api.bilibili.com/medialist/gateway/coll/resource/deal
+//			//rid=55340268&type=2&add_media_ids=101411121&del_media_ids=&jsonp=jsonp&csrf=14f4956b04e6775a3a32ca47a30b5d54
+//			/*String favoriteJson=Network.getSourceCode("https://api.bilibili.com/medialist/gateway/base/created?pn=1&ps=100&type=2&rid=55340268&up_mid=64483321",cookie);
+//			 JsonObject fjobj=new JsonParser().parse(favoriteJson).getAsJsonObject().get("data").getAsJsonObject();
+//			 JsonArray fja=fjobj.get("list").getAsJsonArray();
+//			 long add_media_id=fja.get(0).getAsJsonObject().get("id").getAsLong();
+//
+//			 */
+//			Connection connection = Jsoup.connect("https://api.bilibili.com/medialist/gateway/coll/resource/deal");
+//			connection.userAgent(MainActivity.instance.userAgent)
+//                .headers(mainHead)
+//                .ignoreContentType(true)
+//                .referrer("https://www.bilibili.com/video/av" + AID)
+//                .cookies(Network.cookieToMap(cookie))
+//                .method(Connection.Method.POST)
+//                .data("rid", String.valueOf(AID))
+//                .data("multiply", String.valueOf(count))
+//                .data("select_like", "0")
+//                .data("cross_domain", "true")
+//                .data("csrf", getCsrf(cookie));
+//			Connection.Response response=null;
+//			try {
+//				response = connection.execute();
+//			} catch (IOException e) {
+//				MainActivity.instance.showToast("连接出错");
+//				return;
+//			}
+//			if (response.statusCode() != 200) {
+//				MainActivity.instance.showToast(String.valueOf(response.statusCode()));
+//			}
+//			JsonParser parser = new JsonParser();
+//			JsonObject obj = parser.parse(response.body()).getAsJsonObject();
+//			MainActivity.instance.showToast(obj.get("message").getAsString());
 	}
 
 	public static String sendCvCoin(int count, long CvId, String cookie) {

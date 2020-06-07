@@ -153,6 +153,14 @@
 			fab:fab_label="收藏"
 			style="@style/MenuButtonsSmall"/>
 
+		<com.github.clans.fab.FloatingActionButton
+			android:id="@+id/av_fragmentButton_download"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_edit"
+			fab:fab_label="下载"
+			style="@style/MenuButtonsSmall"/>
+		
 	</com.github.clans.fab.FloatingActionMenu>
 
 </FrameLayout>

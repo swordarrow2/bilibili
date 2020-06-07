@@ -5,16 +5,7 @@ import java.util.zip.*;
 import org.jsoup.*;
 
 public class NetWorkUtil {
-
-	public static String get(String url) {
-		try {
-			return Jsoup.connect(url).execute().body();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
+	
 	public static byte[] uncompress(byte[] inputByte) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(inputByte.length);
         try {

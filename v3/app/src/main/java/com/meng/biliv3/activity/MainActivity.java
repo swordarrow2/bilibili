@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     public AccountAdapter mainAccountAdapter;
 
-    public String jsonPath ;
-    public String mainDic = mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
+    public String jsonPath;
+    public String mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
@@ -322,9 +322,9 @@ public class MainActivity extends AppCompatActivity {
 				case R.id.accounts:
 					showFragment(ManagerFragment.class, IDType.Accounts);
 					break;
-				case R.id.download:
-					showFragment(DownloadFragment.class,IDType.Download);
-					break;
+				//case R.id.download:
+				//	showFragment(DownloadFragment.class,IDType.Download);
+				//	break;
 				case R.id.medal:
 					String items[] = new String[MainActivity.instance.loginAccounts.size()];
 					for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {

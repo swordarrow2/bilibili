@@ -90,7 +90,7 @@ public class BaseIdFragment extends Fragment {
 		spList.add("每次选择");
 		spList.add("主账号");
 		spList.add("全部");
-		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+		for (AccountInfo ai:MainActivity.instance.accountManager.iterate()) {
 			spList.add(ai.name);
 		}
 		if (spinnerAccountAdapter != null) {
@@ -102,9 +102,9 @@ public class BaseIdFragment extends Fragment {
 
 	protected void sendBili(final String sel, final int opValue, final String msg) {
 		if (sel.equals("每次选择")) {
-			String items[] = new String[MainActivity.instance.loginAccounts.size()];
+			String items[] = new String[MainActivity.instance.accountManager.size()];
 			for (int i=0;i < items.length;++i) {
-				items[i] = MainActivity.instance.loginAccounts.get(i).name;
+				items[i] = MainActivity.instance.accountManager.get(i).name;
 			}
 			final boolean checkedItems[] = new boolean[items.length];
 			new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
@@ -117,7 +117,7 @@ public class BaseIdFragment extends Fragment {
 					public void onClick(DialogInterface dialog, int which) {
 						for (int i = 0; i < checkedItems.length; i++) {
 							if (checkedItems[i]) {
-								opSwitch(MainActivity.instance.loginAccounts.get(i), opValue, msg);
+								opSwitch(MainActivity.instance.accountManager.get(i), opValue, msg);
 							}
 						}
 					}
@@ -127,7 +127,7 @@ public class BaseIdFragment extends Fragment {
 
 					@Override
 					public void run() {
-						for (AccountInfo ac:MainActivity.instance.loginAccounts) {
+						for (AccountInfo ac:MainActivity.instance.accountManager.iterate()) {
 							opSwitch(ac, opValue, msg);
 							try {
 								Thread.sleep(100);
@@ -136,7 +136,7 @@ public class BaseIdFragment extends Fragment {
 					}
 				});
 		} else {
-			opSwitch(sel.equals("主账号") ?MainActivity.instance.getAccount(MainActivity.instance.sjfSettings.getMainAccount()): MainActivity.instance.getAccount(sel), opValue, msg);
+			opSwitch(sel.equals("主账号") ?MainActivity.instance.accountManager.getAccount(MainActivity.instance.sjfSettings.getMainAccount()): MainActivity.instance.accountManager.getAccount(sel), opValue, msg);
 		}
 	}
 

@@ -33,6 +33,14 @@ public class SJFSettings {
 		}
 	}
 
+	public void setSaveDebugLog(boolean b){
+		putBoolean("debugLog",b);
+	}
+	
+	public boolean isSaveDebugLog(){
+		return sp.getBoolean("debugLog",false);
+	}
+	
 	public void setMainAccount(long ac) {
 		putLong("mainAccount", ac);
 	}

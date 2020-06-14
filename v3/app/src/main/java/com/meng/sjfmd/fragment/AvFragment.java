@@ -17,8 +17,6 @@ import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
-import com.meng.sjfmd.tasks.*;
-import java.io.*;
 
 public class AvFragment extends BaseIdFragment implements View.OnClickListener,View.OnLongClickListener {
 
@@ -31,42 +29,21 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 	private FloatingActionButton fabCoin2;
     private FloatingActionButton fabFavorite;
 	private FloatingActionButton fabDownload;
+	private FloatingActionButton fabCopy;
 
 	private EditText et;
 	private TextView info;
 	private Spinner selectAccount;
 	private VideoInfo videoInfo;
+	private VideoUrl videoUrl;
 	private ImageView ivPreview;
 	private Bitmap preview;
 	private LinearLayout llInput;
+
 	//private ArrayList<DanmakuBean> danmakuList=null;
 
 	public ExpandableListView judgeList;
-//	VideoCid videoCid;
-//	private VideoDownloadServiceConnection connection = new VideoDownloadServiceConnection();
-//	private DownloadService.MyBinder myBinder;
-//
-//	class VideoDownloadServiceConnection implements ServiceConnection {
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-//        }
-//
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-//            myBinder = (DownloadService.MyBinder) service;
-//        }
-//
-//        void downloadVideo(String title, String cid) {
-//            String result = myBinder.startDownload(id + "",
-//												   cid,
-//												   title,
-//                                                   videoInfo.data.pic,
-//												   Bilibili.getVideoPlayUrl(id, Long.parseLong(cid)),
-//												   "https://comment.bilibili.com/" + cid + ".xml");
-//			MainActivity.instance.showToast(result.equals("") ?"已添加至下载列表": result);
-//        }
-//    }
-//
+
 	public AvFragment(IDType type, long id) {
 		super(type, id);
 	}
@@ -90,6 +67,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		fabCoin2 = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_coin2);
 		fabFavorite = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_favorite);
 		fabDownload = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_download);
+		fabCopy = (FloatingActionButton) view.findViewById(R.id.av_fragmentButton_copy);
 		et = (EditText) view.findViewById(R.id.av_fragmentEditText_msg);
 		ivPreview = (ImageView) view.findViewById(R.id.av_fragmentImageView);  
 		info = (TextView) view.findViewById(R.id.av_fragmentTextView_info);
@@ -102,13 +80,10 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 		fabCoin2.setOnClickListener(this);
 		fabFavorite.setOnClickListener(this);
 		fabDownload.setOnClickListener(this);
-		//fabFavorite.setEnabled(false);
+		fabCopy.setOnClickListener(this);
 		send.setOnClickListener(this);
 		selectAccount.setAdapter(spinnerAccountAdapter);
-		ivPreview.setOnLongClickListener(this);
-//		Intent serviceIntent = new Intent(getActivity(), DownloadService.class);
-//        getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-//		
+		ivPreview.setOnLongClickListener(this);		
 		final Animation animShow = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_in_from_right);
 		final Animation animHide = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_out_to_right);
 		menuGroup.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
@@ -132,6 +107,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 						MainActivity.instance.showToast(videoInfo.message);
 						return;
 					}
+					videoUrl = Bilibili.getVideoUrl(id, videoInfo.data.cid, 64);
 					final VideoReply aj = Bilibili.getVideoJudge(id);
 					getActivity().runOnUiThread(new Runnable(){
 
@@ -200,7 +176,7 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 				sendBili((String) selectAccount.getSelectedItem(), VideoCoin2, "");
 				break;
 			case R.id.av_fragmentButton_favorite:
-				final AccountInfo aicf=MainActivity.instance.loginAccounts.get(0);
+				final AccountInfo aicf=MainActivity.instance.accountManager.get(0);
 				MainActivity.instance.threadPool.execute(new Runnable(){
 
 						@Override
@@ -210,13 +186,33 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 					});
 				break;
 			case R.id.av_fragmentButton_download:
+
+				final Spinner sp=new Spinner(getActivity());
+				sp.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, videoUrl.data.accept_description));
+
+				new AlertDialog.Builder(getActivity()).setTitle("选择画质").setView(sp).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface p1, int p2) {
+							MainActivity.instance.threadPool.execute(new Runnable(){
+									@Override
+									public void run() {
+										videoUrl = Bilibili.getVideoUrl(id, videoInfo.data.cid, videoUrl.data.accept_quality.get(sp.getSelectedItemPosition()));
+										download(id, videoInfo.data.cid);
+									}
+								});
+						}
+					}).setNegativeButton("取消", null).show();
+
+
+
+				break;
+			case R.id.av_fragmentButton_copy:
 				MainActivity.instance.threadPool.execute(new Runnable(){
+
 						@Override
 						public void run() {
-							//	connection.downloadVideo(videoInfo.data.title, videoInfo.data.cid + "");
-
-							download(id, videoInfo.data.cid);
-
+							AndroidContent.copyToClipboard(Bilibili.getVideoUrl(id, videoInfo.data.cid).data.durl.get(0).url);
+							MainActivity.instance.showToast("复制成功");
 						}
 					});
 				break;
@@ -236,22 +232,16 @@ public class AvFragment extends BaseIdFragment implements View.OnClickListener,V
 
 
 	public void download(long aid, long cid) {
-        String fileName = new File(String.format("AV%d CID%d %s.flv", aid, cid, videoInfo.data.title)).getName();
-        //文件下载链接
-        String url = Bilibili.getVideoUrl(id, cid).data.durl.get(0).url;
-
+        String fileName = String.format("AV%d CID%d %s.flv", aid, cid, videoInfo.data.title.replace(".", "_"));
 		DownloadManager downloadManager = (DownloadManager)getActivity(). getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        // 通知栏的下载通知
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(videoUrl.data.durl.get(0).url));
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setTitle(fileName);
 		request.addRequestHeader("Referer", "https://www.bilibili.com/");
 		request.addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36");
-		//  request.setMimeType("application/vnd.android.package-archive");
 		request.setDestinationInExternalFilesDir(getActivity(), Environment.DIRECTORY_DOWNLOADS, fileName);
         long downloadId = downloadManager.enqueue(request);
-		// MainActivity.instance.showToast("task id:"+downloadId,"id:"+id+"  cid:"+cid);
-		MainActivity.instance.showToast(url);
+		
 	}
 
 

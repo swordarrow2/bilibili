@@ -90,7 +90,9 @@
 				android:layout_height="wrap_content"
 				android:text="发送"
 				android:layout_weight="1"
-				android:src="@drawable/ic_plane"/>
+				android:background="@null"
+				android:src="@drawable/ic_plane"
+				android:layout_gravity="bottom|center"/>
 
 		</LinearLayout>
 
@@ -165,7 +167,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:src="@drawable/ic_edit"
-			fab:fab_label="保存直播视频"
+			fab:fab_label="复制视频地址"
 			style="@style/MenuButtonsSmall"/>
 
 	</com.github.clans.fab.FloatingActionMenu>

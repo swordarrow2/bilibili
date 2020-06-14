@@ -13,7 +13,7 @@ public class AutoSign implements Runnable {
 		int succesd=0;
 		int failed=0;
 		int noAction=0;
-		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+		for (AccountInfo ai:MainActivity.instance.accountManager.iterate()) {
 			if (!TimeFormater.getDate().equals(TimeFormater.getDate(ai.lastSign))) {
 				ai.setSigned(false);
 				++noAction;
@@ -56,6 +56,6 @@ public class AutoSign implements Runnable {
 			}
 		}
 		MainActivity.instance.showToast(String.format("签到成功%d个,失败%d个,无动作%d个", succesd, failed, noAction), sb.toString());
-		MainActivity.instance.saveConfig();
+		MainActivity.instance.accountManager.saveConfig();
 	}
 }

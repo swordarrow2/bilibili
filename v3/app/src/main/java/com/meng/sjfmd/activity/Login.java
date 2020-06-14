@@ -47,7 +47,7 @@ public class Login extends Activity {
 						if (po == -1) {
 							return;
 						}
-						AccountInfo aci=MainActivity.instance.loginAccounts.get(po);
+						AccountInfo aci=MainActivity.instance.accountManager.get(po);
 						if (aci.phone != 0 && aci.password != null) {
 							view.evaluateJavascript(String.format(AndroidContent.readAssetsString("patchInput.js"), aci.phone, aci.password), null);
 							MainActivity.instance.threadPool.execute(new Runnable(){
@@ -78,7 +78,7 @@ public class Login extends Activity {
 							public void run() {
 								UserInfo bilibiliPersonInfo = GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/space/myinfo?jsonp=jsonp", cookieStr), UserInfo.class);
 								int po=getIntent().getIntExtra("pos", -1);
-								final AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.loginAccounts.get(po);
+								final AccountInfo account =po == -1 ?new AccountInfo(): MainActivity.instance.accountManager.get(po);
 								account.cookie = cookieStr;
 								account.name = bilibiliPersonInfo.data.name;
 								account.uid = bilibiliPersonInfo.data.mid;

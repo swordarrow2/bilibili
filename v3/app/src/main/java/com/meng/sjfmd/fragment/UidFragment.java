@@ -57,7 +57,7 @@ public class UidFragment extends BaseIdFragment {
 				public void run() {
 					try {
 						if (containsID(id)) {
-							final MyInfo info = Bilibili.getMyInfo(MainActivity.instance.getAccount(id).cookie);
+							final MyInfo info = Bilibili.getMyInfo(MainActivity.instance.accountManager.getAccount(id).cookie);
 							addData("ID", info.data.mid);
 							addData("用户名", info.data.name);
 							addData("性别", info.data.sex);
@@ -113,7 +113,7 @@ public class UidFragment extends BaseIdFragment {
 						addData("阅读量", u.data.article.view);
 						notifyList();
 						if (containsID(id)) {
-							addData("cookie", MainActivity.instance.getAccount(id).cookie);
+							addData("cookie", MainActivity.instance.accountManager.getAccount(id).cookie);
 							notifyList();
 						}
 					} catch (Exception e) {
@@ -137,7 +137,7 @@ public class UidFragment extends BaseIdFragment {
 	}
 
 	private boolean containsID(long uid) {
-		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+		for (AccountInfo ai:MainActivity.instance.accountManager.iterate()) {
 			if (ai.uid == uid) {
 				return true;
 			}

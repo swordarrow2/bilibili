@@ -80,7 +80,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 		holder.tvTime.setText(TimeFormater.getTime(parentReply.ctime * 1000));
 		holder.tvName.setText(parentReply.member.uname);
 		holder.tvContent.setText(parentReply.content.message);
-		holder.canDelete = MainActivity.instance.getAccount(Long.parseLong(parentReply.member.mid));
+		holder.canDelete = MainActivity.instance.accountManager.getAccount(Long.parseLong(parentReply.member.mid));
 		if (holder.canDelete != null) {
 			holder.btnDelete.setVisibility(View.VISIBLE);
 			holder.btnDelete.setOnClickListener(new OnClickListener(){
@@ -216,7 +216,7 @@ public class JudgeListAdapter extends BaseExpandableListAdapter {
 		holder.tvTime.setText(TimeFormater.getTime(rootReply.ctime * 1000));
 		holder.tvName.setText(rootReply.member.uname);
 		holder.tvContent.setText(rootReply.content.message);
-		holder.canDelete = MainActivity.instance.getAccount(Long.parseLong(rootReply.member.mid));
+		holder.canDelete = MainActivity.instance.accountManager.getAccount(Long.parseLong(rootReply.member.mid));
 		if (holder.canDelete != null) {
 			holder.btnDelete.setVisibility(View.VISIBLE);
 			holder.btnDelete.setOnClickListener(new OnClickListener(){

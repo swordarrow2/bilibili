@@ -13,7 +13,6 @@ import com.meng.biliv3.activity.*;
 import com.meng.biliv3.update.*;
 import com.meng.sjfmd.activity.*;
 import com.meng.sjfmd.enums.*;
-import com.meng.sjfmd.fragment.*;
 import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
@@ -46,7 +45,7 @@ public class ManagerFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-					MainActivity.instance.showFragment(UidFragment.class, IDType.UID, MainActivity.instance.loginAccounts.get(position).uid);
+					MainActivity.instance.showFragment(UidFragment.class, IDType.UID, MainActivity.instance.accountManager.get(position).uid);
 				}
 			});
 
@@ -67,7 +66,7 @@ public class ManagerFragment extends Fragment {
 							public void onItemClick(AdapterView<?> p1, View p2, int selectOp, long p4) {
 								switch (((String) p1.getAdapter().getItem(selectOp))) {
 									case "设置账号":
-										final AccountInfo aci=MainActivity.instance.loginAccounts.get(position);
+										final AccountInfo aci=MainActivity.instance.accountManager.get(position);
 										final EditText et1=new EditText(getActivity());
 										new AlertDialog.Builder(getActivity()).setTitle("账号").setView(et1).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 												@Override
@@ -79,23 +78,19 @@ public class ManagerFragment extends Fragment {
 															@Override
 															public void onClick(DialogInterface p1, int p2) {
 																aci.password = et2.getText().toString();
-																MainActivity.instance.saveConfig();
+																MainActivity.instance.accountManager.saveConfig();
 															}
 														}).show();
 												}
 											}).show();
 										break;
 									case "上移":
-										if (position > 0) {
-											MainActivity.instance.loginAccounts.add(position - 1, MainActivity.instance.loginAccounts.remove(position));
-										} else {
+										if (!MainActivity.instance.accountManager.moveUp(position)) {
 											MainActivity.instance.showToast("已经是最上面了");
 										}
 										break;
 									case "下移":
-										if (position < MainActivity.instance.loginAccounts.size() - 1) {
-											MainActivity.instance.loginAccounts.add(position + 1, MainActivity.instance.loginAccounts.remove(position));
-										} else {
+										if (!MainActivity.instance.accountManager.moveDown(position)) {
 											MainActivity.instance.showToast("已经是最下面了");
 										}
 										break;
@@ -105,7 +100,7 @@ public class ManagerFragment extends Fragment {
 										startActivity(inte);
 										break;
 									case "上传cookie":
-										final AccountInfo aif = MainActivity.instance.loginAccounts.get(position);
+										final AccountInfo aif = MainActivity.instance.accountManager.get(position);
 										MainActivity.instance.threadPool.execute(new Runnable(){
 
 												@Override
@@ -132,18 +127,16 @@ public class ManagerFragment extends Fragment {
 											});
 										break;
 									case "删除":
-										new AlertDialog.Builder(getActivity()).setTitle("确定删除" + MainActivity.instance.loginAccounts.get(position).name + "吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										new AlertDialog.Builder(getActivity()).setTitle("确定删除" + MainActivity.instance.accountManager.get(position).name + "吗").setPositiveButton("确定", new DialogInterface.OnClickListener() {
 												@Override
 												public void onClick(DialogInterface p1, int p2) {
-													MainActivity.instance.loginAccounts.remove(position);
-													MainActivity.instance.saveConfig();
+													MainActivity.instance.accountManager.remove(position);
 													MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
 													BaseIdFragment.createSpinnerList();
 												}
 											}).setNegativeButton("取消", null).show();
 										break;
 								}
-								MainActivity.instance.saveConfig();
 								MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
 								BaseIdFragment.createSpinnerList();
 								selectOpDialog.cancel();
@@ -163,8 +156,7 @@ public class ManagerFragment extends Fragment {
 		}
 		if (resultCode == Activity.RESULT_OK && data != null) {
 			final AccountInfo aci=GSON.fromJson(data.getStringExtra("aci"), AccountInfo.class);
-			MainActivity.instance.loginAccounts.add(aci);
-			MainActivity.instance.saveConfig();
+			MainActivity.instance.accountManager.add(aci);
 			MainActivity.instance.mainAccountAdapter.notifyDataSetChanged();
 			BaseIdFragment.createSpinnerList();
 		} else if (resultCode == Activity.RESULT_CANCELED) {
@@ -203,18 +195,15 @@ public class ManagerFragment extends Fragment {
 				@Override
 				public void run() {
 					MyInfo myInfo = Bilibili.getMyInfo(cookie);
-					for (AccountInfo ai:MainActivity.instance.loginAccounts) {
-						if (ai.uid == myInfo.data.mid) {
-							MainActivity.instance.showToast("已添加过此帐号");
-							return;
-						}
+					if(MainActivity.instance.accountManager.contains(myInfo.data.mid)){
+						MainActivity.instance.showToast("已添加过此帐号");
+						return;
 					}
 					AccountInfo accountInfo = new AccountInfo();
 					accountInfo.cookie = cookie;
 					accountInfo.name = myInfo.data.name;
 					accountInfo.uid = myInfo.data.mid;
-					MainActivity.instance.loginAccounts.add(accountInfo);
-					MainActivity.instance.saveConfig();
+					MainActivity.instance.accountManager.add(accountInfo);
 					MainActivity.instance.runOnUiThread(new Runnable(){
 
 							@Override

@@ -35,6 +35,11 @@
 			android:title="json缓存模式" />
 
 		<CheckBoxPreference
+			android:key="debugLog"
+			android:defaultValue="false"
+			android:title="保存调试信息"/>
+		
+		<CheckBoxPreference
 			android:key="netLog"
 			android:defaultValue="false"
 			android:title="记录网络日志"

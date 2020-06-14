@@ -6,12 +6,14 @@ import java.nio.charset.*;
 public class FileTool {
 	public static void deleteFiles(File folder) {
 		File[] fs = folder.listFiles();
-		for (File f : fs) {
-			if (f.isDirectory()) {
-				deleteFiles(f);
-				f.delete();
-			} else {
-				f.delete();
+		if (fs != null && fs.length > 0) {
+			for (File f : fs) {
+				if (f.isDirectory()) {
+					deleteFiles(f);
+					f.delete();
+				} else {
+					f.delete();
+				}
 			}
 		}
 	}
@@ -64,7 +66,7 @@ public class FileTool {
 		}
 		return filecontent;
 	}
-	
+
 	public static byte[] readBytes(String path) {
 		return readBytes(new File(path));
 	}

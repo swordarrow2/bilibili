@@ -16,14 +16,12 @@ import android.text.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-import com.google.gson.reflect.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.update.*;
 import com.meng.sjfmd.adapters.*;
 import com.meng.sjfmd.customView.*;
 import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.fragment.*;
-import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.tasks.*;
 import java.io.*;
@@ -48,12 +46,9 @@ public class MainActivity extends AppCompatActivity {
 	public HashMap<String,Fragment> fragments = new HashMap<>();
     public TextView tvMemory;
     public final String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0";
-    public ArrayList<AccountInfo> loginAccounts;
-
     public AccountAdapter mainAccountAdapter;
-
-    public String jsonPath;
-    public String mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
+	public AccountManager accountManager;
+	public String mainDic = Environment.getExternalStorageDirectory() + "/Pictures/grzx/";
 
     public static boolean onWifi = false;
 	private RecentAdapter recentAdapter;
@@ -126,25 +121,15 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
 		navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
-
 		ColorStateList csl = getResources().getColorStateList(R.color.navigation_menu_item_color_blue);
         navigationView.setItemTextColor(csl);
         navigationView.setItemIconTintList(csl);
-
-		jsonPath = getFilesDir() + "/account.json";
 		ExceptionCatcher.getInstance().init(getApplicationContext());
 		//  DataBaseHelper.init(getBaseContext());
 		colorManager.addView(new TextView(this), ColorType.StatusBar);
 		colorManager.addView(rightDrawer, ColorType.RightDrawer);
         setListener();
-		File f = new File(jsonPath);
-		if (!f.exists()) {
-			saveConfig();
-		}
-		loginAccounts = GSON.fromJson(FileTool.readString(jsonPath), new TypeToken<ArrayList<AccountInfo>>(){}.getType());
-		if (loginAccounts == null) {
-			loginAccounts = new ArrayList<>();
-		}
+		accountManager = new AccountManager(this);
 		mainAccountAdapter = new AccountAdapter(this);
 		navigationView.addHeaderView(new UserInfoHeaderView(this));
 		for (String s:new String[]{"group/","user/","bilibili/","cache/"}) {
@@ -161,15 +146,20 @@ public class MainActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		}
-		File logF=new File(Environment.getExternalStorageDirectory()+"/log.txt");
-		File logFe=new File(Environment.getExternalStorageDirectory()+"/log.txt");
-		try {
-			PrintStream ps=new PrintStream(new FileOutputStream(logF));
-			System.setOut(ps);
-			PrintStream pse=new PrintStream(new FileOutputStream(logFe));
-			System.setErr(pse);
-		} catch (FileNotFoundException e) {
-			showToast("log文件创建失败");
+		File logF=new File(Environment.getExternalStorageDirectory() + "/log.txt");
+		File logFe=new File(Environment.getExternalStorageDirectory() + "/loge.txt");
+		if (sjfSettings.isSaveDebugLog()) {
+			try {
+				PrintStream ps=new PrintStream(new FileOutputStream(logF));
+				System.setOut(ps);
+				PrintStream pse=new PrintStream(new FileOutputStream(logFe));
+				System.setErr(pse);
+			} catch (FileNotFoundException e) {
+				showToast("log文件创建失败");
+			}
+		} else {
+			logF.delete();
+			logFe.delete();
 		}
 		//mDrawerList.addHeaderView(new UserInfoHeaderView(this));
 		onWifi = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
@@ -322,18 +312,18 @@ public class MainActivity extends AppCompatActivity {
 				case R.id.accounts:
 					showFragment(ManagerFragment.class, IDType.Accounts);
 					break;
-				//case R.id.download:
-				//	showFragment(DownloadFragment.class,IDType.Download);
-				//	break;
+					//case R.id.download:
+					//	showFragment(DownloadFragment.class,IDType.Download);
+					//	break;
 				case R.id.medal:
-					String items[] = new String[MainActivity.instance.loginAccounts.size()];
-					for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {
-						items[i] = MainActivity.instance.loginAccounts.get(i).name;
+					String items[] = new String[accountManager.size()];
+					for (int i=0,j=accountManager.size();i < j;++i) {
+						items[i] = accountManager.get(i).name;
 					}
 					new AlertDialog.Builder(MainActivity.this).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setItems(items, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								showFragment(MedalFragment.class, IDType.Medal, MainActivity.instance.loginAccounts.get(which).uid);
+								showFragment(MedalFragment.class, IDType.Medal, MainActivity.instance.accountManager.get(which).uid);
 							}
 						}).show();
 					break;
@@ -509,82 +499,6 @@ public class MainActivity extends AppCompatActivity {
 		fragments.remove(id);
 	}
 
-	public String getCookie(long bid) {
-        for (AccountInfo l : loginAccounts) {
-            if (bid == l.uid) {
-                return l.cookie;
-            }
-        }
-        return null;
-    }
-
-	public AccountInfo getAccount(long id) {
-		for (AccountInfo ai:loginAccounts) {
-			if (ai.uid == id) {
-				return ai;
-			}
-		}
-		return null;
-	}
-
-	public AccountInfo getAccount(String name) {
-		for (AccountInfo ai:loginAccounts) {
-			if (ai.name.equals(name)) {
-				return ai;
-			}
-		}
-		return null;
-	}
-
-	public int getAccountIndex(long uid) {
-		for (int i=0;i < loginAccounts.size();++i) {
-			if (loginAccounts.get(i).uid == uid) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/*public int getAccountIndex(String name) {
-	 for (int i=0;i < loginAccounts.size();++i) {
-	 if (loginAccounts.get(i).name.equals(name)) {
-	 return i;
-	 }
-	 }
-	 return -1;
-	 }
-	 */
-    public void saveConfig() {
-        try {
-            FileOutputStream fos = null;
-            OutputStreamWriter writer = null;
-            File file = new File(jsonPath);
-            fos = new FileOutputStream(file);
-            writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(GSON.toJson(loginAccounts));
-            writer.flush();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		saveConfig2();
-    }
-
-	public void saveConfig2() {
-        try {
-            FileOutputStream fos = null;
-            OutputStreamWriter writer = null;
-            File file = new File(Environment.getExternalStorageDirectory() + "/account.json");
-            fos = new FileOutputStream(file);
-            writer = new OutputStreamWriter(fos, "utf-8");
-            writer.write(GSON.toJson(loginAccounts));
-            writer.flush();
-            fos.close();
-		} catch (IOException e) {
-            e.printStackTrace();
-		}
-	}
-
 	public void showToast(final String msgAbbr, final String msgOrigin) {
         runOnUiThread(new Runnable() {
 
@@ -599,6 +513,14 @@ public class MainActivity extends AppCompatActivity {
 											   .setIcon(R.drawable.ic_launcher)
 											   .setTitle("全文")
 											   .setMessage(msgOrigin)
+											   .setNegativeButton("复制", new DialogInterface.OnClickListener(){
+
+												   @Override
+												   public void onClick(DialogInterface p1, int p2) {
+													   AndroidContent.copyToClipboard(msgOrigin);
+													   showToast("复制成功");
+												   }
+											   })
 											   .setPositiveButton("确定", null).show();
 									   }
 								   }).show();
@@ -620,6 +542,14 @@ public class MainActivity extends AppCompatActivity {
 											   .setIcon(R.drawable.ic_launcher)
 											   .setTitle("全文")
 											   .setMessage(msg)
+											   .setNegativeButton("复制", new DialogInterface.OnClickListener(){
+
+												   @Override
+												   public void onClick(DialogInterface p1, int p2) {
+													   AndroidContent.copyToClipboard(msg);
+													   showToast("复制成功");
+												   }
+											   })
 											   .setPositiveButton("确定", null).show();
 									   }
 								   }).show();

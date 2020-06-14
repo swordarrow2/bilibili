@@ -36,7 +36,7 @@ public class QRlogin extends Activity {
 				CookieManager cookieManager = CookieManager.getInstance();  
 				cookieManager.setAcceptCookie(true);  
 				cookieManager.removeSessionCookie();//移除  
-				cookieManager.setCookie(url, MainActivity.instance.loginAccounts.get(1).cookie);//cookies是在HttpClient中获得的cookie  
+				cookieManager.setCookie(url, MainActivity.instance.accountManager.get(1).cookie);//cookies是在HttpClient中获得的cookie  
 				CookieSyncManager.getInstance().sync();
 				
 				

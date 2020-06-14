@@ -14,19 +14,19 @@ public class AccountAdapter extends BaseAdapter {
 
     public AccountAdapter(MainActivity context) {
         activity = context;
-		
+
     }
 
     public int getCount() {
-        return activity.loginAccounts.size();
+        return activity.accountManager.size();
     }
 
     public Object getItem(int position) {
-        return activity.loginAccounts.get(position);
+        return activity.accountManager.get(position);
     }
 
     public long getItemId(int position) {
-        return activity.loginAccounts.get(position).hashCode();
+        return activity.accountManager.get(position).hashCode();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -40,7 +40,7 @@ public class AccountAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final AccountInfo accountInfo = activity.loginAccounts.get(position);
+        final AccountInfo accountInfo = activity.accountManager.get(position);
 		holder.tvName.setText(accountInfo.name);
 		holder.tvName.setTextColor(accountInfo.isCookieExceed() ?Color.RED: MainActivity.instance.colorManager.getColorText());
 		File bilibiliImageFile = new File(MainActivity.instance.mainDic + "bilibili/" + accountInfo.uid + ".jpg");

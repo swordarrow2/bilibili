@@ -47,7 +47,7 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 		btnSelect.setOnClickListener(this);
 		btnSend.setOnClickListener(this);
 		selectAccount = (Spinner) view.findViewById(R.id.send_dynamicSpinner_account);
-		for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+		for (AccountInfo ai:MainActivity.instance.accountManager.iterate()) {
 			spList.add(ai.name);
 		}
 		selectAccount.setAdapter(spinnerAccountAdapter = new ArrayAdapter<String>(MainActivity.instance, android.R.layout.simple_list_item_1, spList));
@@ -84,10 +84,10 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 							String result;
 							ArrayList<File> files=selectedImageAdapter.getFiles();
 							if (files.size() == 0) {
-								result = Bilibili.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie);
+								result = Bilibili.sendDynamic(et.getText().toString(), MainActivity.instance.accountManager.getAccount((String)selectAccount.getSelectedItem()).cookie);
 								MainActivity.instance.showToast(result);
 							} else {
-								MainActivity.instance.showToast(Bilibili.sendDynamic(et.getText().toString(), MainActivity.instance.getAccount((String)selectAccount.getSelectedItem()).cookie, files).toString());
+								MainActivity.instance.showToast(Bilibili.sendDynamic(et.getText().toString(), MainActivity.instance.accountManager.getAccount((String)selectAccount.getSelectedItem()).cookie, files).toString());
 							}
 //							if (new JsonParser().parse(result).getAsJsonObject().get("code").getAsInt() == 0) {
 //								MainActivity.instance.showToast("发送成功");

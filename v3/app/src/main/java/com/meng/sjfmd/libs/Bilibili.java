@@ -41,10 +41,14 @@ public class Bilibili {
 		return GSON.fromJson(Network.httpGet("http://api.bilibili.com/x/web-interface/view?aid=" + aid) , VideoInfo.class);
 	}
 
-	public static VideoUrl getVideoUrl(long aid,long cid){
-		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/player/playurl?avid=" + aid + "&cid=" + cid + "&qn=64&type=flv",MainActivity.instance.loginAccounts.get(0).cookie,"https://www.bilibili.com/video/av"+aid),VideoUrl.class);
+	public static VideoUrl getVideoUrl(long aid, long cid, int quality) {
+		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/player/playurl?avid=" + aid + "&cid=" + cid + "&qn=" + quality + "&type=flv", MainActivity.instance.accountManager.get(0).cookie, "https://www.bilibili.com/video/av" + aid), VideoUrl.class);
 	}
-	
+
+	public static VideoUrl getVideoUrl(long aid, long cid) {
+		return getVideoUrl(aid, cid, 64);
+	}
+
 	public static VideoReply getVideoJudge(long aid) {
 		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&sort=1&oid=" + aid), VideoReply.class);
 	}
@@ -58,7 +62,7 @@ public class Bilibili {
 	}
 
 	public static UserInfo getUserInfo(long id) {
-		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.loginAccounts.get(0).cookie), UserInfo.class);
+		return GSON.fromJson(Network.httpGet("https://api.bilibili.com/x/space/acc/info?mid=" + id + "&jsonp=jsonp", MainActivity.instance.accountManager.get(0).cookie), UserInfo.class);
 	}
 
 	public static UidToRoom getUidToRoom(long uid) {

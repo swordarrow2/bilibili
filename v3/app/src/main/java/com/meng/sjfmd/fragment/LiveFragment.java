@@ -13,6 +13,7 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import com.github.clans.fab.*;
 import com.google.gson.*;
+import com.meng.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.sjfmd.customView.*;
@@ -20,6 +21,7 @@ import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
 import com.universalvideoview.*;
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.nio.*;
@@ -64,7 +66,11 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
     private UniversalMediaController mMediaController;
 
 	private boolean isFullscreen;
+
 	private JsonObject liveInfo;
+	private UidToRoom utr;
+	private long uid;
+
 
 	public ArrayList<String> recieved = new ArrayList<>();
 	public ArrayAdapter<String> adapter;
@@ -85,6 +91,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		llInput = (LinearLayout) view.findViewById(R.id.live_fragmentLinearLayout_input);
+		llInput.setBackgroundColor(0xffffffff);
 		send = (ImageButton) view.findViewById(R.id.live_fragment2Button_send);
 		fabSilver = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_silver);
 		fabPack = (FloatingActionButton) view.findViewById(R.id.live_fragment2Button_pack);
@@ -97,7 +104,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 		selectAccount = (Spinner) view.findViewById(R.id.live_fragment2Spinner);
 		fabMilk = (FloatingActionButton) view.findViewById(R.id.livefragmentButtonSerialMilk);
 		fabDownload = (FloatingActionButton) view.findViewById(R.id.livefragmentButtonDownload);
-		fabDownload.setEnabled(false);
+		//fabDownload.setEnabled(false);
 		mVideoLayout = view.findViewById(R.id.videoLayout);
         mBottomLayout = view.findViewById(R.id.live_fragmentLinearLayout_b);
 		mVideoView = (UniversalVideoView) view.findViewById(R.id.videoView);
@@ -175,7 +182,9 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					return true;
 				}
 			});
-
+		if (!MainActivity.instance.sjfSettings.isSaveDebugLog()) {
+			FileTool.deleteFiles(new File(Environment.getExternalStorageDirectory() + "/d/"));
+		}
 		MainActivity.instance.threadPool.execute(new Runnable(){
 
 				@Override
@@ -193,9 +202,9 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 					} catch (Exception e) {
 						return;
 					}
-					long uid=liveToMainInfo.get("uid").getAsLong();
+					uid = liveToMainInfo.get("uid").getAsLong();
 					final String uname=liveToMainInfo.get("uname").getAsString();
-					final UidToRoom sjb = Bilibili.getUidToRoom(uid);
+					utr = Bilibili.getUidToRoom(uid);
 					final byte[] imgbs = NetworkCacher.getNetPicture(Bilibili.getUidToRoom(uid).data.cover);
 					preview = BitmapFactory.decodeByteArray(imgbs, 0, imgbs.length);
 					getActivity().runOnUiThread(new Runnable(){
@@ -203,7 +212,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 							@Override
 							public void run() {
 								img.setImageBitmap(preview);
-								if (sjb.data.liveStatus != 1) {
+								if (utr.data.liveStatus != 1) {
 									info.setText("房间号:" + id + "\n主播:" + uname + "\n未直播");
 									mMediaController.setTitle("未直播");
 									MainActivity.instance.renameFragment(type.toString() + id, uname + "的直播间");
@@ -211,10 +220,9 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 									uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
 									mVideoView.setVideoURI(uri);
 									mVideoView.requestFocus();
-									mMediaController.setTitle(sjb.data.title);
-									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + sjb.data.title);
+									mMediaController.setTitle(utr.data.title);
+									info.setText("房间号:" + id + "\n主播:" + uname + "\n标题:" + utr.data.title);
 									MainActivity.instance.renameFragment(type.toString() + id, uname + "的直播间");
-									MainActivity.instance.showToast("uri:" + uri);
 								}
 							}
 						});
@@ -369,14 +377,34 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 						}
 					}).show();
 				break;
-				/*	case R.id.livefragmentButtonDownload:
-				 // 本地存储路径
-				 final JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
-				 Uri uri = Uri.parse(ja.get(0).getAsJsonObject().get("url").getAsString());
-				 DownloadManager downloadManager=(DownloadManager)getActivity().getSystemService(getActivity().DOWNLOAD_SERVICE);
-				 DownloadManager.Request request=new DownloadManager.Request(uri);
-				 long downloadId=downloadManager.enqueue(request);
-				 break;*/
+			case R.id.livefragmentButtonDownload:
+				JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+				AndroidContent.copyToClipboard(ja.get(0).getAsJsonObject().get("url").getAsString());
+				MainActivity.instance.showToast("已复制到剪贴板,可使用ADM下载直播视频");
+//				MainActivity.instance.threadPool.execute(new Runnable(){
+//
+//						@Override
+//						public void run() {
+//							String fileName = new File(String.format("Live%d %s %s.flv", id, utr.data.title, TimeFormater.getTime())).getName();
+//							JsonArray ja = liveInfo.get("data").getAsJsonObject().get("durl").getAsJsonArray();
+//							String url = ja.get(0).getAsJsonObject().get("url").getAsString();
+//							DownloadManager downloadManager = (DownloadManager)getActivity(). getSystemService(Context.DOWNLOAD_SERVICE);
+//							DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+//							// 通知栏的下载通知
+//							request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//							request.setTitle(fileName);
+//							request.addRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+//							//request.addRequestHeader("Referer", "https://live.bilibili.com/" + id);
+//							request.addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36");
+//							//  request.setMimeType("application/vnd.android.package-archive");
+//							request.setDestinationInExternalFilesDir(getActivity(), Environment.DIRECTORY_DOWNLOADS, fileName);
+//							long downloadId = downloadManager.enqueue(request);
+//							// MainActivity.instance.showToast("task id:"+downloadId,"id:"+id+"  cid:"+cid);
+//							MainActivity.instance.showToast(url);
+//
+//						}
+//					});
+				break;
 		}
 	}
 
@@ -455,6 +483,18 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 
 		@Override
 		public void onMessage(ByteBuffer bs) {
+			if (MainActivity.instance.sjfSettings.isSaveDebugLog()) {
+				try {
+					File binFile=new File(Environment.getExternalStorageDirectory() + "/d/" + System.currentTimeMillis() + ".dat");
+					FileOutputStream fos=new FileOutputStream(binFile);
+					fos.write(bs.array());
+					fos.flush();
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println(e.toString());
+					throw new SJFException(e.toString());
+				}
+			}
 			byte[] bytes=bs.array();
 			int offset=0;
 			do{
@@ -595,6 +635,7 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 			public int op;
 			public int seq;
 			public String body="";
+			public byte[] bodyArray;
 
 			public DataPackage(int opCode, String jsonStr) {
 				byte[] jsonByte=jsonStr.getBytes();
@@ -615,7 +656,20 @@ public class LiveFragment extends BaseIdFragment implements View.OnClickListener
 				version = readShort();
 				op = readInt();
 				seq = readInt();
-				body = new String(data, offset + 16, length - 16, StandardCharsets.UTF_8);
+				bodyArray = new byte[length - 16];
+				for (int i=0;i < bodyArray.length;++i) {
+					bodyArray[i] = data[i + 16];
+				}
+
+				if (version == 1) {
+					body = new String(data, offset + 16, length - 16, StandardCharsets.UTF_8);
+				} else if (version == 2) {
+					//	try {
+					//		DataPackage ndp=new DataPackage(NetWorkUtil.uncompress(bodyArray), 0);
+					//	body=ndp.body;
+					//		} catch (IOException e) {}
+				}
+
 				data = null;
 			}
 

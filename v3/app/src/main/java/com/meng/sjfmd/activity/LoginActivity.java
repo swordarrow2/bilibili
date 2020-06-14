@@ -67,7 +67,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 						case 0:
 							String cookie = UserLoginApi.getCookie(loginResult.data.access_token);
 							MyInfo myInfo = Bilibili.getMyInfo(cookie);
-							for (AccountInfo ai:MainActivity.instance.loginAccounts) {
+							for (AccountInfo ai:MainActivity.instance.accountManager.iterate()) {
 								if (ai.uid == myInfo.data.mid) {
 									LoginActivity.this.runOnUiThread(new Runnable(){
 

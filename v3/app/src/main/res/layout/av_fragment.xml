@@ -73,7 +73,7 @@
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
 				android:src="@drawable/ic_plane"
-				android:layout_gravity="center"
+				android:layout_gravity="bottom|center"
 				android:background="@null"/>
 
 		</LinearLayout>
@@ -160,7 +160,15 @@
 			android:src="@drawable/ic_edit"
 			fab:fab_label="下载"
 			style="@style/MenuButtonsSmall"/>
-		
+
+		<com.github.clans.fab.FloatingActionButton
+			android:id="@+id/av_fragmentButton_copy"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_edit"
+			fab:fab_label="复制地址"
+			style="@style/MenuButtonsSmall"/>
+
 	</com.github.clans.fab.FloatingActionMenu>
 
 </FrameLayout>

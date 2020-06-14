@@ -3,6 +3,7 @@ package com.meng.sjfmd.customView;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
+import android.support.design.widget.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
@@ -10,13 +11,11 @@ import android.widget.ExpandableListView.*;
 import com.meng.biliv3.*;
 import com.meng.biliv3.activity.*;
 import com.meng.sjfmd.adapters.*;
-import com.meng.sjfmd.customView.*;
 import com.meng.sjfmd.enums.*;
 import com.meng.sjfmd.javabean.*;
 import com.meng.sjfmd.libs.*;
 import com.meng.sjfmd.result.*;
 import java.io.*;
-import android.support.design.widget.*;
 
 
 public class UserInfoHeaderView extends LinearLayout implements View.OnClickListener {
@@ -26,7 +25,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
     private TextView tvBMain;
 	private TextView tvBLive;
 	private TextInputLayout til;
-	
+
 	private Button btnStart;
 	private Button btnCopy;
 	private Button btnRename;
@@ -60,7 +59,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
         tvName = (TextView) findViewById(R.id.main_account_list_headerTextView_name);
         tvBMain = (TextView) findViewById(R.id.main_account_list_headerTextView_bmain);
 		tvBLive = (TextView) findViewById(R.id.main_account_list_headerTextView_blive);
-		MainActivity.instance.colorManager.addView(findViewById(R.id.main_account_list_headerLinearLayout_main),ColorType.DrawerHeader);
+		MainActivity.instance.colorManager.addView(findViewById(R.id.main_account_list_headerLinearLayout_main), ColorType.DrawerHeader);
 		btnStart = (Button) findViewById(R.id.main_account_list_headerButton_start);
 		btnRename = (Button) findViewById(R.id.main_account_list_headerButton_rename);
 		newName = (EditText) findViewById(R.id.main_account_list_headerEditText_new_name);
@@ -71,16 +70,16 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 			tvName.setText("点击SJF设置主账号");
 			ivHead.setImageResource(R.drawable.ic_launcher);
 		} else {
-			getInfo(MainActivity.instance.getAccount(mainUID));
+			getInfo(MainActivity.instance.accountManager.getAccount(mainUID));
         }
 		ivHead.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View p1) {
-					String items[] = new String[MainActivity.instance.loginAccounts.size()];
+					String items[] = new String[MainActivity.instance.accountManager.size()];
 					final int[] wi=new int[1];
-					for (int i=0,j=MainActivity.instance.loginAccounts.size();i < j;++i) {
-						items[i] = MainActivity.instance.loginAccounts.get(i).name;
+					for (int i=0,j=MainActivity.instance.accountManager.size();i < j;++i) {
+						items[i] = MainActivity.instance.accountManager.get(i).name;
 					}
 					new AlertDialog.Builder(MainActivity.instance).setIcon(R.drawable.ic_launcher).setTitle("选择账号").setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
 							@Override
@@ -90,7 +89,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 						}).setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								AccountInfo ai=MainActivity.instance.loginAccounts.get(wi[0]);
+								AccountInfo ai=MainActivity.instance.accountManager.get(wi[0]);
 								if (ai == null) {
 									return;
 								}
@@ -113,7 +112,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 						return;
 					}
 					utr = Bilibili.getUidToRoom(mainUid);
-					liveStream = Bilibili.getLiveStream(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+					liveStream = Bilibili.getLiveStream(utr.data.roomid, MainActivity.instance.accountManager.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 					final LivePart livePartList = GSON.fromJson(AndroidContent.readAssetsString("livePart.json"), LivePart.class);
 					if (utr == null | liveStream == null || livePartList == null) {
 						MainActivity.instance.showToast("直播间连接失败");
@@ -123,7 +122,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 							@Override
 							public void run() {
-										if (liveStream != null) {
+								if (liveStream != null) {
 									btnCopy.setEnabled(true);
 									btnCopy.setText("复制推流码");
 								}
@@ -141,7 +140,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 																@Override
 																public void run() {
-																	liveStart = Bilibili.startLive(utr.data.roomid, child.id, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+																	liveStart = Bilibili.startLive(utr.data.roomid, child.id, MainActivity.instance.accountManager.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 																	if (liveStart.code != 0) {
 																		return;
 																	}
@@ -172,7 +171,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 													@Override
 													public void run() {
-														liveStart = Bilibili.startLive(utr.data.roomid, "235", MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+														liveStart = Bilibili.startLive(utr.data.roomid, "235", MainActivity.instance.accountManager.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 														if (liveStart.code != 0) {
 															return;
 														}
@@ -289,7 +288,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 
 										@Override
 										public void run() {
-											if (Bilibili.stopLive(utr.data.roomid, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
+											if (Bilibili.stopLive(utr.data.roomid, MainActivity.instance.accountManager.getCookie(MainActivity.instance.sjfSettings.getMainAccount())).code != 0) {
 												return;
 											}
 											MainActivity.instance.showToast("关播成功");
@@ -315,7 +314,7 @@ public class UserInfoHeaderView extends LinearLayout implements View.OnClickList
 				MainActivity.instance.threadPool.execute(new Runnable() {
 						@Override
 						public void run() {
-							Bilibili.renameLive(utr.data.roomid, name, MainActivity.instance.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
+							Bilibili.renameLive(utr.data.roomid, name, MainActivity.instance.accountManager.getCookie(MainActivity.instance.sjfSettings.getMainAccount()));
 						}
 					});
 				break;
